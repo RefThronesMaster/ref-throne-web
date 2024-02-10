@@ -41,6 +41,12 @@ body {
   }
 }
 
+input,
+button {
+  appearance: none;
+  outline: none;
+}
+
 .chakra-petch-light {
   font-family: "Chakra Petch", sans-serif;
   font-weight: 300;
@@ -99,9 +105,4 @@ body {
   font-family: "Chakra Petch", sans-serif;
   font-weight: 700;
   font-style: italic;
-}
-
-input {
-  appearance: none;
-  outline: none;
 }

@@ -17,6 +17,24 @@ const config: Config = {
       backgroundColor: {
         primary: "#fcfc03",
         secondary: "#404833",
+        yello: {
+          300: "#FCFC03",
+          100: "#FCFDC7",
+        },
+        camo: {
+          300: "#9BA885",
+          400: "#75835D",
+          500: "#404833",
+          700: "#11140C",
+        },
+      },
+      borderColor: {
+        primary: "#fcfc03",
+        secondary: "#404833",
+        yello: {
+          300: "#FCFC03",
+          100: "#FCFDC7",
+        },
         camo: {
           300: "#9BA885",
           400: "#75835D",
@@ -27,6 +45,10 @@ const config: Config = {
       textColor: {
         primary: "#fcfc03",
         secondary: "#404833",
+        yello: {
+          300: "#FCFC03",
+          100: "#FCFDC7",
+        },
         camo: {
           300: "#9BA885",
           400: "#75835D",
@@ -37,6 +59,10 @@ const config: Config = {
       fill: {
         primary: "#fcfc03",
         secondary: "#404833",
+        yello: {
+          300: "#FCFC03",
+          100: "#FCFDC7",
+        },
         camo: {
           300: "#9BA885",
           400: "#75835D",

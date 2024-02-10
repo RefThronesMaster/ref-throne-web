@@ -6,6 +6,7 @@ type ButtonProps = {
   className?: string;
   color?: Color;
   style?: CSSProperties;
+  disabled?: boolean;
   onClick?: () => void;
 };
 
@@ -15,6 +16,7 @@ export const Button = ({
   className,
   onClick,
   style,
+  disabled,
 }: ButtonProps) => {
   let colorSet = "";
   switch (color) {
@@ -34,11 +36,12 @@ export const Button = ({
   return (
     <button
       className={
-        "rounded-sm p-1 px-4" +
+        "rounded-sm" +
         (colorSet ? ` ${colorSet}` : "") +
         (className ? ` ${className}` : "")
       }
       style={style}
+      disabled={disabled}
       onClick={onClick}
     >
       {text}

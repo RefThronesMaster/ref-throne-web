@@ -17,7 +17,7 @@ export const Header = () => {
   const pathname = usePathname();
 
   return (
-    <nav className="flex items-center justify-between">
+    <nav className="flex flex-wrap items-center justify-between">
       <Image
         alt="header_logo"
         src="/assets/images/tor_logo.png"
@@ -28,29 +28,32 @@ export const Header = () => {
         }}
         priority={true}
       />
-      <span>
-        {Object.entries(MENU).map((item) => {
-          const [url, title] = item;
-          return (
-            <Link key={url} href={url}>
-              <Button
-                color="text"
-                text={title}
-                className={
-                  (url != "/" && pathname.includes(url)) || pathname == url
-                    ? "text-primary"
-                    : ""
-                }
-              />
-            </Link>
-          );
-        })}
+      <div className="flex lg:inline-block items-center justify-between w-full lg:w-fit">
+        <div className="lg:inline-block">
+          {Object.entries(MENU).map((item) => {
+            const [url, title] = item;
+            return (
+              <Link key={url} href={url}>
+                <Button
+                  color="text"
+                  text={title}
+                  className={
+                    "text-base py-2 lg:py-1 px-6 lg:px-4" +
+                    ((url != "/" && pathname.includes(url)) || pathname == url
+                      ? " text-primary"
+                      : "")
+                  }
+                />
+              </Link>
+            );
+          })}
+        </div>
         <Button
-          color="primary"
           text={"Connect Wallet"}
+          className="lg:ml-8 bg-yellow-300 text-black active:bg-amber-400"
           style={{ width: 180, height: 36 }}
         />
-      </span>
+      </div>
     </nav>
   );
 };

@@ -1,59 +1,65 @@
-import React, { CSSProperties, ChangeEvent } from "react";
-import { Color, SearchIcon } from ".";
+import React, {
+  CSSProperties,
+  ChangeEvent,
+  HTMLInputTypeAttribute,
+} from "react";
+import { SearchIcon } from ".";
 
 type InputProps = {
-  text?: string;
+  id?: string;
+  type?: HTMLInputTypeAttribute;
   className?: string;
-  color?: Color;
+  placeholder?: string;
   style?: CSSProperties;
-  onClick?: () => void;
+  step?: string | number;
+  readOnly?: boolean;
+  value?: string | number;
+  onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
 };
 
 export const Input = ({
-  text,
-  color,
+  id,
+  type,
   className,
-  onClick,
+  placeholder,
+  onChange,
+  step,
+  readOnly,
   style,
+  value,
 }: InputProps) => {
-  let colorSet = "";
-  switch (color) {
-    case "primary":
-      colorSet = "text-black bg-primary";
-      break;
-    case "secondary":
-      colorSet = "text-black bg-secondary";
-      break;
-    case "text":
-      if (!className?.includes("text-")) colorSet = "text-white";
-      break;
-    default:
-      break;
-  }
-
   return (
-    <button
-      className={
-        "rounded-sm p-1 px-4" +
-        (colorSet ? ` ${colorSet}` : "") +
-        (className ? ` ${className}` : "")
-      }
+    <input
+      id={id}
+      type={type}
+      className={className}
+      placeholder={placeholder}
       style={style}
-      onClick={onClick}
-    >
-      {text}
-    </button>
+      step={step}
+      readOnly={readOnly}
+      onChange={onChange}
+      value={value ?? 0}
+    />
   );
 };
 
-type SerachProps = {
+// export const MemoizedInput = React.memo(Input);
+
+type SearchProps = {
   id: string;
   className?: string;
+  placeholder?: string;
   style?: CSSProperties;
   onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
 };
 
-export const Search = ({ id, className, onChange, style }: SerachProps) => {
+export const Search = ({
+  id,
+  className,
+  placeholder,
+  onChange,
+  style,
+}: SearchProps) => {
   const [focused, setFocused] = React.useState<boolean>(false);
   return (
     <div
@@ -72,8 +78,9 @@ export const Search = ({ id, className, onChange, style }: SerachProps) => {
         style={style}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
+        placeholder={placeholder}
         onChange={onChange}
-      ></input>
+      />
     </div>
   );
 };

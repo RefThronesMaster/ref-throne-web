@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { AccountContext } from "./AccountProvider";
 import React, { ChangeEvent } from "react";
-import { Button, Input, Search } from "@/common/components";
+import { Search } from "@/common/components";
 import { DataTable, DataRowProps } from "@/common/components/DataTable";
 
 const Columns: DataRowProps[] = [
@@ -57,7 +57,7 @@ const SampleRecords = [
   },
 ];
 
-export default function MainPage() {
+export default function PageMain() {
   const { accounts, reqAccounts, getPermissions } =
     React.useContext(AccountContext);
   const onChange = React.useCallback((event: ChangeEvent<HTMLInputElement>) => {

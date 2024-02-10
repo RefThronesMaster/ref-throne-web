@@ -40,7 +40,8 @@ export const Footer = () => {
           alt="BUILT ON BLAST SMALL WORDMARK INVERSE"
           className="mt-2 sm:mt-0 ml-4 md:ml-14"
           width={173}
-          height={43}
+          height={44}
+          style={{ objectFit: "contain" }}
         />
       </div>
     </div>
