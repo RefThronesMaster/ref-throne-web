@@ -15,17 +15,35 @@ const config: Config = {
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
       backgroundColor: {
-        "primary": '#fcfc03',
-        "secondary": '#404833'
+        primary: "#fcfc03",
+        secondary: "#404833",
+        camo: {
+          300: "#9BA885",
+          400: "#75835D",
+          500: "#404833",
+          700: "#11140C",
+        },
       },
       textColor: {
-        "primary": '#fcfc03',
-        "secondary": '#404833'
+        primary: "#fcfc03",
+        secondary: "#404833",
+        camo: {
+          300: "#9BA885",
+          400: "#75835D",
+          500: "#404833",
+          700: "#11140C",
+        },
       },
       fill: {
-        "primary": '#fcfc03',
-        "secondary": '#404833'
-      }
+        primary: "#fcfc03",
+        secondary: "#404833",
+        camo: {
+          300: "#9BA885",
+          400: "#75835D",
+          500: "#404833",
+          700: "#11140C",
+        },
+      },
     },
   },
   plugins: [],

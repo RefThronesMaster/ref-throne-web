@@ -20,7 +20,7 @@ export default function RootLayout({
     <html lang="en">
       <AccountProvider>
         <body className={inter.className}>
-          <main className="flex min-h-screen flex-col p-4 bg-black text-white chakra-petch-regular">
+          <main className="flex min-w-screen min-h-screen flex-col p-4 bg-black text-white chakra-petch-regular">
             <Header />
             {children}
             <Footer />

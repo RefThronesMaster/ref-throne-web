@@ -24,20 +24,21 @@ export const Footer = () => {
         />
         <span>©2024 RefThrones. All rights reserved</span>
       </div>
-      <div className="flex items-end">
+      <div className="flex flex-wrap items-end justify-end">
         <a href="https://github.com" target="_blank">
-          <GithubIcon className="w-8 h-8 fill-primary mr-4" />
+          <GithubIcon className="w-8 h-8 fill-primary" />
         </a>
         <a href="https://twitter.com" target="_blank">
-          <TwitterIcon className="w-8 h-8 fill-primary mr-4" />
+          <TwitterIcon className="w-8 h-8 fill-primary ml-4" />
         </a>
         <a href="https://discord.com" target="_blank">
-          <DiscordIcon className="w-8 h-8 fill-primary mr-20" />
+          <DiscordIcon className="w-8 h-8 fill-primary ml-4" />
         </a>
 
         <Image
           src="https://assets-global.website-files.com/65a6baa1a3f8ed336f415cb4/65bc152b599bdd962b5f813c_Built%20on%20Blast%20Logo%20Small%20Dark.svg"
           alt="BUILT ON BLAST SMALL WORDMARK INVERSE"
+          className="mt-2 sm:mt-0 ml-4 md:ml-14"
           width={173}
           height={43}
         />

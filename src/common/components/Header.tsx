@@ -3,11 +3,10 @@
 import Image from "next/image";
 import { Button } from ".";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { usePathname } from "next/navigation";
 
 const MENU = {
-  "/": "Refereral Thrones",
+  "/": "Referral Thrones",
   "/swap": "TOR Swap",
   "/dashboard": "Dashboard",
   "/guides": "Guides",
@@ -46,21 +45,6 @@ export const Header = () => {
             </Link>
           );
         })}
-        {/* <Link href="/">
-          <Button color="text" text="Referral Thrones" />
-        </Link>
-        <Link href="/swap">
-          <Button color="text" text="TOR Swap" />
-        </Link>
-        <Link href="/dashboard">
-          <Button color="text" text="Dashboard" />
-        </Link>
-        <Link href="/guides">
-          <Button color="text" text="Guides" />
-        </Link>
-        <Link href="/gtor">
-          <Button color="text" text="gTOR Token" />
-        </Link> */}
         <Button
           color="primary"
           text={"Connect Wallet"}
