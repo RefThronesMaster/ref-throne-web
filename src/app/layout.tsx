@@ -20,12 +20,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <AppProvider>
-        <body className={(inter.className, "overflow-y-scroll")}>
-          <main className="flex min-w-screen min-h-screen flex-col p-4 bg-black text-white chakra-petch-regular">
-            <Header />
-            {children}
-            <Footer />
-          </main>
+        <body className={inter.className}>
+          <div className="flex min-w-screen min-h-screen justify-center bg-black text-white chakra-petch-regular">
+            <main className="flex flex-col w-full max-w-[1280px] p-4">
+              <Header />
+              {children}
+              <Footer />
+            </main>
+          </div>
         </body>
       </AppProvider>
     </html>

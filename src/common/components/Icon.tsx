@@ -1,11 +1,11 @@
 import { Color } from ".";
 
-type ButtonProps = {
+type IconProps = {
   className?: string;
   onClick?: () => void;
 };
 
-export const DiscordIcon = ({ className, ...props }: ButtonProps) => {
+export const DiscordIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       id="discord_icon"
@@ -19,7 +19,7 @@ export const DiscordIcon = ({ className, ...props }: ButtonProps) => {
   );
 };
 
-export const TwitterIcon = ({ className, ...props }: ButtonProps) => {
+export const TwitterIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       enableBackground="new 0 0 56.693 56.693"
@@ -38,7 +38,7 @@ export const TwitterIcon = ({ className, ...props }: ButtonProps) => {
     </svg>
   );
 };
-export const GithubIcon = ({ className, ...props }: ButtonProps) => {
+export const GithubIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       enableBackground="new -1163 1657.697 56.693 56.693"
@@ -71,7 +71,7 @@ export const GithubIcon = ({ className, ...props }: ButtonProps) => {
   );
 };
 
-export const SearchIcon = ({ className, ...props }: ButtonProps) => {
+export const SearchIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -88,7 +88,7 @@ export const SearchIcon = ({ className, ...props }: ButtonProps) => {
   );
 };
 
-type SortIconProps = ButtonProps & { order?: "asc" | "desc" | undefined };
+type SortIconProps = IconProps & { order?: "asc" | "desc" | undefined };
 
 export const SortIcon = ({ className, order, ...props }: SortIconProps) => {
   return (
@@ -109,6 +109,27 @@ export const SortIcon = ({ className, order, ...props }: SortIconProps) => {
         opacity={order == "desc" ? 1 : 0.5}
         d="M12 13.125C12.3013 13.125 12.5733 13.3052 12.6907 13.5827C12.8081 13.8601 12.7482 14.1808 12.5384 14.3971L8.53844 18.5221C8.39719 18.6678 8.20293 18.75 8.00002 18.75C7.79711 18.75 7.60285 18.6678 7.46159 18.5221L3.46159 14.3971C3.25188 14.1808 3.19192 13.8601 3.30934 13.5827C3.42676 13.3052 3.69877 13.125 4.00002 13.125H7.25002L7.25002 6C7.25002 5.58579 7.5858 5.25 8.00002 5.25C8.41423 5.25 8.75002 5.58579 8.75002 6L8.75002 13.125L12 13.125Z"
       />
+    </svg>
+  );
+};
+
+export const SwordIcon = ({ className, ...props }: IconProps) => {
+  return (
+    <svg
+      width="20px"
+      height="20px"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+      className={className}
+    >
+      <g>
+        <path fill="none" d="M0 0h24v24H0z" />
+        <path
+          fillRule="nonzero"
+          d="M7.05 13.406l3.534 3.536-1.413 1.414 1.415 1.415-1.414 1.414-2.475-2.475-2.829 2.829-1.414-1.414 2.829-2.83-2.475-2.474 1.414-1.414 1.414 1.413 1.413-1.414zM3 3l3.546.003 11.817 11.818 1.415-1.414 1.414 1.414-2.474 2.475 2.828 2.829-1.414 1.414-2.829-2.829-2.475 2.475-1.414-1.414 1.414-1.415L3.003 6.531 3 3zm14.457 0L21 3.003l.002 3.523-4.053 4.052-3.536-3.535L17.457 3z"
+        />
+      </g>
     </svg>
   );
 };

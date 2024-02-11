@@ -17,21 +17,23 @@ export default function PageSwap() {
       <div className="w-full md:max-w-[450px] rounded-md border border-white">
         <div className="px-4 py-4 flex justify-between divide-x">
           <Button
-            text="Deposit"
             className={
               "chakra-petch-bold text-lg w-1/2 " +
               (mode == "deposit" ? " text-primary" : " text-camo-500")
             }
             onClick={() => setMode("deposit")}
-          />
+          >
+            Deposit
+          </Button>
           <Button
-            text="Withdraw"
             className={
               "chakra-petch-bold text-lg w-1/2" +
               (mode == "withdraw" ? " text-primary" : " text-camo-500")
             }
             onClick={() => setMode("withdraw")}
-          />
+          >
+            Withdraw
+          </Button>
         </div>
         {mode == "deposit" && <Deposit />}
         {mode == "withdraw" && <Withdraw />}
@@ -120,10 +122,11 @@ const Deposit = () => {
             </div>
             <Button
               className="mt-5 mb-2 py-1 w-full chakra-petch-bold rounded-md bg-yellow-100 active:bg-amber-200 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-200 text-black"
-              text="Send transaction"
               disabled={value <= 0}
               onClick={handleTransaction}
-            />
+            >
+              Send transaction
+            </Button>
           </div>
         </div>
       </div>
@@ -212,10 +215,11 @@ const Withdraw = () => {
             </div>
             <Button
               className="mt-5 mb-2 py-1 w-full chakra-petch-bold rounded-md bg-yellow-100 active:bg-amber-200 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-200 text-black"
-              text="Send transaction"
               disabled={value <= 0}
               onClick={handleTransaction}
-            />
+            >
+              Send transaction
+            </Button>
           </div>
         </div>
       </div>

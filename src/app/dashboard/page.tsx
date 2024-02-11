@@ -2,7 +2,7 @@
 
 import { AppContext } from "@/app/AppProvider";
 import React from "react";
-import { DataRowProps, DataTable } from "@/common/components/DataTable";
+import { DataRowProps, DataTable, Dialog } from "@/common/components";
 
 const SampleLeadersRecords = [
   {
@@ -251,3 +251,11 @@ const PanelTitle = ({ name, result, className }: TitleProps) => {
     </div>
   );
 };
+
+// type ModalProps = {
+//   open: boolean;
+// };
+
+// export const UsurpReferralModal = ({ open }: ModalProps) => {
+//   return <Dialog title={"Usurp the Referral Throne"}>asdsadad</Dialog>;
+// };
