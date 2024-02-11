@@ -4,7 +4,7 @@ import Image from "next/image";
 import { AccountContext } from "@/app/AccountProvider";
 import React, { ChangeEvent } from "react";
 import { Button, Input } from "@/common/components";
-
+import { Decimal } from "decimal.js";
 type MODE = "deposit" | "withdraw";
 
 export default function PageSwap() {
@@ -40,14 +40,13 @@ export default function PageSwap() {
   );
 }
 
-export const Deposit = () => {
+const Deposit = () => {
   const [value, setValue] = React.useState<number>(0);
 
   const handleChange = React.useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const { value } = event.target;
       const parsedValue = parseFloat(value);
-
       setValue(parsedValue >= 0 ? parsedValue : 0);
     },
     []
@@ -105,7 +104,7 @@ export const Deposit = () => {
                 id="tor_val"
                 className="w-full h-full py-1 text-right chakra-petch-regular text-white placeholder:text-camo-300 bg-transparent"
               >
-                {(value * 5000).toFixed(2)}
+                {new Decimal(value * 5000).toString()}
               </span>
             </div>
 
@@ -116,7 +115,7 @@ export const Deposit = () => {
             <div className="mt-1 w-full flex justify-between items-center">
               <span className="text-sm">Deposit Fee (1%)</span>
               <span className="text-sm">
-                {Math.round(value * 100) / 10000} ETH
+                {new Decimal(value * 0.01).toString()} ETH
               </span>
             </div>
             <Button
@@ -132,7 +131,7 @@ export const Deposit = () => {
   );
 };
 
-export const Withdraw = () => {
+const Withdraw = () => {
   const [value, setValue] = React.useState<number>(0);
 
   const handleChange = React.useCallback(
@@ -197,7 +196,7 @@ export const Withdraw = () => {
                 id="eth_val"
                 className="w-full h-full py-1 text-right chakra-petch-regular text-white placeholder:text-camo-300 bg-transparent"
               >
-                {Math.round(value * 200) / 1000000}
+                {new Decimal((value * 2) / 1000000).toString()}
               </span>
             </div>
 
@@ -208,7 +207,7 @@ export const Withdraw = () => {
             <div className="mt-1 w-full flex justify-between items-center">
               <span className="text-sm">Deposit Fee (2%)</span>
               <span className="text-sm">
-                {Math.round(value * 200) / 10000} ETH
+                {new Decimal((value * 2) / 10000).toString()} ETH
               </span>
             </div>
             <Button
