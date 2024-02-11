@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { AccountProvider } from "./AccountProvider";
+import { AppProvider } from "./AppProvider";
 import { Footer, Header } from "@/common/components";
+import React from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,15 +19,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <AccountProvider>
-        <body className={inter.className}>
+      <AppProvider>
+        <body className={(inter.className, "overflow-y-scroll")}>
           <main className="flex min-w-screen min-h-screen flex-col p-4 bg-black text-white chakra-petch-regular">
             <Header />
             {children}
             <Footer />
           </main>
         </body>
-      </AccountProvider>
+      </AppProvider>
     </html>
   );
 }

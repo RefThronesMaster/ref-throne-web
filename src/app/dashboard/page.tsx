@@ -1,7 +1,6 @@
 "use client";
 
-import Image from "next/image";
-import { AccountContext } from "@/app/AccountProvider";
+import { AppContext } from "@/app/AppProvider";
 import React from "react";
 import { DataRowProps, DataTable } from "@/common/components/DataTable";
 
@@ -61,7 +60,7 @@ const SampleMyReferralsRecords = [
 
 export default function PageDashboard() {
   const { accounts, reqAccounts, getPermissions } =
-    React.useContext(AccountContext);
+    React.useContext(AppContext);
 
   const ColumnsLeaders: DataRowProps[] = React.useMemo(
     () => [

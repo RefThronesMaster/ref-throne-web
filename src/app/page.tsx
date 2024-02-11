@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { AccountContext } from "./AccountProvider";
+import { AppContext } from "./AppProvider";
 import React, { ChangeEvent } from "react";
 import { Search } from "@/common/components";
 import { DataTable, DataRowProps } from "@/common/components/DataTable";
@@ -59,7 +59,7 @@ const SampleRecords = [
 
 export default function PageMain() {
   const { accounts, reqAccounts, getPermissions } =
-    React.useContext(AccountContext);
+    React.useContext(AppContext);
   const onChange = React.useCallback((event: ChangeEvent<HTMLInputElement>) => {
     console.log(event.target.value);
   }, []);

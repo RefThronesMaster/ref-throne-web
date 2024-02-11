@@ -1,12 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { AccountContext } from "@/app/AccountProvider";
+import { AppContext } from "@/app/AppProvider";
 import React from "react";
 
 export default function Home() {
   const { accounts, reqAccounts, getPermissions } =
-    React.useContext(AccountContext);
+    React.useContext(AppContext);
 
   return (
     <div className="mt-10">

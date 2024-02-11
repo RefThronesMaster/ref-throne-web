@@ -3,8 +3,15 @@
 import React from "react";
 
 import { Web3ContextProvider } from "@/libs/web3/components/Web3ContextProvider";
+import { Connector } from "@web3-react/types";
+import {
+  ConnectionType,
+  PRIORITIZED_CONNECTORS,
+  getConnection,
+} from "@/libs/web3/connections";
+import { Web3ReactProvider } from "@web3-react/core";
 
-interface IAccountContext {
+interface IAppContext {
   accounts: [];
   // setLoading: (loading: boolean) => void;
   reqAccounts: () => void;
@@ -12,18 +19,30 @@ interface IAccountContext {
   getPermissions: () => void;
 }
 
-export const AccountContext = React.createContext<IAccountContext>({
+export const AppContext = React.createContext<IAppContext>({
   accounts: [],
   reqAccounts: () => {},
   loadAccounts: () => {},
   getPermissions: () => {},
 });
 
-export const AccountProvider = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
+async function connect(connector: Connector) {
+  try {
+    if (connector.connectEagerly) {
+      await connector.connectEagerly();
+    } else {
+      await connector.activate();
+    }
+  } catch (error) {
+    console.debug(`web3-react eager connection error: ${error}`);
+  }
+}
+
+const connectEagerly = async () => {
+  await connect(getConnection(ConnectionType.NETWORK).connector);
+};
+
+export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [accounts, setAccounts] = React.useState<any>([]);
 
   const reqAccounts = React.useCallback(async () => {
@@ -83,15 +102,27 @@ export const AccountProvider = ({
 
   React.useEffect(() => {
     window.Buffer = Buffer;
-    loadAccounts();
+    if (window?.ethereum) {
+      window.ethereum.autoRefreshOnNetworkChange = false;
+      console.log("autoRefreshOnNetworkChange off");
+    }
+    // loadAccounts();
+    connectEagerly();
     return () => {};
   }, [loadAccounts]);
 
   return (
-    <AccountContext.Provider
+    <AppContext.Provider
       value={{ accounts, reqAccounts, loadAccounts, getPermissions }}
     >
-      <Web3ContextProvider>{children}</Web3ContextProvider>
-    </AccountContext.Provider>
+      <Web3ReactProvider
+        connectors={Object.values(PRIORITIZED_CONNECTORS).map((connector) => [
+          connector.connector,
+          connector.hooks,
+        ])}
+      >
+        {children}
+      </Web3ReactProvider>
+    </AppContext.Provider>
   );
 };

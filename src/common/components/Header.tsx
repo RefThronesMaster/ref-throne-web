@@ -4,6 +4,8 @@ import Image from "next/image";
 import { Button } from ".";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import React from "react";
+import { AppContext, AppProvider } from "@/app/AppProvider";
 
 const MENU = {
   "/": "Referral Thrones",
@@ -15,7 +17,16 @@ const MENU = {
 
 export const Header = () => {
   const pathname = usePathname();
+  const { accounts, getPermissions, reqAccounts } =
+    React.useContext(AppContext);
 
+  const handleConnect = React.useCallback(() => {}, []);
+  console.log(accounts);
+
+  React.useEffect(() => {
+    if (accounts?.length) {
+    }
+  }, [accounts]);
   return (
     <nav className="flex flex-wrap items-center justify-between">
       <Image
@@ -52,6 +63,7 @@ export const Header = () => {
           text={"Connect Wallet"}
           className="lg:ml-8 bg-yellow-300 text-black active:bg-amber-400"
           style={{ width: 180, height: 36 }}
+          onClick={handleConnect}
         />
       </div>
     </nav>
