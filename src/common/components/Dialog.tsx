@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { EventHandler, MouseEvent } from "react";
 import { Button } from ".";
 
 type DialogProps = {
@@ -29,18 +29,44 @@ export const Dialog = ({
   btnClose,
   onClose,
 }: DialogProps) => {
-  const handleWrapper = React.useCallback((evt: any) => {
+  const wrapperRef = React.createRef<HTMLDivElement>();
+  const beforeRef = React.useRef<HTMLElement>();
+
+  const handleWrapper = React.useCallback((evt: MouseEvent<HTMLElement>) => {
     evt.stopPropagation();
   }, []);
 
+  const handleMouseDown = React.useCallback(
+    (event: MouseEvent<HTMLElement>) => {
+      beforeRef.current = event.target as HTMLElement;
+    },
+    []
+  );
+
+  const handleMouseUp = React.useCallback(
+    (event: MouseEvent<HTMLElement>) => {
+      if (
+        beforeRef.current == wrapperRef.current &&
+        beforeRef.current == (event.target as HTMLElement)
+      ) {
+        onClose && onClose();
+      }
+      beforeRef.current = undefined;
+    },
+    [wrapperRef, onClose]
+  );
+
   return (
     <div
+      ref={wrapperRef}
       className="fixed top-0 left-0 flex items-center justify-center w-full h-screen z-[98] backdrop-blur-sm bg-white/30 touch-none"
-      onClick={onClose}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
     >
       <div
         className="w-[calc(100%_-_32px)] md:max-w-[480px] border border-white bg-black text-white rounded-lg p-4"
         onClick={handleWrapper}
+        onMouseUp={handleWrapper}
       >
         <div className="p-1 text-center text-primary text-lg chakra-petch-medium">
           {title}
