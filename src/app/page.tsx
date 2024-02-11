@@ -3,38 +3,8 @@
 import Image from "next/image";
 import { AccountContext } from "./AccountProvider";
 import React, { ChangeEvent } from "react";
-import { Search } from "@/common/components";
+import { Search, SwordIcon } from "@/common/components";
 import { DataTable, DataRowProps } from "@/common/components/DataTable";
-
-const Columns: DataRowProps[] = [
-  { field: "throne", displayName: "Throne", value: (row) => row["throne"] },
-  {
-    field: "service",
-    displayName: "Service Type",
-    value: (row) => row["service"],
-  },
-  {
-    field: "referrer",
-    displayName: "Referrer",
-    value: (row) => row["referrer"],
-  },
-  {
-    field: "referral_code",
-    displayName: "Referral Code",
-    value: (row) => row["referral_code"],
-  },
-  { field: "benefit", displayName: "Benefit", value: (row) => row["benefit"] },
-  {
-    field: "price",
-    displayName: "Price of the throne",
-    value: (row) => row["price"],
-  },
-  {
-    field: "link",
-    displayName: "Link [Verified]",
-    value: (row) => row["link"],
-  },
-];
 
 const SampleRecords = [
   {
@@ -63,6 +33,50 @@ export default function PageMain() {
   const onChange = React.useCallback((event: ChangeEvent<HTMLInputElement>) => {
     console.log(event.target.value);
   }, []);
+
+  const Columns: DataRowProps[] = React.useMemo(
+    () => [
+      { field: "throne", displayName: "Throne", value: (row) => row["throne"] },
+      {
+        field: "service",
+        displayName: "Service Type",
+        value: (row) => row["service"],
+      },
+      {
+        field: "referrer",
+        displayName: "Referrer",
+        value: (row) => row["referrer"],
+      },
+      {
+        field: "referral_code",
+        displayName: "Referral Code",
+        value: (row) => row["referral_code"],
+      },
+      {
+        field: "benefit",
+        displayName: "Benefit",
+        value: (row) => row["benefit"],
+      },
+      {
+        field: "price",
+        displayName: "Price of the throne",
+        value: (row) => (
+          <div className="flex items-center justify-end">
+            <span>{row["price"]}</span>
+            <span>
+              <SwordIcon className="ml-1 w-6 h-6 fill-primary" />
+            </span>
+          </div>
+        ),
+      },
+      {
+        field: "link",
+        displayName: "Link [Verified]",
+        value: (row) => row["link"],
+      },
+    ],
+    []
+  );
 
   return (
     <div className="mt-10">
