@@ -26,8 +26,8 @@ export const DataTable = React.memo(function FnDataTable({
   data,
 }: DataTableProps) {
   return (
-    <div className="flex w-full flex-wrap items-end justify-between mt-4 overflow-x-scroll md:overflow-hidden md:table-fixed">
-      <table className="w-full" cellPadding={0} cellSpacing={0}>
+    <div className="flex w-full flex-wrap items-end justify-between mt-4 overflow-x-scroll">
+      <table className="min-w-[1248px]" cellPadding={0} cellSpacing={0}>
         <colgroup>
           {columns?.map((column, idx) => (
             <col key={idx} width={column.width} />

@@ -63,19 +63,19 @@ export default function PageMain() {
         {
           field: "service",
           displayName: "Throne",
-          width: 80,
+          width: 140,
           value: (row: TService) => row.service,
         },
         {
           field: "serviceType",
           displayName: "Service Type",
-          width: 80,
+          width: 140,
           value: (row: TService) => row.serviceType,
         },
         {
           field: "referrer",
           displayName: "Referrer",
-          width: 80,
+          width: 140,
           value: (row: TService) =>
             `${row.referrer.substring(0, 5)}...${row.referrer.substring(
               row.referrer.length - 2
@@ -84,19 +84,19 @@ export default function PageMain() {
         {
           field: "referral_code",
           displayName: "Referral Code",
-          width: 80,
+          width: 130,
           value: (row: TService) => row.referral_code,
         },
         {
           field: "benefit",
           displayName: "Benefit",
-          width: 80,
+          width: 150,
           value: (row: TService) => `${row.benefit} ${row.benefitType}`,
         },
         {
           field: "price",
           displayName: "Price of the throne",
-          width: 80,
+          width: 170,
           value: (row: TService) => (
             <div className="flex items-center">
               <span>{row.price}</span>
@@ -115,7 +115,7 @@ export default function PageMain() {
         {
           field: "link",
           displayName: "Link [Verified]",
-          width: 80,
+          width: "*",
           value: (row: TService) =>
             `${row.link.substring(0, 16)}...${row.link.substring(
               row.link.length - 6
