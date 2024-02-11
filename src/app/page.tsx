@@ -12,7 +12,7 @@ import {
   Dialog,
   Input,
 } from "@/common/components";
-
+import { useWeb3React } from "@web3-react/core";
 const SampleRecords: TService[] = [
   {
     service: "Binance",
@@ -56,7 +56,9 @@ export default function PageMain() {
 
   const [open, setOpen] = React.useState<boolean>(false);
   const [selected, setSelected] = React.useState<TService | undefined>();
+  const { chainId, account, isActive } = useWeb3React();
 
+  console.log({ chainId, account, isActive });
   const Columns: DataRowProps[] = React.useMemo(
     () =>
       [
