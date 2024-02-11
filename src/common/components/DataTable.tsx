@@ -20,9 +20,13 @@ export type DataTableProps = {
   data: any[];
 };
 
-const FnDataTable = ({ className, columns, data }: DataTableProps) => {
+export const DataTable = React.memo(function FnDataTable({
+  className,
+  columns,
+  data,
+}: DataTableProps) {
   return (
-    <div className="flex w-full items-end justify-between mt-4">
+    <div className="flex w-full flex-wrap items-end justify-between mt-4 overflow-x-scroll md:overflow-hidden md:table-fixed">
       <table className="w-full" cellPadding={0} cellSpacing={0}>
         <colgroup>
           {columns?.map((column, idx) => (
@@ -63,6 +67,4 @@ const FnDataTable = ({ className, columns, data }: DataTableProps) => {
       </table>
     </div>
   );
-};
-
-export const DataTable = React.memo(FnDataTable);
+});

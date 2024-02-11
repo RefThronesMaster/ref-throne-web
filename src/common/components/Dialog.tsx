@@ -10,6 +10,7 @@ type DialogProps = {
   btnConfirm?: {
     label?: string | React.ReactNode;
     btnClass?: string;
+    disabled?: boolean;
     onClick?: () => void;
   };
   btnClose?: {
@@ -34,18 +35,18 @@ export const Dialog = ({
 
   return (
     <div
-      className="fixed top-0 left-0 w-full h-screen flex items-center justify-center z-[99] bg-white bg-opacity-30"
+      className="fixed top-0 left-0 flex items-center justify-center w-full h-screen z-[98] backdrop-blur-sm bg-white/30 touch-none"
       onClick={onClose}
     >
       <div
-        className="w-[calc(100%_-_32px)] md:max-w-[480px] border border-white bg-black text-white rounded-lg p-2"
+        className="w-[calc(100%_-_32px)] md:max-w-[480px] border border-white bg-black text-white rounded-lg p-4"
         onClick={handleWrapper}
       >
-        <div className="p-3 text-center text-primary text-lg chakra-petch-medium">
+        <div className="p-1 text-center text-primary text-lg chakra-petch-medium">
           {title}
         </div>
-        <div className="">{children}</div>
-        <div className="">
+        <div className="my-4">{children}</div>
+        <div className="text-center">
           {btnClose?.label && (
             <Button className={btnClose?.btnClass} onClick={btnClose?.onClick}>
               {btnClose.label}
@@ -54,6 +55,7 @@ export const Dialog = ({
           {btnConfirm?.label && (
             <Button
               className={btnConfirm?.btnClass}
+              disabled={btnConfirm?.disabled}
               onClick={btnConfirm?.onClick}
             >
               {btnConfirm.label}
