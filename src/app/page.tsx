@@ -98,19 +98,17 @@ export default function PageMain() {
           displayName: "Price of the throne",
           width: 80,
           value: (row: TService) => (
-            <div className="flex items-center justify-end">
+            <div className="flex items-center">
               <span>{row.price}</span>
-              <span>
-                <Button
-                  className="mx-1"
-                  onClick={() => {
-                    setOpen(true);
-                    setSelected(row);
-                  }}
-                >
-                  <SwordIcon className="w-6 h-6 fill-primary" />
-                </Button>
-              </span>
+              <Button
+                className="mx-1"
+                onClick={() => {
+                  setOpen(true);
+                  setSelected(row);
+                }}
+              >
+                <SwordIcon className="w-6 h-6 fill-primary" />
+              </Button>
             </div>
           ),
         },
