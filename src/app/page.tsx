@@ -50,6 +50,9 @@ export default function PageMain() {
     console.log(event.target.value);
   }, []);
 
+  const [open, setOpen] = React.useState<boolean>(false);
+  const [selected, setSelected] = React.useState<TService | undefined>();
+
   const Columns: DataRowProps[] = React.useMemo(
     () => [
       {
@@ -86,7 +89,8 @@ export default function PageMain() {
             <span>
               <Button
                 onClick={() => {
-                  console.log(row);
+                  setOpen(true);
+                  setSelected(row);
                 }}
               >
                 <SwordIcon className="ml-1 w-6 h-6 fill-primary" />
@@ -140,21 +144,26 @@ export default function PageMain() {
           <DataTable columns={Columns} data={SampleRecords} />
         </div>
       </div>
-      {/* <UsurpReferralModal open={true} /> */}
+      <UsurpReferralModal open={open} onClose={() => setOpen(false)} />
     </div>
   );
 }
 
 type ModalProps = {
   open: boolean;
+  onClose?: () => void;
 };
 type UsurpReferralModal = ModalProps & {
   data?: TService;
 };
 
-export const UsurpReferralModal = ({ open, data }: UsurpReferralModal) => {
+export const UsurpReferralModal = ({
+  open,
+  data,
+  onClose,
+}: UsurpReferralModal) => {
   return open ? (
-    <Dialog title={"Usurp the Referral Throne"}>
+    <Dialog title={"Usurp the Referral Throne"} onClose={onClose}>
       <div>
         <label>
           <span>Service</span>

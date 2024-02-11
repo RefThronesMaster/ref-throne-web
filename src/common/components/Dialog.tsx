@@ -28,10 +28,22 @@ export const Dialog = ({
   btnClose,
   onClose,
 }: DialogProps) => {
+  const handleWrapper = React.useCallback((evt: any) => {
+    evt.stopPropagation();
+  }, []);
+
   return (
-    <div className="fixed top-0 left-0 w-full h-screen flex items-center justify-center z-[99] bg-white bg-opacity-30">
-      <div className="w-[calc(100%_-_32px)] md:max-w-[480px] border border-white bg-black text-white rounded-lg p-2">
-        <div className="p-3 text-center text-primary text-lg chakra-petch-medium">{title}</div>
+    <div
+      className="fixed top-0 left-0 w-full h-screen flex items-center justify-center z-[99] bg-white bg-opacity-30"
+      onClick={onClose}
+    >
+      <div
+        className="w-[calc(100%_-_32px)] md:max-w-[480px] border border-white bg-black text-white rounded-lg p-2"
+        onClick={handleWrapper}
+      >
+        <div className="p-3 text-center text-primary text-lg chakra-petch-medium">
+          {title}
+        </div>
         <div className="">{children}</div>
         <div className="">
           {btnClose?.label && (

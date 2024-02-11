@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import { SortIcon } from ".";
 
 export type DataRowProps = {
@@ -20,7 +20,7 @@ export type DataTableProps = {
   data: any[];
 };
 
-export const DataTable = ({ className, columns, data }: DataTableProps) => {
+const FnDataTable = ({ className, columns, data }: DataTableProps) => {
   return (
     <div className="flex w-full items-end justify-between mt-4">
       <table className="w-full" cellPadding={0} cellSpacing={0}>
@@ -32,7 +32,10 @@ export const DataTable = ({ className, columns, data }: DataTableProps) => {
         <thead>
           <tr>
             {columns?.map((column, idx) => (
-              <th key={idx} className="text-sm chakra-petch-regular py-4 px-2 bg-camo-700">
+              <th
+                key={idx}
+                className="text-sm chakra-petch-regular py-4 px-2 bg-camo-700"
+              >
                 <div className="flex items-center">
                   <span>{column.displayName}</span>
                   <span>
@@ -61,3 +64,5 @@ export const DataTable = ({ className, columns, data }: DataTableProps) => {
     </div>
   );
 };
+
+export const DataTable = React.memo(FnDataTable);
