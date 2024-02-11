@@ -36,23 +36,25 @@ export const Header = () => {
               <Link key={url} href={url}>
                 <Button
                   color="text"
-                  text={title}
                   className={
                     "text-base py-2 lg:py-1 px-6 lg:px-4" +
                     ((url != "/" && pathname.includes(url)) || pathname == url
                       ? " text-primary"
                       : "")
                   }
-                />
+                >
+                  {title}
+                </Button>
               </Link>
             );
           })}
         </div>
         <Button
-          text={"Connect Wallet"}
           className="lg:ml-8 bg-yellow-300 text-black active:bg-amber-400"
           style={{ width: 180, height: 36 }}
-        />
+        >
+          Connect Wallet
+        </Button>
       </div>
     </nav>
   );

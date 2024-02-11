@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { AccountContext } from "./AccountProvider";
 import React, { ChangeEvent } from "react";
-import { Search, SwordIcon } from "@/common/components";
+import { Button, Search, SwordIcon } from "@/common/components";
 import { DataTable, DataRowProps } from "@/common/components/DataTable";
 
 const SampleRecords = [
@@ -64,7 +64,13 @@ export default function PageMain() {
           <div className="flex items-center justify-end">
             <span>{row["price"]}</span>
             <span>
-              <SwordIcon className="ml-1 w-6 h-6 fill-primary" />
+              <Button
+                onClick={() => {
+                  console.log(row);
+                }}
+              >
+                <SwordIcon className="ml-1 w-6 h-6 fill-primary" />
+              </Button>
             </span>
           </div>
         ),

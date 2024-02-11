@@ -1,8 +1,8 @@
-import { CSSProperties } from "react";
+import React, { CSSProperties } from "react";
 import { Color } from ".";
 
 type ButtonProps = {
-  text: string;
+  children: string | number | React.ReactNode;
   className?: string;
   color?: Color;
   style?: CSSProperties;
@@ -11,7 +11,7 @@ type ButtonProps = {
 };
 
 export const Button = ({
-  text,
+  children,
   color,
   className,
   onClick,
@@ -44,7 +44,7 @@ export const Button = ({
       disabled={disabled}
       onClick={onClick}
     >
-      {text}
+      {children}
     </button>
   );
 };
