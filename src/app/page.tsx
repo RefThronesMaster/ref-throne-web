@@ -3,13 +3,19 @@
 import Image from "next/image";
 import { AccountContext } from "./AccountProvider";
 import React, { ChangeEvent } from "react";
-import { Button, Search, SwordIcon } from "@/common/components";
-import { DataTable, DataRowProps } from "@/common/components/DataTable";
+import {
+  Button,
+  Search,
+  SwordIcon,
+  DataTable,
+  DataRowProps,
+  Dialog,
+} from "@/common/components";
 
 const SampleRecords = [
   {
-    throne: "Binance",
-    service: "CEX",
+    service: "Binance",
+    serviceType: "CEX",
     referrer: "0xC2334441231233",
     referral_code: "HBD887JH",
     benefit: "30% discount on fees",
@@ -17,8 +23,8 @@ const SampleRecords = [
     link: "https://hhydasdasdasda.co.kr",
   },
   {
-    throne: "OKX",
-    service: "CEX",
+    service: "OKX",
+    serviceType: "CEX",
     referrer: "0x98HASDSADB7D",
     referral_code: "NMO187hJ",
     benefit: "200 USDT",
@@ -26,6 +32,16 @@ const SampleRecords = [
     link: "https://okxd.asssdsd.co.kr",
   },
 ];
+
+type TService = {
+  service: string;
+  serviceType: "CEX" | "DEX";
+  referrer: string;
+  referral_code: string;
+  benefit: string;
+  price: number;
+  link: string;
+};
 
 export default function PageMain() {
   const { accounts, reqAccounts, getPermissions } =
@@ -36,33 +52,37 @@ export default function PageMain() {
 
   const Columns: DataRowProps[] = React.useMemo(
     () => [
-      { field: "throne", displayName: "Throne", value: (row) => row["throne"] },
       {
         field: "service",
+        displayName: "Throne",
+        value: (row: TService) => row.service,
+      },
+      {
+        field: "serviceType",
         displayName: "Service Type",
-        value: (row) => row["service"],
+        value: (row: TService) => row.serviceType,
       },
       {
         field: "referrer",
         displayName: "Referrer",
-        value: (row) => row["referrer"],
+        value: (row: TService) => row.referrer,
       },
       {
         field: "referral_code",
         displayName: "Referral Code",
-        value: (row) => row["referral_code"],
+        value: (row: TService) => row.referral_code,
       },
       {
         field: "benefit",
         displayName: "Benefit",
-        value: (row) => row["benefit"],
+        value: (row: TService) => row.benefit,
       },
       {
         field: "price",
         displayName: "Price of the throne",
-        value: (row) => (
+        value: (row: TService) => (
           <div className="flex items-center justify-end">
-            <span>{row["price"]}</span>
+            <span>{row.price}</span>
             <span>
               <Button
                 onClick={() => {
@@ -78,7 +98,7 @@ export default function PageMain() {
       {
         field: "link",
         displayName: "Link [Verified]",
-        value: (row) => row["link"],
+        value: (row: TService) => row.link,
       },
     ],
     []
@@ -120,6 +140,35 @@ export default function PageMain() {
           <DataTable columns={Columns} data={SampleRecords} />
         </div>
       </div>
+      {/* <UsurpReferralModal open={true} /> */}
     </div>
   );
 }
+
+type ModalProps = {
+  open: boolean;
+};
+type UsurpReferralModal = ModalProps & {
+  data?: TService;
+};
+
+export const UsurpReferralModal = ({ open, data }: UsurpReferralModal) => {
+  return open ? (
+    <Dialog title={"Usurp the Referral Throne"}>
+      <div>
+        <label>
+          <span>Service</span>
+          <span>{data?.service}</span>
+        </label>
+      </div>
+      <div>
+        <label>
+          <span>Service Type</span>
+          <span>{data?.serviceType}</span>
+        </label>
+      </div>
+    </Dialog>
+  ) : (
+    <></>
+  );
+};
