@@ -35,6 +35,7 @@ export const Button = ({
 
   return (
     <button
+      type="button"
       className={
         "rounded-sm" +
         (colorSet ? ` ${colorSet}` : "") +

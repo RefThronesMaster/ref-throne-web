@@ -59,8 +59,7 @@ const SampleMyReferralsRecords = [
 ];
 
 export default function PageDashboard() {
-  const { accounts, reqAccounts, getPermissions } =
-    React.useContext(AppContext);
+  // const { web3Client } = React.useContext(AppContext);
 
   const ColumnsLeaders: DataRowProps[] = React.useMemo(
     () => [

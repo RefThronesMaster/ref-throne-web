@@ -8,8 +8,8 @@ import { Decimal } from "decimal.js";
 type MODE = "deposit" | "withdraw";
 
 export default function PageSwap() {
-  const { accounts, reqAccounts, getPermissions } =
-    React.useContext(AppContext);
+  // const { accounts, reqAccounts, getPermissions } =
+  //   React.useContext(AppContext);
   const [mode, setMode] = React.useState<MODE>("deposit");
 
   return (

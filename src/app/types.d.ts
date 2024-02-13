@@ -9,5 +9,7 @@ interface Window {
     request<T = any>(args: any): Promise<T>;
     isMetaMask?: true;
     autoRefreshOnNetworkChange?: boolean;
+    selectedAddress: string;
+    enable: () => void;
   };
 }

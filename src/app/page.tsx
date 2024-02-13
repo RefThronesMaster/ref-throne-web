@@ -12,7 +12,7 @@ import {
   Dialog,
   Input,
 } from "@/common/components";
-import { useWeb3React } from "@web3-react/core";
+
 const SampleRecords: TService[] = [
   {
     service: "Binance",
@@ -48,17 +48,21 @@ type TService = {
 };
 
 export default function PageMain() {
-  const { accounts, reqAccounts, getPermissions } =
-    React.useContext(AppContext);
+  // const { web3Client, account } = React.useContext(AppContext);
   const onChange = React.useCallback((event: ChangeEvent<HTMLInputElement>) => {
     console.log(event.target.value);
   }, []);
 
   const [open, setOpen] = React.useState<boolean>(false);
   const [selected, setSelected] = React.useState<TService | undefined>();
-  const { chainId, account, isActive } = useWeb3React();
+  // const { chainId, account, isActive } = useWeb3React();
 
-  console.log({ chainId, account, isActive });
+  React.useEffect(() => {
+    // web3Client?.eth.
+    // console.log(web3Client?.eth.defaultAccount);
+  }, []);
+  // console.log(account);
+  // console.log({ chainId, account, isActive });
   const Columns: DataRowProps[] = React.useMemo(
     () =>
       [
