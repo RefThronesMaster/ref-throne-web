@@ -6,7 +6,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 import { AppContext, AppProvider } from "@/app/AppProvider";
-import { ABI } from "@/libs/web3/abi";
+import {
+  EthTreasuryContract,
+  RefThroneContract,
+  TORTokenContract,
+} from "@/libs/web3/abi";
 import { useWeb3React } from "@web3-react/core";
 import { hooks, metaMask } from "@/libs/web3/connectors/metamask";
 import {
@@ -43,14 +47,14 @@ export const Header = () => {
   const provider = useProvider();
   const ENSNames = useENSNames(provider);
 
-  console.log({
-    chainId,
-    accounts,
-    isActivating,
-    isActive,
-    provider,
-    ENSNames,
-  });
+  // console.log({
+  //   chainId,
+  //   accounts,
+  //   isActivating,
+  //   isActive,
+  //   provider,
+  //   ENSNames,
+  // });
 
   // React.useEffect(() => {
   //   void metaMask
@@ -77,33 +81,60 @@ export const Header = () => {
 
   const handleConnect = React.useCallback(async () => {
     if (CHAIN_IDS.BLAST_SEPOLIA == chainId) {
-      // connector.provider
-      //   ?.request({ method: "eth_accounts" })
-      //   .then((res) => console.log({ res }));
       const web3 = new Web3(connector.provider);
       const contract = new web3.eth.Contract(
-        ABI,
-        "0x3A9bb1987B486c6C1518879683F84a8da5E73A36"
+        RefThroneContract.ABI,
+        RefThroneContract.ADDRESS
       );
+
+      // contract.methods
+      //   .getServiceTypes()
+      //   .call()
+      //   .then((res) => console.log({ getServiceTypes: res }))
+      //   .catch((err) => console.log({ getServiceTypes: err }));
+      // contract.methods
+      //   .getBenefitTypes()
+      //   .call()
+      //   .then((res) => console.log({ getBenefitTypes: res }))
+      //   .catch((err) => console.log({ getBenefitTypes: err }));
       contract.methods
-        ._totalEthBalance()
-        .call()
-        .then((res) => console.log(res));
-      // connector.provider
-      //   ?.request({
-      //     method: "totalSupply",
-      //     params: {
-      //       address: "0xF7a2a089fb174f7e3d283b8d314B099f299324b3",
-      //     },
-      //   })
-      //   .then((res) => console.log({ res }));
+        .getAllOwnedThrones()
+        .call({})
+        .then((res) => console.log({ getAllOwnedThrones: res }))
+        .catch((err) => console.log({ getAllOwnedThrones: err }));
+      // contract.methods
+      //   ._totalEthBalance()
+      //   .call()
+      //   .then((res) => console.log({ _totalEthBalance: res }));
+      // contract.methods
+      //   .getEthBalance()
+      //   .call()
+      //   .then((res) => console.log({ getEthBalance: res }))
+      //   .catch((err) => console.log({ getEthBalance: err }));
+      // const contract = new web3.eth.Contract(
+      //   TORTokenContract.ABI,
+      //   TORTokenContract.ADDRESS
+      // );
+      // contract.methods
+      //   ._name()
+      //   .call()
+      //   .then((res) => console.log({ name: res }));
+      // contract.methods
+      //   ._symbol()
+      //   .call()
+      //   .then((res) => console.log({ symbol: res }));
+      // contract.methods
+      //   .totalSupply()
+      //   .call()
+      //   .then((res) => console.log({ totalSupply: res }));
+
       // if (connector?.deactivate) {
       //   await connector.deactivate();
       // } else {
       //   await connector.resetState();
       // }
       // connector?.connectEagerly
-      console.log("is available disconnect?");
+      // console.log("is available disconnect?");
     } else {
       await connector.activate(getAddChainParameters(CHAIN_IDS.BLAST_SEPOLIA));
     }
