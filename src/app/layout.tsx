@@ -20,8 +20,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <AppProvider>
-        {/* <Web3ContextProvider> */}
-        {/* <Web3ReactProvider connectors={connectors}> */}
         <body className={inter.className}>
           <div className="flex min-w-screen min-h-screen justify-center bg-black text-white chakra-petch-regular">
             <main className="flex flex-col w-full max-w-[1280px] p-4">
@@ -31,8 +29,6 @@ export default function RootLayout({
             </main>
           </div>
         </body>
-        {/* </Web3ReactProvider> */}
-        {/* </Web3ContextProvider> */}
       </AppProvider>
     </html>
   );

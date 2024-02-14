@@ -86,7 +86,6 @@ export const Header = () => {
     } else {
       if (CHAIN_IDS.BLAST_SEPOLIA == chainId) {
         const web3 = new Web3(connector.provider);
-
         if (accounts?.length) {
           web3.eth.getBalance(accounts[0]).then((res) => console.log({ res }));
         }
