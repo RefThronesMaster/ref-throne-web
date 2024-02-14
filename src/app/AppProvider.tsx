@@ -57,9 +57,7 @@ export const MyAccountProvider = ({
           setWeb3(web3);
           if (defaultAccount) {
             try {
-              return Number(
-                await web3.eth.getBalance(defaultAccount)
-              ).valueOf();
+              return Number(await web3.eth.getBalance(defaultAccount));
             } catch (err) {
               console.error(err);
               return null;

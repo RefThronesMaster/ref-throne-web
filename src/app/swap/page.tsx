@@ -5,6 +5,7 @@ import { MyAccountContext } from "@/app/AppProvider";
 import React, { ChangeEvent } from "react";
 import { Button, Input } from "@/common/components";
 import { Decimal } from "decimal.js";
+import { EthTreasuryContract } from "@/libs/web3/abi";
 type MODE = "deposit" | "withdraw";
 
 export default function PageSwap() {
@@ -46,6 +47,24 @@ const Deposit = () => {
   const [value, setValue] = React.useState<number>(0);
   const { account, getBalance, web3 } = React.useContext(MyAccountContext);
   const [message, setMessage] = React.useState<string>("");
+  const [depositFeeRate, setDepositFeeRate] = React.useState<number>(1);
+
+  React.useEffect(() => {
+    if (web3) {
+      const contract = new web3.eth.Contract(
+        EthTreasuryContract.ABI,
+        EthTreasuryContract.ADDRESS
+      );
+
+      contract.methods
+        ._depositFeeRate()
+        .call<number>()
+        .then((rate) => {
+          setDepositFeeRate(Number(rate));
+        })
+        .catch((err) => console.error(err));
+    }
+  }, [web3]);
 
   const handleChange = React.useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -72,6 +91,21 @@ const Deposit = () => {
       } catch (err) {}
     }
   }, [value, getBalance, web3]);
+
+  const depositFeeWei = React.useMemo(() => {
+    if (web3) {
+      return (Number(web3.utils.toWei(value, "ether")) * depositFeeRate) / 100;
+    }
+
+    return Math.floor(value * Number("10000000000000000") * depositFeeRate);
+  }, [value, depositFeeRate, web3]);
+
+  const depositFeeEth = React.useMemo(() => {
+    if (web3) {
+      return Number(web3.utils.fromWei(depositFeeWei, "ether"));
+    }
+    return depositFeeWei / Number("1000000000000000000");
+  }, [depositFeeWei, web3]);
 
   return (
     <>
@@ -135,10 +169,11 @@ const Deposit = () => {
               <span className="text-sm">1 ETH = 5,000 TOR</span>
             </div>
             <div className="mt-1 w-full flex justify-between items-center">
-              <span className="text-sm">Deposit Fee (1%)</span>
-              <span className="text-sm">
+              <span className="text-sm">Deposit Fee ({depositFeeRate}%)</span>
+              <span className="text-sm">{depositFeeEth.toString()} ETH</span>
+              {/* <span className="text-sm">
                 {new Decimal(value * 0.01).toString()} ETH
-              </span>
+              </span> */}
             </div>
             <Button
               className="mt-5 mb-2 py-1 w-full chakra-petch-bold rounded-md bg-yellow-100 active:bg-amber-200 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-200 text-black"
@@ -156,6 +191,26 @@ const Deposit = () => {
 
 const Withdraw = () => {
   const [value, setValue] = React.useState<number>(0);
+  const { account, getBalance, web3 } = React.useContext(MyAccountContext);
+  const [message, setMessage] = React.useState<string>("");
+  const [withdrawFeeRate, setWithdrawFeeRate] = React.useState<number>(2);
+
+  React.useEffect(() => {
+    if (web3) {
+      const contract = new web3.eth.Contract(
+        EthTreasuryContract.ABI,
+        EthTreasuryContract.ADDRESS
+      );
+
+      contract.methods
+        ._withdrawFeeRate()
+        .call<number>()
+        .then((rate) => {
+          setWithdrawFeeRate(Number(rate));
+        })
+        .catch((err) => console.error(err));
+    }
+  }, [web3]);
 
   const handleChange = React.useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -163,9 +218,20 @@ const Withdraw = () => {
       const parsedValue = parseFloat(value);
 
       setValue(parsedValue >= 0 ? parsedValue : 0);
+      setMessage("");
     },
     []
   );
+
+  const withdrawFee = React.useMemo(() => {
+    if (web3) {
+      const wei = web3.utils.toWei(value, "ether");
+      console.log(wei);
+    }
+    // console.log(value);
+
+    return 0;
+  }, [value, withdrawFeeRate, web3]);
 
   const handleTransaction = React.useCallback(() => {
     console.log(value);
@@ -228,7 +294,7 @@ const Withdraw = () => {
               <span className="text-sm">5,000 TOR = 1 ETH</span>
             </div>
             <div className="mt-1 w-full flex justify-between items-center">
-              <span className="text-sm">Deposit Fee (2%)</span>
+              <span className="text-sm">Withdraw Fee ({withdrawFeeRate}%)</span>
               <span className="text-sm">
                 {new Decimal((value * 2) / 10000).toString()} ETH
               </span>
