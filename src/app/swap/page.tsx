@@ -1,15 +1,15 @@
 "use client";
 
 import Image from "next/image";
-import { AccountContext } from "@/app/AccountProvider";
+import { AppContext } from "@/app/AppProvider";
 import React, { ChangeEvent } from "react";
 import { Button, Input } from "@/common/components";
 import { Decimal } from "decimal.js";
 type MODE = "deposit" | "withdraw";
 
 export default function PageSwap() {
-  const { accounts, reqAccounts, getPermissions } =
-    React.useContext(AccountContext);
+  // const { accounts, reqAccounts, getPermissions } =
+  //   React.useContext(AppContext);
   const [mode, setMode] = React.useState<MODE>("deposit");
 
   return (

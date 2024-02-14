@@ -1,6 +1,6 @@
 "use client";
 
-import { AccountContext } from "@/app/AccountProvider";
+import { AppContext } from "@/app/AppProvider";
 import React from "react";
 import { DataRowProps, DataTable, Dialog } from "@/common/components";
 
@@ -59,8 +59,7 @@ const SampleMyReferralsRecords = [
 ];
 
 export default function PageDashboard() {
-  const { accounts, reqAccounts, getPermissions } =
-    React.useContext(AccountContext);
+  // const { web3Client } = React.useContext(AppContext);
 
   const ColumnsLeaders: DataRowProps[] = React.useMemo(
     () => [

@@ -35,10 +35,9 @@ export const Button = ({
 
   return (
     <button
+      type="button"
       className={
-        "rounded-sm" +
-        (colorSet ? ` ${colorSet}` : "") +
-        (className ? ` ${className}` : "")
+        (colorSet ? ` ${colorSet}` : "") + (className ? ` ${className}` : "")
       }
       style={style}
       disabled={disabled}
