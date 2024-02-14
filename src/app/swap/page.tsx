@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { AppContext } from "@/app/AppProvider";
+import { MyAccountContext } from "@/app/AppProvider";
 import React, { ChangeEvent } from "react";
 import { Button, Input } from "@/common/components";
 import { Decimal } from "decimal.js";
@@ -44,19 +44,34 @@ export default function PageSwap() {
 
 const Deposit = () => {
   const [value, setValue] = React.useState<number>(0);
+  const { account, getBalance, web3 } = React.useContext(MyAccountContext);
+  const [message, setMessage] = React.useState<string>("");
 
   const handleChange = React.useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const { value } = event.target;
       const parsedValue = parseFloat(value);
       setValue(parsedValue >= 0 ? parsedValue : 0);
+      setMessage("");
     },
     []
   );
 
-  const handleTransaction = React.useCallback(() => {
-    console.log(value);
-  }, [value]);
+  const handleTransaction = React.useCallback(async () => {
+    if (web3) {
+      try {
+        const balance = await getBalance();
+        if (balance) {
+          const deposit = Number(web3.utils.toWei(value, "ether"));
+          if (deposit > balance) {
+            setMessage("not enough your balance");
+          } else {
+            console.log("start contract");
+          }
+        }
+      } catch (err) {}
+    }
+  }, [value, getBalance, web3]);
 
   return (
     <>
@@ -88,6 +103,11 @@ const Deposit = () => {
             />
           </label>
         </div>
+        {message && (
+          <div className="flex justify-end px-2 text-red-400">
+            <span>{message}</span>
+          </div>
+        )}
         <div className="mt-3 bg-camo-500 rounded-lg py-2">
           <span className="py-2 px-4">You receive</span>
           <div className="px-4">
