@@ -37,7 +37,9 @@ export const Button = ({
     <button
       type="button"
       className={
-        (colorSet ? ` ${colorSet}` : "") + (className ? ` ${className}` : "")
+        "disabled:text-gray-400 disabled:cursor-not-allowed" +
+        (colorSet ? ` ${colorSet}` : "") +
+        (className ? ` ${className}` : "")
       }
       style={style}
       disabled={disabled}

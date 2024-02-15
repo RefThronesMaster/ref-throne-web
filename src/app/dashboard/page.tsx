@@ -1,6 +1,5 @@
 "use client";
 
-import { AppContext } from "@/app/AppProvider";
 import React from "react";
 import { DataRowProps, DataTable, Dialog } from "@/common/components";
 

@@ -18,10 +18,10 @@ import {
   getAddChainParameters,
 } from "@/libs/web3/chains";
 import Web3, { ContractAbi } from "web3";
-import { MyAccountContext } from "@/app/AppProvider";
+import { MyAccountContext } from "@/app/MyAccountProvider";
 
 const MENU = {
-  "/": "Referral Thrones",
+  "/referrals": "Referral Thrones",
   "/swap": "TOR Swap",
   "/dashboard": "Dashboard",
   "/guides": "Guides",
@@ -41,6 +41,10 @@ export const Header = () => {
   const { connector } = useWeb3React();
   const chainId = useChainId();
   const { account, getBalance } = React.useContext(MyAccountContext);
+
+  const signedIn = React.useMemo(() => {
+    return CHAIN_IDS.BLAST_SEPOLIA == chainId && account;
+  }, [account, chainId]);
 
   React.useEffect(() => {
     if (account) {
@@ -172,10 +176,11 @@ export const Header = () => {
                   color="text"
                   className={
                     "text-base py-2 lg:py-1 px-6 lg:px-4" +
-                    ((url != "/" && pathname.includes(url)) || pathname == url
+                    (pathname.includes(url) || pathname == url
                       ? " text-primary"
                       : "")
                   }
+                  disabled={!signedIn}
                 >
                   {title}
                 </Button>

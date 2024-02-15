@@ -63,7 +63,7 @@ export enum CHAIN_IDS {
 export const TESTNET_CHAINS: ChainConfig = {
   [CHAIN_IDS.BLAST_SEPOLIA]: {
     urls: ["https://sepolia.blast.io"],
-    name: "Blast Sepolia",
+    name: "Blast Sepolia Testnet",
     nativeCurrency: ETH,
     blockExplorerUrls: ["https://testnet.blastscan.io"],
   },
