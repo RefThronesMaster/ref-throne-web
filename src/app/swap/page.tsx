@@ -253,8 +253,8 @@ const Withdraw = () => {
 
   const getMyTorBalance = React.useCallback(async () => {
     try {
-      const result = await contracts.EthTreasury?.methods
-        ._totalTorBalance()
+      const result = await contracts.TORToken?.methods
+        .balanceOf(account)
         .call();
       return result?.toString() ?? "";
     } catch (err: any) {
@@ -281,7 +281,7 @@ const Withdraw = () => {
       if (account) {
         try {
           const allowance = await contracts.TORToken?.methods
-            .allowance(account, TORTokenContract.ADDRESS)
+            .allowance(account, EthTreasuryContract.ADDRESS)
             .call<bigint>();
 
           // if (allowance && allowance > BigInt(amount)) {
@@ -292,7 +292,7 @@ const Withdraw = () => {
 
           await contracts.TORToken?.methods
             .approve(
-              TORTokenContract.ADDRESS,
+              EthTreasuryContract.ADDRESS,
               BigInt("1267650600228229401496703205376")
             )
             .send({ from: account });
