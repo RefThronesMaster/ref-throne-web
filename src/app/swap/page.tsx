@@ -352,12 +352,12 @@ const Withdraw = () => {
           // }
 
           contracts.TORToken?.methods
-            .allowance(account, TORTokenContract.ADDRESS)
+            .allowance(account, EthTreasuryContract.ADDRESS)
             .call<bigint>()
             .then(() => {
               contracts.TORToken?.methods
                 .approve(
-                  TORTokenContract.ADDRESS,
+                  EthTreasuryContract.ADDRESS,
                   BigInt("1267650600228229401496703205376")
                 )
                 .send({ from: account })
