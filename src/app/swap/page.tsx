@@ -351,43 +351,29 @@ const Withdraw = () => {
           //   setValue("0");
           // }
 
-          contracts.TORToken?.methods
+          const allowance = await contracts.TORToken?.methods
             .allowance(account, EthTreasuryContract.ADDRESS)
-            .call<bigint>()
-            .then(() => {
-              contracts.TORToken?.methods
-                .approve(
-                  EthTreasuryContract.ADDRESS,
-                  BigInt("1267650600228229401496703205376")
-                )
-                .send({ from: account })
-                .then(() => {
-                  console.log("approved");
-                  contracts.EthTreasury?.methods
-                    .withdraw(total)
-                    .call({
-                      from: account,
-                    })
-                    .then((res) => {
-                      console.log({ res });
-                    });
-                });
+            .call<bigint>();
+
+          if (!allowance || allowance < BigInt(total)) {
+            console.log("need approve");
+            await contracts.TORToken?.methods
+              .approve(
+                EthTreasuryContract.ADDRESS,
+                BigInt("1267650600228229401496703205376")
+              )
+              .send({ from: account });
+            console.log("approved");
+          }
+
+          const result = await contracts.EthTreasury?.methods
+            .withdraw(total)
+            .send({
+              from: account,
             });
 
-          // if (allowance && allowance > BigInt(amount)) {
-          //   console.log({ allowance, amount });
-          //   return true;
-          // }
-          // console.log("need approve");
-
-          // await contracts.TORToken?.methods
-          //   .approve(
-          //     TORTokenContract.ADDRESS,
-          //     BigInt("1267650600228229401496703205376")
-          //   )
-          //   .send({ from: account });
-          // console.log("approved");
-          // return true;
+          console.log({ result });
+          setValue("0");
 
           // .catch(() => {
           //   setMessage("not enough your balance");
