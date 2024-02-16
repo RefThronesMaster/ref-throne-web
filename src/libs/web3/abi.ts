@@ -312,7 +312,7 @@ export const TORTokenContract: TContract = {
 // const a: AbiOutput;
 
 export const RefThroneContract: TContract = {
-  ADDRESS: "0x163e905d0F44dB0a59571020B443bFba3349F3A1",
+  ADDRESS: "0x6D0dFC88dF5A12760E3Bd1F73c4c707E19799558",
   ABI: [
     {
       name: "requestDepositForThrone",

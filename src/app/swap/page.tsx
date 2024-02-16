@@ -284,10 +284,10 @@ const Withdraw = () => {
             .allowance(account, TORTokenContract.ADDRESS)
             .call<bigint>();
 
-          if (allowance && allowance > BigInt(amount)) {
-            console.log({ allowance, amount });
-            return true;
-          }
+          // if (allowance && allowance > BigInt(amount)) {
+          //   console.log({ allowance, amount });
+          //   return true;
+          // }
           console.log("need approve");
 
           await contracts.TORToken?.methods
@@ -340,16 +340,54 @@ const Withdraw = () => {
           setMessage("");
           setTransacting(true);
 
-          if (await getAvailableBalance(total)) {
-            const result = await contracts.EthTreasury?.methods
-              .withdraw(total)
-              .call({
-                from: account,
-              });
+          // if (await getAvailableBalance(total)) {
+          //   const result = await contracts.EthTreasury?.methods
+          //     .withdraw(total)
+          //     .call({
+          //       from: account,
+          //     });
 
-            console.log({ result });
-            setValue("0");
-          }
+          //   console.log({ result });
+          //   setValue("0");
+          // }
+
+          contracts.TORToken?.methods
+            .allowance(account, TORTokenContract.ADDRESS)
+            .call<bigint>()
+            .then(() => {
+              contracts.TORToken?.methods
+                .approve(
+                  TORTokenContract.ADDRESS,
+                  BigInt("1267650600228229401496703205376")
+                )
+                .send({ from: account })
+                .then(() => {
+                  console.log("approved");
+                  contracts.EthTreasury?.methods
+                    .withdraw(total)
+                    .call({
+                      from: account,
+                    })
+                    .then((res) => {
+                      console.log({ res });
+                    });
+                });
+            });
+
+          // if (allowance && allowance > BigInt(amount)) {
+          //   console.log({ allowance, amount });
+          //   return true;
+          // }
+          // console.log("need approve");
+
+          // await contracts.TORToken?.methods
+          //   .approve(
+          //     TORTokenContract.ADDRESS,
+          //     BigInt("1267650600228229401496703205376")
+          //   )
+          //   .send({ from: account });
+          // console.log("approved");
+          // return true;
 
           // .catch(() => {
           //   setMessage("not enough your balance");
@@ -396,21 +434,21 @@ const Withdraw = () => {
     return BigInt(utils.toWei(value));
   }, [value, utils]);
 
-  const withdrawTorFeeWei = React.useMemo(() => {
-    return (withdrawTorWei / BigInt(100)) * BigInt(withdrawFeeRate);
-  }, [withdrawTorWei, withdrawFeeRate]);
+  // const withdrawTorFeeWei = React.useMemo(() => {
+  //   return (withdrawTorWei / BigInt(100)) * BigInt(withdrawFeeRate);
+  // }, [withdrawTorWei, withdrawFeeRate]);
 
   const handleTransaction = React.useCallback(async () => {
     try {
-      const total = withdrawTorWei + withdrawTorFeeWei;
-      transact(total.toString());
+      // const total = withdrawTorWei + withdrawTorFeeWei;
+      await transact(withdrawTorWei.toString());
 
       // if (total > BigInt(balance)) {
       //   setMessage("not enough your balance");
       // } else {
       // }
     } catch (err) {}
-  }, [withdrawTorWei, withdrawTorFeeWei, transact]);
+  }, [withdrawTorWei, transact]);
 
   return (
     <>
