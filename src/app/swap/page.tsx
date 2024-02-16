@@ -284,14 +284,19 @@ const Withdraw = () => {
             .allowance(account, TORTokenContract.ADDRESS)
             .call<bigint>();
 
-          console.log({ allowance });
-          // if (allowance && allowance.valueOf() > 0) {
-          //   return true;
-          // }
+          if (allowance && allowance > BigInt(amount)) {
+            console.log({ allowance, amount });
+            return true;
+          }
+          console.log("need approve");
+
           await contracts.TORToken?.methods
-            .approve(TORTokenContract.ADDRESS, amount)
+            .approve(
+              TORTokenContract.ADDRESS,
+              BigInt("1267650600228229401496703205376")
+            )
             .send({ from: account });
-          console.log("confirmed");
+          console.log("approved");
           return true;
         } catch (err: any) {
           if (err?.message?.includes("Internal JSON-RPC")) {
