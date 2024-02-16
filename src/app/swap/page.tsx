@@ -343,7 +343,7 @@ const Withdraw = () => {
           if (await getAvailableBalance(total)) {
             const result = await contracts.EthTreasury?.methods
               .withdraw(total)
-              .call({
+              .send({
                 from: account,
               });
 
