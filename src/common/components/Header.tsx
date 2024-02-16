@@ -33,7 +33,7 @@ export const Header = () => {
   const pathname = usePathname();
   const { connector } = useWeb3React();
   const chainId = useChainId();
-  const { account, getBalance } = React.useContext(MyAccountContext);
+  const { account, getBalance, contracts } = React.useContext(MyAccountContext);
 
   const signedIn = React.useMemo(() => {
     return CHAIN_IDS.BLAST_SEPOLIA == chainId && account;
@@ -53,64 +53,6 @@ export const Header = () => {
       return;
     } else {
       if (CHAIN_IDS.BLAST_SEPOLIA == chainId) {
-        // const web3 = new Web3(connector.provider);
-        // // const contract = new web3.eth.Contract(
-        // //   RefThroneContract.ABI,
-        // //   RefThroneContract.ADDRESS
-        // // );
-        // // contract.methods
-        // //   .getServiceTypes()
-        // //   .call()
-        // //   .then((res) => console.log({ getServiceTypes: res }))
-        // //   .catch((err) => console.log({ getServiceTypes: err }));
-        // // contract.methods
-        // //   .getBenefitTypes()
-        // //   .call()
-        // //   .then((res) => console.log({ getBenefitTypes: res }))
-        // //   .catch((err) => console.log({ getBenefitTypes: err }));
-        // // contract.methods
-        // //   .getAllOwnedThrones()
-        // //   .call({})
-        // //   .then((res) => console.log({ getAllOwnedThrones: res }))
-        // //   .catch((err) => console.log({ getAllOwnedThrones: err }));
-        // // contract.methods
-        // //   ._totalEthBalance()
-        // //   .call()
-        // //   .then((res) => console.log({ _totalEthBalance: res }));
-        // const contract = new web3.eth.Contract(
-        //   EthTreasuryContract.ABI as ContractAbi,
-        //   EthTreasuryContract.ADDRESS
-        // );
-
-        // contract.methods
-        //   ._depositFeeRate()
-        //   .call<number>()
-        //   .then((res) => {
-        //     console.log({ _depositFeeRate: res });
-        //   })
-        //   .catch((err) => console.log({ _depositFeeRate: err }));
-        // contract.methods
-        //   ._withdrawFeeRate()
-        //   .call()
-        //   .then((res) => console.log({ _withdrawFeeRate: res }))
-        //   .catch((err) => console.log({ _withdrawFeeRate: err }));
-        // const contract = new web3.eth.Contract(
-        //   TORTokenContract.ABI,
-        //   TORTokenContract.ADDRESS
-        // );
-        // contract.methods
-        //   ._name()
-        //   .call()
-        //   .then((res) => console.log({ name: res }));
-        // contract.methods
-        //   ._symbol()
-        //   .call()
-        //   .then((res) => console.log({ symbol: res }));
-        // contract.methods
-        //   .totalSupply()
-        //   .call()
-        //   .then((res) => console.log({ totalSupply: res }));
-
         if (connector?.deactivate) {
           await connector.deactivate();
         } else {
@@ -147,6 +89,9 @@ export const Header = () => {
   //   if (accounts?.length) {
   //   }
   // }, [accounts]);
+
+  const handleDailyCheck = React.useCallback(() => {}, [contracts.UserHistory]);
+
   return (
     <nav className="flex flex-wrap items-center justify-between">
       <Image
@@ -182,15 +127,24 @@ export const Header = () => {
           })}
         </div>
 
-        <Button className="lg:ml-8">
+        <Button
+          className="lg:ml-8"
+          disabled={!signedIn}
+          onClick={handleDailyCheck}
+        >
           <AttendIcon className="w-[32px] h-[32px] fill-primary" />
         </Button>
         <Button
-          className="lg:ml-4 bg-yellow-300 rounded-sm text-black active:bg-amber-400"
-          style={{ width: 180, height: 36 }}
+          className={
+            "lg:ml-4 bg-yellow-300 rounded-sm text-black active:bg-amber-400 w-[180px] h-[36px] text-sm font-bold"
+          }
           onClick={handleConnect}
         >
-          {chainId == CHAIN_IDS.BLAST_SEPOLIA ? "Disconnect" : "Connect"} Wallet
+          {signedIn
+            ? `${account?.substring(0, 8)}...${account?.substring(
+                account?.length - 4
+              )}`
+            : "Connect Wallet"}
         </Button>
       </div>
     </nav>

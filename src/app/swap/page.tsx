@@ -5,7 +5,15 @@ import { MyAccountContext } from "@/app/MyAccountProvider";
 import React, { ChangeEvent } from "react";
 import { Button, Input } from "@/common/components";
 import { Decimal } from "decimal.js";
-import { EthTreasuryContract } from "@/libs/web3/abi";
+import {
+  EthTreasuryContract,
+  RefThroneContract,
+  TORTokenContract,
+} from "@/libs/web3/abi";
+import { RpcError } from "web3";
+import { ethToTor, torToEth } from "@/libs/web3/utils";
+import { Truculenta } from "next/font/google";
+
 type MODE = "deposit" | "withdraw";
 
 export default function PageSwap() {
@@ -42,68 +50,115 @@ export default function PageSwap() {
 }
 
 const Deposit = () => {
-  const [value, setValue] = React.useState<number>(0);
-  const { account, getBalance, web3 } = React.useContext(MyAccountContext);
+  const [value, setValue] = React.useState<string>("0.0000");
+  const { account, getBalance, web3, contracts, utils } =
+    React.useContext(MyAccountContext);
   const [message, setMessage] = React.useState<string>("");
   const [depositFeeRate, setDepositFeeRate] = React.useState<number>(1);
+  const [transacting, setTransacting] = React.useState<boolean>(false);
 
   React.useEffect(() => {
-    if (web3) {
-      const contract = new web3.eth.Contract(
-        EthTreasuryContract.ABI,
-        EthTreasuryContract.ADDRESS
-      );
-
-      contract.methods
-        ._depositFeeRate()
-        .call<number>()
-        .then((rate) => {
-          setDepositFeeRate(Number(rate));
-        })
-        .catch((err) => console.error(err));
-    }
-  }, [web3]);
+    contracts.EthTreasury?.methods
+      ._depositFeeRate()
+      .call<number>()
+      .then((rate) => {
+        setDepositFeeRate(Number(rate));
+      })
+      .catch((err) => console.error(err));
+  }, [contracts.EthTreasury]);
 
   const handleChange = React.useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const { value } = event.target;
-      const parsedValue = parseFloat(value);
-      setValue(parsedValue >= 0 ? parsedValue : 0);
+
       setMessage("");
+      if (parseFloat(value) < 0) {
+        setValue("0.0000");
+      } else {
+        setValue(value);
+      }
     },
     []
   );
 
-  const handleTransaction = React.useCallback(async () => {
-    if (web3) {
-      try {
-        const balance = await getBalance();
-        if (balance) {
-          const deposit = Number(web3.utils.toWei(value, "ether"));
-          if (deposit > balance) {
-            setMessage("not enough your balance");
-          } else {
-            console.log("start contract");
+  const transact = React.useCallback(
+    async (total: string) => {
+      if (account && web3) {
+        try {
+          console.log("start contract");
+          setTransacting(true);
+
+          await web3.eth.sendTransaction({
+            to: EthTreasuryContract.ADDRESS,
+            from: account,
+            value: total,
+          });
+
+          setValue("0.0000");
+        } catch (err: any) {
+          console.log("error transaction");
+          if (err?.message?.includes("Internal JSON-RPC")) {
+            setMessage(
+              (err.data as RpcError).message.replace("execution reverted: ", "")
+            );
           }
+          console.log(err?.data);
+        } finally {
+          console.log("end transaction");
+          setTransacting(false);
         }
-      } catch (err) {}
+      }
+    },
+    [web3, setMessage, account]
+  );
+
+  const receivedTor = React.useMemo(() => {
+    try {
+      const tor = ethToTor(parseFloat(value));
+      return tor.toFixed(value.length - 3).replace(/\.?0+$/, "");
+    } catch (err) {
+      console.log(err);
     }
-  }, [value, getBalance, web3]);
+    return "-";
+  }, [value]);
 
   const depositFeeWei = React.useMemo(() => {
-    if (web3) {
-      return (Number(web3.utils.toWei(value, "ether")) * depositFeeRate) / 100;
-    }
+    try {
+      const feeWei =
+        (BigInt(utils.toWei(value)) / BigInt(100)) * BigInt(depositFeeRate);
 
-    return Math.floor(value * Number("10000000000000000") * depositFeeRate);
-  }, [value, depositFeeRate, web3]);
+      return feeWei;
+    } catch (err) {
+      console.log(err);
+    }
+    return BigInt(0);
+  }, [value, depositFeeRate, utils]);
 
   const depositFeeEth = React.useMemo(() => {
-    if (web3) {
-      return Number(web3.utils.fromWei(depositFeeWei, "ether"));
+    try {
+      return utils.fromWei(depositFeeWei.toString());
+    } catch (err) {
+      console.log(err);
     }
-    return depositFeeWei / Number("1000000000000000000");
-  }, [depositFeeWei, web3]);
+    return "-";
+  }, [depositFeeWei, utils]);
+
+  const handleTransaction = React.useCallback(async () => {
+    try {
+      const balance = await getBalance();
+      if (balance) {
+        const deposit = BigInt(utils.toWei(value));
+        const total = deposit + depositFeeWei;
+
+        if (total > BigInt(balance)) {
+          setMessage("not enough your balance");
+        } else {
+          setMessage("");
+          transact(total.toString());
+        }
+      }
+    } catch (err) {}
+  }, [value, getBalance, depositFeeWei, utils, transact]);
 
   return (
     <>
@@ -128,7 +183,7 @@ const Deposit = () => {
               id="eth_val"
               className="w-full h-full py-1 text-right chakra-petch-regular text-white placeholder:text-camo-300 bg-transparent"
               type={"number"}
-              step={0.01}
+              step={0.0001}
               placeholder="0.00"
               value={value}
               onChange={handleChange}
@@ -158,7 +213,7 @@ const Deposit = () => {
                 id="tor_val"
                 className="w-full h-full py-1 text-right chakra-petch-regular text-white placeholder:text-camo-300 bg-transparent"
               >
-                {new Decimal(value * 5000).toString()}
+                {receivedTor}
               </span>
             </div>
 
@@ -168,17 +223,17 @@ const Deposit = () => {
             </div>
             <div className="mt-1 w-full flex justify-between items-center">
               <span className="text-sm">Deposit Fee ({depositFeeRate}%)</span>
-              <span className="text-sm">{depositFeeEth.toString()} ETH</span>
+              <span className="text-sm">{depositFeeEth} ETH</span>
               {/* <span className="text-sm">
-                {new Decimal(value * 0.01).toString()} ETH
+                {(value * 0.01).toFixed(18).replace(/\.?0+$/, "")} ETH
               </span> */}
             </div>
             <Button
               className="mt-5 mb-2 py-1 w-full chakra-petch-bold rounded-md bg-yellow-100 active:bg-amber-200 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-200 text-black"
-              disabled={value <= 0}
+              disabled={parseFloat(value) <= 0 || transacting}
               onClick={handleTransaction}
             >
-              Send transaction
+              {transacting ? "Transacting" : "Send transaction"}
             </Button>
           </div>
         </div>
@@ -188,52 +243,169 @@ const Deposit = () => {
 };
 
 const Withdraw = () => {
-  const [value, setValue] = React.useState<number>(0);
-  const { account, getBalance, web3 } = React.useContext(MyAccountContext);
+  const [value, setValue] = React.useState<string>("0");
+  const { account, getBalance, web3, contracts, utils } =
+    React.useContext(MyAccountContext);
   const [message, setMessage] = React.useState<string>("");
   const [withdrawFeeRate, setWithdrawFeeRate] = React.useState<number>(2);
+  const [transacting, setTransacting] = React.useState<boolean>(false);
+  const [torBalanceWei, setTorBalanceWei] = React.useState<string>("");
+
+  const getMyTorBalance = React.useCallback(async () => {
+    try {
+      const result = await contracts.EthTreasury?.methods
+        ._totalTorBalance()
+        .call();
+      return result?.toString() ?? "";
+    } catch (err: any) {
+      console.log(err?.data);
+      return "";
+    }
+  }, [contracts.EthTreasury]);
 
   React.useEffect(() => {
-    if (web3) {
-      const contract = new web3.eth.Contract(
-        EthTreasuryContract.ABI,
-        EthTreasuryContract.ADDRESS
-      );
+    contracts.EthTreasury?.methods
+      ._withdrawFeeRate()
+      .call<number>()
+      .then((rate) => {
+        setWithdrawFeeRate(Number(rate));
+      })
+      .catch((err) => console.error(err));
+    getMyTorBalance().then((result) => {
+      setTorBalanceWei(result);
+    });
+  }, [contracts.EthTreasury, getMyTorBalance]);
 
-      contract.methods
-        ._withdrawFeeRate()
-        .call<number>()
-        .then((rate) => {
-          setWithdrawFeeRate(Number(rate));
-        })
-        .catch((err) => console.error(err));
-    }
-  }, [web3]);
+  const getAvailableBalance = React.useCallback(
+    async (amount: string) => {
+      if (account) {
+        try {
+          const allowance = await contracts.TORToken?.methods
+            .allowance(account, TORTokenContract.ADDRESS)
+            .call<bigint>();
+
+          console.log({ allowance });
+          // if (allowance && allowance.valueOf() > 0) {
+          //   return true;
+          // }
+          await contracts.TORToken?.methods
+            .approve(TORTokenContract.ADDRESS, amount)
+            .send({ from: account });
+          console.log("confirmed");
+          return true;
+        } catch (err: any) {
+          if (err?.message?.includes("Internal JSON-RPC")) {
+            setMessage(
+              (err.data as RpcError).message.replace("execution reverted: ", "")
+            );
+          }
+        }
+      }
+      return false;
+    },
+    [contracts.TORToken, account]
+  );
+
+  const torBalance = React.useMemo(() => {
+    try {
+      return utils.fromWei(torBalanceWei);
+    } catch (err) {}
+    return 0;
+  }, [torBalanceWei, utils]);
 
   const handleChange = React.useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const { value } = event.target;
-      const parsedValue = parseFloat(value);
 
-      setValue(parsedValue >= 0 ? parsedValue : 0);
       setMessage("");
+      if (parseFloat(value) < 0) {
+        setValue("0");
+      } else {
+        setValue(value);
+      }
     },
     []
   );
 
-  const withdrawFee = React.useMemo(() => {
-    if (web3) {
-      const wei = web3.utils.toWei(value, "ether");
-      console.log(wei);
-    }
-    // console.log(value);
+  const transact = React.useCallback(
+    async (total: string) => {
+      if (account) {
+        try {
+          console.log("start contract");
+          setMessage("");
+          setTransacting(true);
 
-    return 0;
-  }, [value, withdrawFeeRate, web3]);
+          if (await getAvailableBalance(total)) {
+            const result = await contracts.EthTreasury?.methods
+              .withdraw(total)
+              .call({
+                from: account,
+              });
 
-  const handleTransaction = React.useCallback(() => {
-    console.log(value);
-  }, [value]);
+            console.log({ result });
+            setValue("0");
+          }
+
+          // .catch(() => {
+          //   setMessage("not enough your balance");
+          // });
+        } catch (err: any) {
+          console.log("error transaction");
+          if (err?.message?.includes("Internal JSON-RPC")) {
+            setMessage(
+              (err.data as RpcError).message.replace("execution reverted: ", "")
+            );
+          }
+          console.log(err);
+        } finally {
+          console.log("end transaction");
+          setTransacting(false);
+        }
+      }
+    },
+    [contracts.EthTreasury, setMessage, account, utils]
+  );
+
+  const receivedEthWei = React.useMemo(() => {
+    // 1ETH = 5000TOR
+    return (BigInt(utils.toWei(value)) / BigInt(10000)) * BigInt(2);
+  }, [value, utils]);
+
+  const receivedEth = React.useMemo(() => {
+    try {
+      return utils.fromWei(receivedEthWei.toString()) || "-";
+    } catch (err) {}
+    return "-";
+  }, [receivedEthWei, utils]);
+
+  const withdrawFeeWei = React.useMemo(() => {
+    const feeWei = (receivedEthWei / BigInt(100)) * BigInt(withdrawFeeRate);
+    return feeWei;
+  }, [receivedEthWei, withdrawFeeRate]);
+
+  const withdrawFeeEth = React.useMemo(() => {
+    return utils.fromWei(withdrawFeeWei.toString());
+  }, [withdrawFeeWei, utils]);
+
+  const withdrawTorWei = React.useMemo(() => {
+    return BigInt(utils.toWei(value));
+  }, [value, utils]);
+
+  const withdrawTorFeeWei = React.useMemo(() => {
+    return (withdrawTorWei / BigInt(100)) * BigInt(withdrawFeeRate);
+  }, [withdrawTorWei, withdrawFeeRate]);
+
+  const handleTransaction = React.useCallback(async () => {
+    try {
+      const total = withdrawTorWei + withdrawTorFeeWei;
+      transact(total.toString());
+
+      // if (total > BigInt(balance)) {
+      //   setMessage("not enough your balance");
+      // } else {
+      // }
+    } catch (err) {}
+  }, [withdrawTorWei, withdrawTorFeeWei, transact]);
 
   return (
     <>
@@ -258,13 +430,21 @@ const Withdraw = () => {
               id="tor_val"
               className="w-full h-full py-1 text-right chakra-petch-regular text-white placeholder:text-camo-300 bg-transparent"
               type={"number"}
-              step={0.01}
+              step={0.1}
               placeholder="0.00"
               value={value}
               onChange={handleChange}
             />
           </label>
         </div>
+        <div className="flex justify-end px-2 text-sm text-camo-300">
+          Available: {torBalance} TOR
+        </div>
+        {message && (
+          <div className="flex justify-end px-2 text-red-400">
+            <span>{message}</span>
+          </div>
+        )}
         <div className="mt-3 bg-camo-500 rounded-lg py-2">
           <span className="py-2 px-4">You receive</span>
           <div className="px-4">
@@ -283,7 +463,7 @@ const Withdraw = () => {
                 id="eth_val"
                 className="w-full h-full py-1 text-right chakra-petch-regular text-white placeholder:text-camo-300 bg-transparent"
               >
-                {new Decimal((value * 2) / 1000000).toString()}
+                {receivedEth}
               </span>
             </div>
 
@@ -293,13 +473,11 @@ const Withdraw = () => {
             </div>
             <div className="mt-1 w-full flex justify-between items-center">
               <span className="text-sm">Withdraw Fee ({withdrawFeeRate}%)</span>
-              <span className="text-sm">
-                {new Decimal((value * 2) / 10000).toString()} ETH
-              </span>
+              <span className="text-sm">{withdrawFeeEth} ETH</span>
             </div>
             <Button
               className="mt-5 mb-2 py-1 w-full chakra-petch-bold rounded-md bg-yellow-100 active:bg-amber-200 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-200 text-black"
-              disabled={value <= 0}
+              disabled={parseFloat(value) <= 0 || transacting}
               onClick={handleTransaction}
             >
               Send transaction

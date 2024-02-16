@@ -1,43 +1,318 @@
-import { AbiFragment, AbiOutput, ContractAbi } from "web3";
+import { ContractAbi } from "web3";
 
-export const TORTokenContract = {
-  ADDRESS: "0xF7a2a089fb174f7e3d283b8d314B099f299324b3",
+export type TContract = {
+  ADDRESS: string;
+  ABI: ContractAbi;
+};
+
+export const TORTokenContract: TContract = {
+  ADDRESS: "0xcc6E4AC4C748F4aD235e1a3Bde52Eec0C5C62A2F",
   ABI: [
     {
-      name: "balanceOf",
-      inputs: [{ name: "address", type: "string" }],
-      outputs: [{ name: "balanceOf", type: "uint256" }],
-      payable: false,
-      type: "function",
+      inputs: [
+        {
+          internalType: "string",
+          name: "name",
+          type: "string",
+        },
+        {
+          internalType: "string",
+          name: "symbol",
+          type: "string",
+        },
+      ],
+      stateMutability: "nonpayable",
+      type: "constructor",
     },
     {
-      name: "totalSupply",
+      inputs: [
+        {
+          internalType: "address",
+          name: "owner",
+          type: "address",
+        },
+      ],
+      name: "OwnableInvalidOwner",
+      type: "error",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "account",
+          type: "address",
+        },
+      ],
+      name: "OwnableUnauthorizedAccount",
+      type: "error",
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: true,
+          internalType: "address",
+          name: "owner",
+          type: "address",
+        },
+        {
+          indexed: true,
+          internalType: "address",
+          name: "spender",
+          type: "address",
+        },
+        {
+          indexed: false,
+          internalType: "uint256",
+          name: "value",
+          type: "uint256",
+        },
+      ],
+      name: "Approval",
+      type: "event",
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: true,
+          internalType: "address",
+          name: "previousOwner",
+          type: "address",
+        },
+        {
+          indexed: true,
+          internalType: "address",
+          name: "newOwner",
+          type: "address",
+        },
+      ],
+      name: "OwnershipTransferred",
+      type: "event",
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: true,
+          internalType: "address",
+          name: "from",
+          type: "address",
+        },
+        {
+          indexed: true,
+          internalType: "address",
+          name: "to",
+          type: "address",
+        },
+        {
+          indexed: false,
+          internalType: "uint256",
+          name: "value",
+          type: "uint256",
+        },
+      ],
+      name: "Transfer",
+      type: "event",
+    },
+    {
       inputs: [],
-      outputs: [{ name: "totalSupply", type: "uint256" }],
-      payable: false,
-      type: "function",
-    },
-    {
       name: "_name",
-      inputs: [],
-      outputs: [{ name: "name", type: "string" }],
-      payable: false,
+      outputs: [
+        {
+          internalType: "string",
+          name: "",
+          type: "string",
+        },
+      ],
+      stateMutability: "view",
       type: "function",
     },
     {
-      name: "_symbol",
       inputs: [],
-      outputs: [{ name: "symbol", type: "string" }],
-      payable: false,
+      name: "_symbol",
+      outputs: [
+        {
+          internalType: "string",
+          name: "",
+          type: "string",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "owner",
+          type: "address",
+        },
+        {
+          internalType: "address",
+          name: "spender",
+          type: "address",
+        },
+      ],
+      name: "allowance",
+      outputs: [
+        {
+          internalType: "uint256",
+          name: "",
+          type: "uint256",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "spender",
+          type: "address",
+        },
+        {
+          internalType: "uint256",
+          name: "amount",
+          type: "uint256",
+        },
+      ],
+      name: "approve",
+      outputs: [
+        {
+          internalType: "bool",
+          name: "",
+          type: "bool",
+        },
+      ],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "account",
+          type: "address",
+        },
+      ],
+      name: "balanceOf",
+      outputs: [
+        {
+          internalType: "uint256",
+          name: "",
+          type: "uint256",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "owner",
+      outputs: [
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "renounceOwnership",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "totalSupply",
+      outputs: [
+        {
+          internalType: "uint256",
+          name: "",
+          type: "uint256",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "to",
+          type: "address",
+        },
+        {
+          internalType: "uint256",
+          name: "amount",
+          type: "uint256",
+        },
+      ],
+      name: "transfer",
+      outputs: [
+        {
+          internalType: "bool",
+          name: "",
+          type: "bool",
+        },
+      ],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "sender",
+          type: "address",
+        },
+        {
+          internalType: "address",
+          name: "recipient",
+          type: "address",
+        },
+        {
+          internalType: "uint256",
+          name: "amount",
+          type: "uint256",
+        },
+      ],
+      name: "transferFrom",
+      outputs: [
+        {
+          internalType: "bool",
+          name: "",
+          type: "bool",
+        },
+      ],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "newOwner",
+          type: "address",
+        },
+      ],
+      name: "transferOwnership",
+      outputs: [],
+      stateMutability: "nonpayable",
       type: "function",
     },
   ] as ContractAbi,
-
 };
 // const a: AbiOutput;
 
-export const RefThroneContract = {
-  ADDRESS: "0xD6c408780a0A87A62671B70C2ab3fbB2e463C4Ab",
+export const RefThroneContract: TContract = {
+  ADDRESS: "0x163e905d0F44dB0a59571020B443bFba3349F3A1",
   ABI: [
     {
       name: "requestDepositForThrone",
@@ -233,8 +508,8 @@ export const RefThroneContract = {
   ] as ContractAbi,
 };
 
-export const EthTreasuryContract = {
-  ADDRESS: "0x3A9bb1987B486c6C1518879683F84a8da5E73A36",
+export const EthTreasuryContract: TContract = {
+  ADDRESS: "0x7f53Ea7151043E5596D437C4E116416398EEF7Ee",
   ABI: [
     {
       name: "_depositFeeRate",
@@ -257,10 +532,58 @@ export const EthTreasuryContract = {
       payable: false,
       type: "function",
     },
+
+    {
+      name: "getTorTokenBalance",
+      inputs: [{ name: "account", type: "address" }],
+      outputs: [{ name: "getTorTokenBalance", type: "uint256" }],
+      payable: false,
+      type: "function",
+    },
+    {
+      name: "getContractEthBalance",
+      inputs: [],
+      outputs: [{ name: "getContractEthBalance", type: "uint256" }],
+      payable: false,
+      type: "function",
+    },
     {
       name: "_totalTorBalance",
       inputs: [],
       outputs: [{ name: "totalTorBalance", type: "uint256" }],
+      payable: false,
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "uint256",
+          name: "tokenAmount",
+          type: "uint256",
+        },
+      ],
+      name: "withdraw",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+  ] as ContractAbi,
+};
+
+export const UserHistoryContract: TContract = {
+  ADDRESS: "0x6d7a265813ECc0af098C45A42e7D826a784b1312",
+  ABI: [
+    {
+      name: "checkDuplicateCheckIn",
+      inputs: [{ name: "account", type: "address" }],
+      outputs: [{ name: "checkDuplicateCheckIn", type: "bool" }],
+      payable: false,
+      type: "function",
+    },
+    {
+      name: "doDailyCheckIn",
+      inputs: [],
+      outputs: [],
       payable: false,
       type: "function",
     },
