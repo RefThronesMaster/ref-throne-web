@@ -27,14 +27,7 @@ const MENU = {
   "/guides": "Guides",
   "/gtor": "gTOR Token",
 };
-const {
-  useChainId,
-  useAccounts,
-  useIsActivating,
-  useIsActive,
-  useProvider,
-  useENSNames,
-} = hooks;
+const { useChainId } = hooks;
 
 export const Header = () => {
   const pathname = usePathname();

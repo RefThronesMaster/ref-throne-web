@@ -6,8 +6,9 @@ import { Web3ReactHooks, useWeb3React } from "@web3-react/core";
 import { Web3ReactProvider } from "@web3-react/core";
 import type { MetaMask } from "@web3-react/metamask";
 import { hooks, metaMask } from "@/libs/web3/connectors/metamask";
-import { CHAIN_IDS, getAddChainParameters } from "@/libs/web3/chains";
+import { CHAIN_IDS } from "@/libs/web3/chains";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+
 const connectors: [MetaMask, Web3ReactHooks][] = [[metaMask, hooks]];
 
 export const AppProvider = ({ children }: { children: React.ReactNode }) => {
@@ -44,11 +45,13 @@ export const MyAccountProvider = ({
     [accounts]
   );
   const [web3, setWeb3] = React.useState<Web3 | null>(null);
-  const router = useRouter();
   const pathname = usePathname();
+  const router = useRouter();
   const searchParams = useSearchParams();
 
-  React.useEffect(() => {}, [defaultAccount, connector, chainId, router]);
+  const signedIn = React.useMemo(() => {
+    return CHAIN_IDS.BLAST_SEPOLIA == chainId && defaultAccount;
+  }, [defaultAccount, chainId]);
 
   const getBalance = React.useCallback(async () => {
     if (!window.ethereum?.isMetaMask) {
@@ -77,56 +80,23 @@ export const MyAccountProvider = ({
   }, [connector, defaultAccount]);
 
   React.useEffect(() => {
-    async function checkLogin() {
-      console.log({
-        defaultAccount,
-        chainId,
-      });
-      try {
-        await connector.activate(
-          getAddChainParameters(CHAIN_IDS.BLAST_SEPOLIA)
-        );
-        const path = searchParams.get("p");
-        if (path) {
-          router.replace(path);
-        } else {
-          router.replace("/referrals");
-        }
-      } catch (err) {
-        if (pathname == "/") {
-          router.replace("/");
-        } else {
-          router.replace(`/?p=${pathname}`);
-        }
+    if (signedIn) {
+      const query = searchParams.get("p");
+
+      if (query) {
+        router.replace(query);
+      } else {
+        router.replace("/referrals");
       }
-
-      // if (CHAIN_IDS.BLAST_SEPOLIA == chainId && defaultAccount) {
-      //   const path = searchParams.get("p");
-      //   if (path) {
-      //     router.replace(path);
-      //   } else {
-      //     router.replace("/referrals");
-      //   }
-      // } else {
-      //   // try {
-      //   //   await connector.activate(
-      //   //     getAddChainParameters(CHAIN_IDS.BLAST_SEPOLIA)
-      //   //   );
-      //   // } catch (err) {
-      //   //   if (pathname == "/") {
-      //   //     router.replace("/");
-      //   //   } else {
-      //   //     router.replace(`/?p=${pathname}`);
-      //   //   }
-      //   // }
-      // }
+    } else {
+      if (pathname == "/") {
+        router.replace("/");
+      } else {
+        router.replace(`/?p=${pathname}`);
+      }
     }
-    checkLogin();
-  }, [connector]);
+  }, [signedIn]);
 
-  // if (accounts?.length) {
-  //   web3.eth.getBalance(accounts[0]).then((res) => console.log({ res }));
-  // }
   return (
     <MyAccountContext.Provider
       value={{ account: defaultAccount, getBalance, web3 }}
