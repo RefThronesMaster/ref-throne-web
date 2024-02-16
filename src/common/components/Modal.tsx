@@ -49,7 +49,10 @@ export const UsurpReferralModal = ({
   const handleChange = React.useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const { id, value } = event.target;
-      if ((id == "benefit" || id == "deposit") && parseFloat(value) <= 0) {
+      if (
+        (id == "benefitAmount" || id == "torAmount") &&
+        parseFloat(value) <= 0
+      ) {
         setFormData((oldValue) => ({ ...oldValue, [id]: 0 }));
       } else {
         setFormData((oldValue) => ({ ...oldValue, [id]: value }));
@@ -80,6 +83,7 @@ export const UsurpReferralModal = ({
         try {
           setTransacting(true);
           const torAmount = utils.toWei(formData?.torAmount);
+
           const allowance = await contracts.TORToken?.methods
             .allowance(account, RefThroneContract.ADDRESS)
             .call<bigint>();
@@ -188,6 +192,7 @@ export const UsurpReferralModal = ({
 };
 
 type TNewFormReferral = TFormReferral & {
+  name: "";
   serviceType: string;
   benefitType: string;
 };
@@ -203,8 +208,10 @@ const initFormNewReferral = {
 } as const;
 
 export const NewReferralModal = ({ open, onClose }: ModalProps) => {
+  const { account, utils, contracts } = React.useContext(MyAccountContext);
   const [formData, setFormData] =
     React.useState<TNewFormReferral>(initFormNewReferral);
+  const [transacting, setTransacting] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     return () => {
@@ -215,7 +222,10 @@ export const NewReferralModal = ({ open, onClose }: ModalProps) => {
   const handleChange = React.useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const { id, value } = event.target;
-      if ((id == "benefit" || id == "deposit") && parseFloat(value) <= 0) {
+      if (
+        (id == "benefitAmount" || id == "torAmount") &&
+        parseFloat(value) <= 0
+      ) {
         setFormData((oldValue) => ({ ...oldValue, [id]: 0 }));
       } else {
         setFormData((oldValue) => ({ ...oldValue, [id]: value }));
@@ -233,28 +243,106 @@ export const NewReferralModal = ({ open, onClose }: ModalProps) => {
     return false;
   }, [formData]);
 
+  const transact = React.useCallback(
+    async (formData?: TNewFormReferral) => {
+      if (formData && account) {
+        try {
+          setTransacting(true);
+          const torAmount = utils.toWei(formData?.torAmount);
+
+          const allowance = await contracts.TORToken?.methods
+            .allowance(account, RefThroneContract.ADDRESS)
+            .call<bigint>();
+          console.log({ torAmount });
+
+          if (!allowance || allowance < BigInt(torAmount)) {
+            console.log("need approve");
+            await contracts.TORToken?.methods
+              .approve(
+                RefThroneContract.ADDRESS,
+                BigInt("1267650600228229401496703205376")
+              )
+              .send({ from: account });
+            console.log("approved");
+          }
+
+          await contracts.RefThrone?.methods
+            .requestDepositForThrone(
+              formData.name,
+              formData.serviceType,
+              formData.benefitType,
+              utils.toWei(formData?.benefitAmount),
+              formData?.referralCode,
+              torAmount,
+              formData?.linkUrl
+            )
+            .send({ from: account });
+          return true;
+        } catch (err) {
+          console.log(err);
+        } finally {
+          setTransacting(false);
+        }
+      }
+      return false;
+    },
+
+    [contracts.RefThrone, account, utils, setTransacting]
+  );
+
+  const handleSubmit = React.useCallback(() => {
+    transact(formData).then((success) => {
+      success && onClose && onClose();
+    });
+  }, [formData, transact, onClose]);
+
   return open ? (
     <Dialog
-      title={"Usurp the Referral Throne"}
+      title={"Create New Referral Throne"}
       onClose={onClose}
       btnConfirm={{
-        label: "Register",
-        disabled: disabled,
+        label: transacting ? "Transacting" : "Register",
+        onClick: handleSubmit,
+        disabled: transacting || disabled,
         btnClass:
           "border-camo-500 bg-camo-500 text-primary chakra-petch-medium rounded-md w-[180px] py-1 active:bg-camo-300 disabled:cursor-not-allowed disabled:bg-gray-400 disabled:text-gray-500",
       }}
     >
       <InputData
-        id="benefit"
-        label="New Benefit"
+        id="name"
+        label="New Service"
+        className="pl-2 text-right"
+        value={formData.name}
+        onChange={handleChange}
+        type="text"
+      />
+      <InputData
+        id="serviceType"
+        label="Service Type"
+        className="pl-2 text-right"
+        value={formData.serviceType}
+        onChange={handleChange}
+        type="text"
+      />
+      <InputData
+        id="benefitType"
+        label="Benefit Type"
+        className="pl-2 text-right"
+        value={formData.benefitType}
+        onChange={handleChange}
+        type="text"
+      />
+      <InputData
+        id="benefitAmount"
+        label="Benefit"
         className="pl-2 text-right"
         value={formData.benefitAmount}
         onChange={handleChange}
         type="number"
       />
       <InputData
-        id="deposit"
-        label="New TOR Deposit"
+        id="torAmount"
+        label="TOR Deposit"
         className="pl-2 text-right"
         value={formData.torAmount}
         onChange={handleChange}
@@ -269,7 +357,7 @@ export const NewReferralModal = ({ open, onClose }: ModalProps) => {
         type="text"
       />
       <InputData
-        id="url"
+        id="linkUrl"
         label="New Referral URL"
         className="pl-2"
         value={formData.linkUrl}
