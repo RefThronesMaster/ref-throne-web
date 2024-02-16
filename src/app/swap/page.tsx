@@ -340,17 +340,6 @@ const Withdraw = () => {
           setMessage("");
           setTransacting(true);
 
-          // if (await getAvailableBalance(total)) {
-          //   const result = await contracts.EthTreasury?.methods
-          //     .withdraw(total)
-          //     .call({
-          //       from: account,
-          //     });
-
-          //   console.log({ result });
-          //   setValue("0");
-          // }
-
           const allowance = await contracts.TORToken?.methods
             .allowance(account, EthTreasuryContract.ADDRESS)
             .call<bigint>();

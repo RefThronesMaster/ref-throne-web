@@ -12,6 +12,7 @@ import {
   Input,
   TService,
   UsurpReferralModal,
+  NewReferralModal,
 } from "@/common/components";
 import { MyAccountContext } from "../MyAccountProvider";
 
@@ -20,8 +21,10 @@ export default function PageReferral() {
     console.log(event.target.value);
   }, []);
 
-  const [open, setOpen] = React.useState<boolean>(false);
+  const [openUsurpModal, setOpenUsurpModal] = React.useState<boolean>(false);
+  const [openNewModal, setOpenNewModal] = React.useState<boolean>(false);
   const [selected, setSelected] = React.useState<TService | undefined>();
+  // const [selected, setSelected] = React.useState<BigInt | undefined>();
   const { account, getBalance, web3, contracts, utils } =
     React.useContext(MyAccountContext);
 
@@ -41,20 +44,6 @@ export default function PageReferral() {
     // console.log(web3Client?.eth.defaultAccount);
     getAllOwnedThrones();
   }, [getAllOwnedThrones]);
-
-  // console.log(account);
-  // console.log({ chainId, account, isActive });
-  // id: BigInt;
-  // benefitAmount: BigInt;
-  // benefitType: "USDT";
-  // linkUrl: string;
-  // name: string;
-  // referralCode: string;
-  // referrer: string;
-  // serviceType: "CEX" | "DEX";
-  // statis: BigInt;
-  // torAmount: BigInt;
-  // timestamp: BigInt;
 
   const Columns: DataRowProps[] = React.useMemo(
     () =>
@@ -98,11 +87,11 @@ export default function PageReferral() {
           width: 170,
           value: (row: TService) => (
             <div className="flex items-center">
-              <span>{row.torAmount.toString()}</span>
+              <span>{utils?.fromWei(row.torAmount.toString())} TOR</span>
               <Button
                 className="mx-1"
                 onClick={() => {
-                  setOpen(true);
+                  setOpenUsurpModal(true);
                   setSelected(row);
                 }}
               >
@@ -126,12 +115,18 @@ export default function PageReferral() {
     []
   );
 
-  const handleClose = React.useCallback(() => {
-    setOpen(false);
+  const handleUsurpModalClose = React.useCallback(() => {
+    setOpenUsurpModal(false);
     setSelected(undefined);
   }, []);
 
-  const openNewReferral = React.useCallback(() => {}, []);
+  const handleNewModalClose = React.useCallback(() => {
+    setOpenNewModal(false);
+  }, []);
+
+  const openNewReferral = React.useCallback(() => {
+    setOpenNewModal(true);
+  }, []);
 
   return (
     <div className="mt-10">
@@ -174,8 +169,13 @@ export default function PageReferral() {
           <DataTable columns={Columns} data={data} />
         </div>
       </div>
-      <UsurpReferralModal open={open} data={selected} onClose={handleClose} />
-      {/* <UsurpReferralModal open={open} data={selected} onClose={handleClose} /> */}
+      <UsurpReferralModal
+        open={openUsurpModal}
+        data={selected}
+        // dataId={selected}
+        onClose={handleUsurpModalClose}
+      />
+      <NewReferralModal open={openNewModal} onClose={handleNewModalClose} />
     </div>
   );
 }

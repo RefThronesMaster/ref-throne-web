@@ -1,37 +1,44 @@
 import React, { ChangeEvent } from "react";
 import { DataInfo, InputData, Dialog } from ".";
 import type { TService } from ".";
+import { MyAccountContext } from "@/app/MyAccountProvider";
+import { RefThroneContract } from "@/libs/web3/abi";
 
 type ModalProps = {
   open: boolean;
   onClose?: () => void;
 };
+
 type UsurpReferralModal = ModalProps & {
   data?: TService;
+  // id: BigInt;
 };
 
-type TFormUsurpReferral = {
-  benefit: number;
-  deposit: number;
-  referral_code: string;
-  url: string;
+type TFormReferral = {
+  benefitAmount: number;
+  torAmount: number;
+  referralCode: string;
+  linkUrl: string;
 };
 
 const initFormUsurpReferral = {
-  benefit: 0,
-  deposit: 0,
-  referral_code: "",
-  url: "",
+  benefitAmount: 0,
+  torAmount: 0,
+  referralCode: "",
+  linkUrl: "",
 } as const;
 
 export const UsurpReferralModal = ({
   open,
   data,
+  // id,
   onClose,
 }: UsurpReferralModal) => {
-  const [formData, setFormData] = React.useState<TFormUsurpReferral>(
+  const { account, utils, contracts } = React.useContext(MyAccountContext);
+  const [formData, setFormData] = React.useState<TFormReferral>(
     initFormUsurpReferral
   );
+  const [transacting, setTransacting] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     return () => {
@@ -52,59 +59,125 @@ export const UsurpReferralModal = ({
   );
 
   const disabled = React.useMemo(() => {
-    if (!formData.url) return true;
-    if (!formData.referral_code) return true;
-    if (formData.benefit <= 0) return true;
-    if (formData.deposit <= 0) return true;
+    if (!formData.linkUrl) return true;
+    if (!formData.referralCode) return true;
+    if (formData.benefitAmount <= 0) return true;
+    if (formData.torAmount <= 0) return true;
+
+    if (
+      BigInt(data?.benefitAmount.toString() ?? "") >=
+      BigInt(formData.benefitAmount)
+    ) {
+      return true;
+    }
 
     return false;
-  }, [formData]);
+  }, [formData, data]);
+
+  const transact = React.useCallback(
+    async (data?: TService, formData?: TFormReferral) => {
+      if (data && formData && account) {
+        try {
+          setTransacting(true);
+          const torAmount = utils.toWei(formData?.torAmount);
+          const allowance = await contracts.TORToken?.methods
+            .allowance(account, RefThroneContract.ADDRESS)
+            .call<bigint>();
+          console.log({ torAmount });
+
+          if (!allowance || allowance < BigInt(torAmount)) {
+            console.log("need approve");
+            await contracts.TORToken?.methods
+              .approve(
+                RefThroneContract.ADDRESS,
+                BigInt("1267650600228229401496703205376")
+              )
+              .send({ from: account });
+            console.log("approved");
+          }
+
+          await contracts.RefThrone?.methods
+            .requestDepositForThrone(
+              data?.name,
+              data?.serviceType,
+              data?.benefitType,
+              utils.toWei(formData?.benefitAmount),
+              formData?.referralCode,
+              torAmount,
+              formData?.linkUrl
+            )
+            .send({ from: account });
+          return true;
+        } catch (err) {
+          console.log(err);
+        } finally {
+          setTransacting(false);
+        }
+      }
+      return false;
+    },
+
+    [contracts.RefThrone, account, utils, setTransacting]
+  );
+
+  const handleSubmit = React.useCallback(() => {
+    transact(data, formData).then((success) => {
+      success && onClose && onClose();
+    });
+  }, [formData, data, transact, onClose]);
 
   return open ? (
     <Dialog
       title={"Usurp the Referral Throne"}
       onClose={onClose}
       btnConfirm={{
-        label: "Register",
-        disabled: disabled,
+        label: transacting ? "Transacting" : "Register",
+        onClick: handleSubmit,
+        disabled: transacting || disabled,
         btnClass:
-          "border-camo-500 bg-camo-500 text-primary chakra-petch-medium rounded-md w-[180px] py-1 active:bg-camo-300 disabled:cursor-not-allowed disabled:bg-gray-400 disabled:text-gray-300",
+          "border-camo-500 bg-camo-500 text-primary chakra-petch-medium rounded-md w-[180px] py-1 active:bg-camo-300 disabled:cursor-not-allowed disabled:bg-gray-400 disabled:text-gray-500",
       }}
     >
-      <DataInfo label={"Service"} value={data?.service} />
+      <DataInfo label={"Service"} value={data?.name} />
       <DataInfo label={"Service Type"} value={data?.serviceType} />
       <DataInfo label={"Benefit Type"} value={data?.benefitType} />
-      <DataInfo label={"Currnet Benefit"} value={data?.benefit} />
-      <DataInfo label={"Current Deposited TOR"} value={"undefined TOR"} />
+      <DataInfo
+        label={"Currnet Benefit"}
+        value={data?.benefitAmount.toString()}
+      />
+      <DataInfo
+        label={"Current Deposited TOR"}
+        value={`${utils.fromWei(data?.torAmount.toString() ?? "")} TOR`}
+      />
       <InputData
-        id="benefit"
+        id="benefitAmount"
         label="New Benefit"
         className="pl-2 text-right"
-        value={formData.benefit}
+        value={formData.benefitAmount}
         onChange={handleChange}
         type="number"
       />
       <InputData
-        id="deposit"
+        id="torAmount"
         label="New TOR Deposit"
         className="pl-2 text-right"
-        value={formData.deposit}
+        value={formData.torAmount}
         onChange={handleChange}
         type="number"
       />
       <InputData
-        id="referral_code"
+        id="referralCode"
         label="New Referral Code"
         className="pl-2"
-        value={formData.referral_code}
+        value={formData.referralCode}
         onChange={handleChange}
         type="text"
       />
       <InputData
-        id="url"
+        id="linkUrl"
         label="New Referral URL"
         className="pl-2"
-        value={formData.url}
+        value={formData.linkUrl}
         onChange={handleChange}
         type="text"
       />
@@ -114,20 +187,30 @@ export const UsurpReferralModal = ({
   );
 };
 
-export const NewReferralModal = ({
-  open,
-  data,
-  onClose,
-}: UsurpReferralModal) => {
-  const [formData, setFormData] = React.useState<TFormUsurpReferral>(
-    initFormUsurpReferral
-  );
+type TNewFormReferral = TFormReferral & {
+  serviceType: string;
+  benefitType: string;
+};
+
+const initFormNewReferral = {
+  name: "",
+  serviceType: "",
+  benefitType: "",
+  benefitAmount: 0,
+  torAmount: 0,
+  referralCode: "",
+  linkUrl: "",
+} as const;
+
+export const NewReferralModal = ({ open, onClose }: ModalProps) => {
+  const [formData, setFormData] =
+    React.useState<TNewFormReferral>(initFormNewReferral);
 
   React.useEffect(() => {
     return () => {
-      setFormData(initFormUsurpReferral);
+      setFormData(initFormNewReferral);
     };
-  }, [open, data]);
+  }, [open]);
 
   const handleChange = React.useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -142,10 +225,10 @@ export const NewReferralModal = ({
   );
 
   const disabled = React.useMemo(() => {
-    if (!formData.url) return true;
-    if (!formData.referral_code) return true;
-    if (formData.benefit <= 0) return true;
-    if (formData.deposit <= 0) return true;
+    if (!formData.linkUrl) return true;
+    if (!formData.referralCode) return true;
+    if (formData.benefitAmount <= 0) return true;
+    if (formData.torAmount <= 0) return true;
 
     return false;
   }, [formData]);
@@ -158,19 +241,14 @@ export const NewReferralModal = ({
         label: "Register",
         disabled: disabled,
         btnClass:
-          "border-camo-500 bg-camo-500 text-primary chakra-petch-medium rounded-md w-[180px] py-1 active:bg-camo-300 disabled:cursor-not-allowed disabled:bg-gray-400 disabled:text-gray-300",
+          "border-camo-500 bg-camo-500 text-primary chakra-petch-medium rounded-md w-[180px] py-1 active:bg-camo-300 disabled:cursor-not-allowed disabled:bg-gray-400 disabled:text-gray-500",
       }}
     >
-      <DataInfo label={"Service"} value={data?.service} />
-      <DataInfo label={"Service Type"} value={data?.serviceType} />
-      <DataInfo label={"Benefit Type"} value={data?.benefitType} />
-      <DataInfo label={"Currnet Benefit"} value={data?.benefit} />
-      <DataInfo label={"Current Deposited TOR"} value={"undefined TOR"} />
       <InputData
         id="benefit"
         label="New Benefit"
         className="pl-2 text-right"
-        value={formData.benefit}
+        value={formData.benefitAmount}
         onChange={handleChange}
         type="number"
       />
@@ -178,15 +256,15 @@ export const NewReferralModal = ({
         id="deposit"
         label="New TOR Deposit"
         className="pl-2 text-right"
-        value={formData.deposit}
+        value={formData.torAmount}
         onChange={handleChange}
         type="number"
       />
       <InputData
-        id="referral_code"
+        id="referralCode"
         label="New Referral Code"
         className="pl-2"
-        value={formData.referral_code}
+        value={formData.referralCode}
         onChange={handleChange}
         type="text"
       />
@@ -194,7 +272,7 @@ export const NewReferralModal = ({
         id="url"
         label="New Referral URL"
         className="pl-2"
-        value={formData.url}
+        value={formData.linkUrl}
         onChange={handleChange}
         type="text"
       />

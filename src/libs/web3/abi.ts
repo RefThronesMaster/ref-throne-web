@@ -315,194 +315,728 @@ export const RefThroneContract: TContract = {
   ADDRESS: "0x6D0dFC88dF5A12760E3Bd1F73c4c707E19799558",
   ABI: [
     {
-      name: "requestDepositForThrone",
       inputs: [
-        { name: "name", type: "string" },
-        { name: "serviceType", type: "string" },
-        { name: "benefitType", type: "string" },
-        { name: "benefitAmount", type: "uint256" },
-        { name: "referralCode", type: "string" },
-        { name: "torAmount", type: "uint256" },
-        { name: "linkUrl", type: "string" },
+        {
+          internalType: "address",
+          name: "torTokenContractAddress",
+          type: "address",
+        },
+        {
+          internalType: "address",
+          name: "userHistoryContractAddress",
+          type: "address",
+        },
       ],
-      outputs: [{ name: "throneId", type: "uint256" }],
-      payable: false,
-      type: "function",
+      stateMutability: "nonpayable",
+      type: "constructor",
     },
     {
-      name: "withdrawFromThrone",
-      inputs: [{ name: "throneId", type: "uint256" }],
-      outputs: [{ name: "success", type: "bool" }],
-      payable: false,
-      type: "function",
-    },
-    {
-      name: "modifyThroneInReview",
       inputs: [
-        { name: "throneId", type: "uint256" },
-        { name: "name", type: "string" },
-        { name: "serviceType", type: "string" },
-        { name: "benefitType", type: "string" },
-        { name: "linkUrl", type: "string" },
-      ],
-      outputs: [],
-      payable: false,
-      type: "function",
-    },
-    {
-      name: "approveThrone",
-      inputs: [{ name: "throneId", type: "uint256" }],
-      outputs: [],
-      payable: false,
-      type: "function",
-    },
-    {
-      name: "rejectThrone",
-      inputs: [{ name: "throneId", type: "uint256" }],
-      outputs: [],
-      payable: false,
-      type: "function",
-    },
-    {
-      name: "getAllOwnedThrones",
-      inputs: [],
-      outputs: [
         {
-          name: "ownedThrones",
-          type: "tuple[]",
-          components: [
-            { name: "id", type: "uint256" },
-            { name: "name", type: "string" },
-            { name: "serviceType", type: "string" },
-            { name: "benefitType", type: "string" },
-            { name: "benefitAmount", type: "uint256" },
-            { name: "referrer", type: "address" },
-            { name: "referralCode", type: "string" },
-            { name: "torAmount", type: "uint256" },
-            { name: "linkUrl", type: "string" },
-            { name: "status", type: "uint8" },
-            { name: "timestamp", type: "uint256" },
-          ],
+          internalType: "address",
+          name: "owner",
+          type: "address",
         },
       ],
-      payable: false,
-      type: "function",
+      name: "OwnableInvalidOwner",
+      type: "error",
     },
     {
-      name: "getAllThronesInReview",
-      inputs: [],
-      outputs: [
+      inputs: [
         {
-          name: "thronesInReview",
-          type: "tuple[]",
-          components: [
-            { name: "id", type: "uint256" },
-            { name: "name", type: "string" },
-            { name: "serviceType", type: "string" },
-            { name: "benefitType", type: "string" },
-            { name: "benefitAmount", type: "uint256" },
-            { name: "referrer", type: "address" },
-            { name: "referralCode", type: "string" },
-            { name: "torAmount", type: "uint256" },
-            { name: "linkUrl", type: "string" },
-            { name: "status", type: "uint8" },
-            { name: "timestamp", type: "uint256" },
-          ],
+          internalType: "address",
+          name: "account",
+          type: "address",
         },
       ],
-      payable: false,
-      type: "function",
+      name: "OwnableUnauthorizedAccount",
+      type: "error",
     },
     {
-      name: "getServiceTypes",
-      inputs: [],
-      outputs: [{ name: "serviceTypes", type: "string[]" }],
-      payable: false,
-      type: "function",
-    },
-    {
-      name: "getBenefitTypes",
-      inputs: [],
-      outputs: [{ name: "benefitTypes", type: "string[]" }],
-      payable: false,
-      type: "function",
-    },
-    {
-      name: "getThroneById",
-      inputs: [{ name: "throneId", type: "uint256" }],
-      outputs: [
+      anonymous: false,
+      inputs: [
         {
-          name: "thrones",
-          type: "tuple[]",
-          components: [
-            { name: "id", type: "uint256" },
-            { name: "name", type: "string" },
-            { name: "serviceType", type: "string" },
-            { name: "benefitType", type: "string" },
-            { name: "benefitAmount", type: "uint256" },
-            { name: "referrer", type: "address" },
-            { name: "referralCode", type: "string" },
-            { name: "torAmount", type: "uint256" },
-            { name: "linkUrl", type: "string" },
-            { name: "status", type: "uint8" },
-            { name: "timestamp", type: "uint256" },
-          ],
+          indexed: true,
+          internalType: "address",
+          name: "previousOwner",
+          type: "address",
+        },
+        {
+          indexed: true,
+          internalType: "address",
+          name: "newOwner",
+          type: "address",
         },
       ],
-      payable: false,
-      type: "function",
+      name: "OwnershipTransferred",
+      type: "event",
     },
     {
-      name: "getThroneByAddress",
-      inputs: [{ name: "address_", type: "address" }],
-      outputs: [
+      anonymous: false,
+      inputs: [
         {
-          name: "thrones",
-          type: "tuple[]",
-          components: [
-            { name: "id", type: "uint256" },
-            { name: "name", type: "string" },
-            { name: "serviceType", type: "string" },
-            { name: "benefitType", type: "string" },
-            { name: "benefitAmount", type: "uint256" },
-            { name: "referrer", type: "address" },
-            { name: "referralCode", type: "string" },
-            { name: "torAmount", type: "uint256" },
-            { name: "linkUrl", type: "string" },
-            { name: "status", type: "uint8" },
-            { name: "timestamp", type: "uint256" },
-          ],
+          indexed: false,
+          internalType: "uint256",
+          name: "throneId",
+          type: "uint256",
+        },
+        {
+          indexed: false,
+          internalType: "enum RefThrone.Status",
+          name: "status",
+          type: "uint8",
         },
       ],
-      payable: false,
-      type: "function",
+      name: "ThroneStatus",
+      type: "event",
     },
     {
-      name: "getTorDepositedByAddress",
-      inputs: [{ name: "address_", type: "address" }],
-      outputs: [{ name: "torAmount", type: "uint256" }],
-      payable: false,
-      type: "function",
-    },
-    {
-      name: "getTotalTorDeposited",
-      inputs: [],
-      outputs: [{ name: "torAmount", type: "uint256" }],
-      payable: false,
-      type: "function",
-    },
-    {
-      name: "addServiceType",
-      inputs: [{ name: "serviceType", type: "string" }],
-      outputs: [],
-      payable: false,
-      type: "function",
-    },
-    {
+      inputs: [
+        {
+          internalType: "string",
+          name: "benefitType",
+          type: "string",
+        },
+      ],
       name: "addBenefitType",
-      inputs: [{ name: "benefitType", type: "string" }],
       outputs: [],
-      payable: false,
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "string",
+          name: "serviceType",
+          type: "string",
+        },
+      ],
+      name: "addServiceType",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "uint256",
+          name: "throneId",
+          type: "uint256",
+        },
+      ],
+      name: "approveThrone",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "claimAllGas",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "getAllOwnedThrones",
+      outputs: [
+        {
+          components: [
+            {
+              internalType: "uint256",
+              name: "id",
+              type: "uint256",
+            },
+            {
+              internalType: "string",
+              name: "name",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "serviceType",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "benefitType",
+              type: "string",
+            },
+            {
+              internalType: "uint256",
+              name: "benefitAmount",
+              type: "uint256",
+            },
+            {
+              internalType: "address",
+              name: "referrer",
+              type: "address",
+            },
+            {
+              internalType: "string",
+              name: "referralCode",
+              type: "string",
+            },
+            {
+              internalType: "uint256",
+              name: "torAmount",
+              type: "uint256",
+            },
+            {
+              internalType: "string",
+              name: "linkUrl",
+              type: "string",
+            },
+            {
+              internalType: "enum RefThrone.Status",
+              name: "status",
+              type: "uint8",
+            },
+            {
+              internalType: "uint256",
+              name: "timestamp",
+              type: "uint256",
+            },
+          ],
+          internalType: "struct RefThrone.Throne[]",
+          name: "",
+          type: "tuple[]",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "getAllThronesInReview",
+      outputs: [
+        {
+          components: [
+            {
+              internalType: "uint256",
+              name: "id",
+              type: "uint256",
+            },
+            {
+              internalType: "string",
+              name: "name",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "serviceType",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "benefitType",
+              type: "string",
+            },
+            {
+              internalType: "uint256",
+              name: "benefitAmount",
+              type: "uint256",
+            },
+            {
+              internalType: "address",
+              name: "referrer",
+              type: "address",
+            },
+            {
+              internalType: "string",
+              name: "referralCode",
+              type: "string",
+            },
+            {
+              internalType: "uint256",
+              name: "torAmount",
+              type: "uint256",
+            },
+            {
+              internalType: "string",
+              name: "linkUrl",
+              type: "string",
+            },
+            {
+              internalType: "enum RefThrone.Status",
+              name: "status",
+              type: "uint8",
+            },
+            {
+              internalType: "uint256",
+              name: "timestamp",
+              type: "uint256",
+            },
+          ],
+          internalType: "struct RefThrone.Throne[]",
+          name: "",
+          type: "tuple[]",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "getBenefitTypes",
+      outputs: [
+        {
+          internalType: "string[]",
+          name: "",
+          type: "string[]",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "getBlastContractAddress",
+      outputs: [
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "getServiceTypes",
+      outputs: [
+        {
+          internalType: "string[]",
+          name: "",
+          type: "string[]",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "uint256",
+          name: "throneId",
+          type: "uint256",
+        },
+      ],
+      name: "getThroneById",
+      outputs: [
+        {
+          components: [
+            {
+              internalType: "uint256",
+              name: "id",
+              type: "uint256",
+            },
+            {
+              internalType: "string",
+              name: "name",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "serviceType",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "benefitType",
+              type: "string",
+            },
+            {
+              internalType: "uint256",
+              name: "benefitAmount",
+              type: "uint256",
+            },
+            {
+              internalType: "address",
+              name: "referrer",
+              type: "address",
+            },
+            {
+              internalType: "string",
+              name: "referralCode",
+              type: "string",
+            },
+            {
+              internalType: "uint256",
+              name: "torAmount",
+              type: "uint256",
+            },
+            {
+              internalType: "string",
+              name: "linkUrl",
+              type: "string",
+            },
+            {
+              internalType: "enum RefThrone.Status",
+              name: "status",
+              type: "uint8",
+            },
+            {
+              internalType: "uint256",
+              name: "timestamp",
+              type: "uint256",
+            },
+          ],
+          internalType: "struct RefThrone.Throne",
+          name: "",
+          type: "tuple",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "address_",
+          type: "address",
+        },
+      ],
+      name: "getThronesByAddress",
+      outputs: [
+        {
+          components: [
+            {
+              internalType: "uint256",
+              name: "id",
+              type: "uint256",
+            },
+            {
+              internalType: "string",
+              name: "name",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "serviceType",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "benefitType",
+              type: "string",
+            },
+            {
+              internalType: "uint256",
+              name: "benefitAmount",
+              type: "uint256",
+            },
+            {
+              internalType: "address",
+              name: "referrer",
+              type: "address",
+            },
+            {
+              internalType: "string",
+              name: "referralCode",
+              type: "string",
+            },
+            {
+              internalType: "uint256",
+              name: "torAmount",
+              type: "uint256",
+            },
+            {
+              internalType: "string",
+              name: "linkUrl",
+              type: "string",
+            },
+            {
+              internalType: "enum RefThrone.Status",
+              name: "status",
+              type: "uint8",
+            },
+            {
+              internalType: "uint256",
+              name: "timestamp",
+              type: "uint256",
+            },
+          ],
+          internalType: "struct RefThrone.Throne[]",
+          name: "",
+          type: "tuple[]",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "address_",
+          type: "address",
+        },
+      ],
+      name: "getTorDepositedByAddress",
+      outputs: [
+        {
+          internalType: "uint256",
+          name: "torAmount",
+          type: "uint256",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "getTorTokenContractAddress",
+      outputs: [
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "getTotalTorDeposited",
+      outputs: [
+        {
+          internalType: "uint256",
+          name: "torAmount",
+          type: "uint256",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "getUserHistoryContractAddress",
+      outputs: [
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "uint256",
+          name: "throneId",
+          type: "uint256",
+        },
+        {
+          internalType: "string",
+          name: "name",
+          type: "string",
+        },
+        {
+          internalType: "string",
+          name: "serviceType",
+          type: "string",
+        },
+        {
+          internalType: "string",
+          name: "benefitType",
+          type: "string",
+        },
+        {
+          internalType: "string",
+          name: "linkUrl",
+          type: "string",
+        },
+      ],
+      name: "modifyThroneInReview",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "owner",
+      outputs: [
+        {
+          internalType: "address",
+          name: "",
+          type: "address",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "readGasParams",
+      outputs: [
+        {
+          internalType: "uint256",
+          name: "etherSeconds",
+          type: "uint256",
+        },
+        {
+          internalType: "uint256",
+          name: "etherBalance",
+          type: "uint256",
+        },
+        {
+          internalType: "uint256",
+          name: "lastUpdated",
+          type: "uint256",
+        },
+        {
+          internalType: "enum GasMode",
+          name: "",
+          type: "uint8",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "uint256",
+          name: "throneId",
+          type: "uint256",
+        },
+      ],
+      name: "rejectThrone",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "renounceOwnership",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "string",
+          name: "name",
+          type: "string",
+        },
+        {
+          internalType: "string",
+          name: "serviceType",
+          type: "string",
+        },
+        {
+          internalType: "string",
+          name: "benefitType",
+          type: "string",
+        },
+        {
+          internalType: "uint256",
+          name: "benefitAmount",
+          type: "uint256",
+        },
+        {
+          internalType: "string",
+          name: "referralCode",
+          type: "string",
+        },
+        {
+          internalType: "uint256",
+          name: "torAmount",
+          type: "uint256",
+        },
+        {
+          internalType: "string",
+          name: "linkUrl",
+          type: "string",
+        },
+      ],
+      name: "requestDepositForThrone",
+      outputs: [
+        {
+          internalType: "uint256",
+          name: "throneId",
+          type: "uint256",
+        },
+      ],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "blastContractAddress",
+          type: "address",
+        },
+      ],
+      name: "setBlastContractAddress",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "torTokenContractAddress",
+          type: "address",
+        },
+      ],
+      name: "setTorTokenContractAddress",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "userHistoryContractAddress",
+          type: "address",
+        },
+      ],
+      name: "setUserHistoryContractAddress",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "newOwner",
+          type: "address",
+        },
+      ],
+      name: "transferOwnership",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "uint256",
+          name: "throneId",
+          type: "uint256",
+        },
+      ],
+      name: "withdrawFromThrone",
+      outputs: [
+        {
+          internalType: "bool",
+          name: "success",
+          type: "bool",
+        },
+      ],
+      stateMutability: "nonpayable",
       type: "function",
     },
   ] as ContractAbi,

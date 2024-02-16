@@ -25,7 +25,7 @@ const MENU = {
   "/swap": "TOR Swap",
   "/dashboard": "Dashboard",
   "/guides": "Guides",
-  "/gtor": "gTOR Token",
+  "/torg": "TORG Token",
 };
 const { useChainId } = hooks;
 
@@ -108,6 +108,51 @@ export const Header = () => {
         <div className="lg:inline-block">
           {Object.entries(MENU).map((item) => {
             const [url, title] = item;
+            if (url == "/guides") {
+              return (
+                <Link
+                  key={url}
+                  href={"https://docs.refthrones.click/"}
+                  target="_blank"
+                >
+                  <Button
+                    color="text"
+                    className={
+                      "text-base py-2 lg:py-1 px-6 lg:px-4" +
+                      (pathname.includes(url) || pathname == url
+                        ? " text-primary"
+                        : "")
+                    }
+                    disabled={!signedIn}
+                  >
+                    {title}
+                  </Button>
+                </Link>
+              );
+            } else if (url == "/torg") {
+              return (
+                <Link
+                  key={url}
+                  href={
+                    "https://docs.refthrones.click/7.-governance-token-tentatively-torg"
+                  }
+                  target="_blank"
+                >
+                  <Button
+                    color="text"
+                    className={
+                      "text-base py-2 lg:py-1 px-6 lg:px-4" +
+                      (pathname.includes(url) || pathname == url
+                        ? " text-primary"
+                        : "")
+                    }
+                    disabled={!signedIn}
+                  >
+                    {title}
+                  </Button>
+                </Link>
+              );
+            }
             return (
               <Link key={url} href={url}>
                 <Button
