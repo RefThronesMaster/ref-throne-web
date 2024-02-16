@@ -312,7 +312,7 @@ export const TORTokenContract: TContract = {
 // const a: AbiOutput;
 
 export const RefThroneContract: TContract = {
-  ADDRESS: "0x6D0dFC88dF5A12760E3Bd1F73c4c707E19799558",
+  ADDRESS: "0xa81dF2481ce429412a339B85c1edB7Bc92bB1Ed9",
   ABI: [
     {
       inputs: [
@@ -1105,7 +1105,7 @@ export const EthTreasuryContract: TContract = {
 };
 
 export const UserHistoryContract: TContract = {
-  ADDRESS: "0x6d7a265813ECc0af098C45A42e7D826a784b1312",
+  ADDRESS: "0xfb1ee26A9DC3B8462FF0664F0B4a9aC1a87A2B7F",
   ABI: [
     {
       name: "checkDuplicateCheckIn",
