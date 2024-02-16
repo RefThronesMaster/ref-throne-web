@@ -253,8 +253,8 @@ const Withdraw = () => {
 
   const getMyTorBalance = React.useCallback(async () => {
     try {
-      const result = await contracts.EthTreasury?.methods
-        ._totalTorBalance()
+      const result = await contracts.TORToken?.methods
+        .balanceOf(account)
         .call();
       return result?.toString() ?? "";
     } catch (err: any) {
