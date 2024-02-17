@@ -109,3 +109,15 @@ button {
   font-weight: 700;
   font-style: italic;
 }
+
+::-webkit-scrollbar {
+  display: block;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 12px; background-color: darkgray;
+}
+
+::-webkit-scrollbar-hover {
+  background-color: darkgray;
+}
