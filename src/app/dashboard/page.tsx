@@ -2,6 +2,7 @@
 
 import React from "react";
 import { DataRowProps, DataTable, Dialog } from "@/common/components";
+import Image from "next/image";
 
 const SampleLeadersRecords = [
   {
@@ -219,12 +220,22 @@ export default function PageDashboard() {
         <h2 className="text-lg text-primary chakra-petch-bold">
           My Referral Thrones
         </h2>
-        <div>
-          <DataTable
-            columns={ColumnsMyReferrals}
-            data={SampleMyReferralsRecords}
-          />
-        </div>
+              <div className="flex items-center justify-center">
+                  <Image
+                      src="/assets/images/mythrones.png"
+                      width={1439}
+                      height={331}
+                      alt="tor_concept"
+                      className="w-full"
+                      style={{ objectFit: "contain" }}
+                  />
+              </div>
+        {/*<div>*/}
+        {/*  <DataTable*/}
+        {/*    columns={ColumnsMyReferrals}*/}
+        {/*    data={SampleMyReferralsRecords}*/}
+        {/*  />*/}
+        {/*</div>*/}
       </div>
     </div>
   );
