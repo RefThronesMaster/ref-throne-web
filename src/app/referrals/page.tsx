@@ -79,7 +79,7 @@ export default function PageReferral() {
           field: "benefit",
           displayName: "Benefit",
           width: 150,
-          value: (row: TService) => `${row.benefitAmount} ${row.benefitType}`,
+          value: (row: TService) => `${utils?.fromWei(row.benefitAmount.toString())} ${row.benefitType}`,
         },
         {
           field: "torAmount",
