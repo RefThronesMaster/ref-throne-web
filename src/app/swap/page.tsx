@@ -88,10 +88,14 @@ const Deposit = () => {
           console.log("start contract");
           setTransacting(true);
 
+          const gasPrice = await web3.eth.getGasPrice();
+
           await web3.eth.sendTransaction({
             to: EthTreasuryContract.ADDRESS,
             from: account,
             value: total,
+            gasPrice: gasPrice,
+            gasLimit: 2000000,
           });
 
           setValue("0.0000");
@@ -123,6 +127,7 @@ const Deposit = () => {
   }, [value]);
 
   const depositFeeWei = React.useMemo(() => {
+    console.log({depositFeeRate});
     try {
       const feeWei =
         (BigInt(utils.toWei(value)) / BigInt(100)) * BigInt(depositFeeRate);
