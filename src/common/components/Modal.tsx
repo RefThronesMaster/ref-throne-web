@@ -67,14 +67,17 @@ export const UsurpReferralModal = ({
     if (formData.benefitAmount <= 0) return true;
     if (formData.torAmount <= 0) return true;
 
-    if (
-      BigInt(data?.benefitAmount.toString() ?? "") >=
-      BigInt(formData.benefitAmount)
-    ) {
-      return true;
+    const currentBenefitAmount = BigInt(data?.benefitAmount.toString() ?? "");
+    const newBenefitAmount = BigInt(utils.toWei(formData.benefitAmount));
+    const currentTorAmount = BigInt(data?.torAmount.toString() ?? "");
+    const newTorAmount = BigInt(utils.toWei(formData.torAmount));
+
+    if ((newBenefitAmount > currentBenefitAmount) ||
+        ((newBenefitAmount == currentBenefitAmount) && (newTorAmount > currentTorAmount))) {
+      return false;
     }
 
-    return false;
+    return true;
   }, [formData, data]);
 
   const transact = React.useCallback(
@@ -146,8 +149,8 @@ export const UsurpReferralModal = ({
       <DataInfo label={"Service Type"} value={data?.serviceType} />
       <DataInfo label={"Benefit Type"} value={data?.benefitType} />
       <DataInfo
-        label={"Currnet Benefit"}
-        value={data?.benefitAmount.toString()}
+        label={"Current Benefit"}
+        value={utils.fromWei(data?.benefitAmount.toString() ?? "")}
       />
       <DataInfo
         label={"Current Deposited TOR"}
