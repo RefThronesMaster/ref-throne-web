@@ -3,6 +3,7 @@
 import React from "react";
 import { DataRowProps, DataTable, Dialog } from "@/components/common";
 import Image from "next/image";
+import { MyAccountContext } from "../MyAccountProvider";
 
 const SampleLeadersRecords = [
   {
@@ -59,7 +60,16 @@ const SampleMyReferralsRecords = [
 ];
 
 export default function PageDashboard() {
-  // const { web3Client } = React.useContext(AppContext);
+  const { contracts, utils, account } = React.useContext(MyAccountContext);
+
+  const [totalTorDeposited, setTotalTorDeposited] =
+    React.useState<string>("0.00");
+  const [myTotalEthDeposited, setMyTotalEthDeposited] =
+    React.useState<string>("0.00");
+  const [myTotalTorDeposited, setMyTotalTorDeposited] =
+    React.useState<string>("0.00");
+
+  const [myInvitees, setMyInvitees] = React.useState<any[]>([]);
 
   const ColumnsLeaders: DataRowProps[] = React.useMemo(
     () => [
@@ -144,6 +154,102 @@ export default function PageDashboard() {
     ],
     []
   );
+
+  const getTotalTorDeposited = React.useCallback(async () => {
+    try {
+      const result = await contracts.RefThrone?.methods
+        .getTotalTorDeposited()
+        .call<bigint>();
+
+      if (result) {
+        setTotalTorDeposited(
+          Number(utils.fromWei(result?.toString())).toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 5,
+          })
+        );
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }, [contracts.RefThrone, utils, account]);
+
+  const getMyTotalEthBalance = React.useCallback(async () => {
+    if (account) {
+      try {
+        const result = await contracts.EthTreasury?.methods
+          .getSwappedUserEthBalance(account)
+          .call<bigint>();
+
+        if (result) {
+          console.log({ eth: result });
+          setMyTotalEthDeposited(
+            Number(utils.fromWei(result?.toString())).toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 5,
+            })
+          );
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  }, [contracts.EthTreasury, utils]);
+
+  const getMyInfo = React.useCallback(async () => {
+    try {
+      const result = await contracts.User?.methods.getUserInfo().call();
+
+      if (result) {
+        console.log({ userInfo: result });
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }, [contracts.User, utils]);
+
+  const getMyInvitees = React.useCallback(async () => {
+    try {
+      const result = await contracts.User?.methods.getInvitees().call<any[]>();
+
+      if (result) {
+        setMyInvitees(result);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }, [contracts.User, utils]);
+
+  const getMyTotalTorBalance = React.useCallback(async () => {
+    if (account) {
+      try {
+        const result = await contracts.EthTreasury?.methods
+          .getSwappedUserTorBalance(account)
+          .call<bigint>();
+
+        if (result) {
+          console.log({ tor: result });
+          setMyTotalTorDeposited(
+            Number(utils.fromWei(result?.toString())).toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 5,
+            })
+          );
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  }, [contracts.EthTreasury, utils, account]);
+
+  React.useEffect(() => {
+    getTotalTorDeposited();
+    getMyTotalEthBalance();
+    getMyTotalTorBalance();
+    getMyInfo();
+    getMyInvitees();
+  }, []);
+
   return (
     <div className="mt-10 w-full">
       <div className="flex flex-wrap justify-center md:justify-between">
@@ -154,7 +260,7 @@ export default function PageDashboard() {
         />
         <PanelTitle
           name={"Total TOR Supply"}
-          result={"0.00 TOR"}
+          result={totalTorDeposited}
           className="w-full max-w-[90%] mt-3 md:mt-0 md:w-1/6 md:max-w-[170px]"
         />
         <PanelTitle
@@ -186,17 +292,17 @@ export default function PageDashboard() {
         <div className="mt-4 flex flex-wrap justify-center md:justify-between">
           <PanelTitle
             name={"My Deposited ETH"}
-            result={"0.00 ETH"}
+            result={myTotalEthDeposited}
             className="w-full max-w-[90%] md:w-1/6 md:max-w-[170px]"
           />
           <PanelTitle
             name={"My TOR"}
-            result={"0.00 TOR"}
+            result={myTotalTorDeposited}
             className="w-full max-w-[90%] mt-3 md:mt-0 md:w-1/6 md:max-w-[170px]"
           />
           <PanelTitle
             name={"My Invitees"}
-            result={0}
+            result={myInvitees.length}
             className="w-full max-w-[90%] mt-3 md:mt-0 md:w-1/6 md:max-w-[170px]"
           />
           <PanelTitle
@@ -220,16 +326,16 @@ export default function PageDashboard() {
         <h2 className="text-lg text-primary chakra-petch-bold">
           My Referral Thrones
         </h2>
-              <div className="flex items-center justify-center">
-                  <Image
-                      src="/assets/images/mythrones.png"
-                      width={1439}
-                      height={331}
-                      alt="tor_concept"
-                      className="w-full"
-                      style={{ objectFit: "contain" }}
-                  />
-              </div>
+        <div className="flex items-center justify-center">
+          <Image
+            src="/assets/images/mythrones.png"
+            width={1439}
+            height={331}
+            alt="tor_concept"
+            className="w-full"
+            style={{ objectFit: "contain" }}
+          />
+        </div>
         {/*<div>*/}
         {/*  <DataTable*/}
         {/*    columns={ColumnsMyReferrals}*/}
