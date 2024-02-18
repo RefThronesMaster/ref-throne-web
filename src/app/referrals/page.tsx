@@ -1,15 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import React, { ChangeEvent, HTMLInputTypeAttribute } from "react";
+import React, { ChangeEvent } from "react";
 import {
   Button,
   Search,
   SwordIcon,
   DataTable,
   DataRowProps,
-  Dialog,
-  Input,
   TService,
   UsurpReferralModal,
   NewReferralModal,
@@ -32,8 +30,7 @@ export default function PageReferral() {
   const [openNewModal, setOpenNewModal] = React.useState<boolean>(false);
   const [selected, setSelected] = React.useState<TService | undefined>();
   const [search, setSearch] = React.useState<string>("");
-  const { account, getBalance, web3, contracts, utils } =
-    React.useContext(MyAccountContext);
+  const { contracts, utils } = React.useContext(MyAccountContext);
 
   const [sort, setSort] = React.useState<SORT>(defaultSort);
 
@@ -71,6 +68,7 @@ export default function PageReferral() {
         front = b;
         back = a;
       }
+
       switch (sort.field) {
         case "torAmount":
           return front.torAmount.valueOf() - back.torAmount.valueOf() >
@@ -97,15 +95,10 @@ export default function PageReferral() {
     contracts.RefThrone?.methods
       .getAllOwnedThrones()
       .call<TService[]>()
-      .then((res) => {
-        // res.sort(handleSort);
-        setData(res);
-      });
+      .then(setData);
   }, [contracts.RefThrone]);
 
   React.useEffect(() => {
-    // web3Client?.eth.
-    // console.log(web3Client?.eth.defaultAccount);
     getAllOwnedThrones();
   }, [getAllOwnedThrones]);
 
