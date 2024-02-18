@@ -1623,3 +1623,29 @@ export const UserHistoryContract: TContract = {
     },
   ] as ContractAbi,
 };
+
+export const UserContract: TContract = {
+  ADDRESS: "0xb32c58BFD2448875a91c6323cD209FF8aEEA6577",
+  ABI: [
+    {
+      name: "getInvitees",
+      inputs: [],
+      outputs: [{ name: "getInvitees", type: "address[]" }],
+      payable: false,
+      type: "function",
+    },
+    {
+      name: "getUserInfo",
+      inputs: [],
+      outputs: [
+        { name: "nickName", type: "string" },
+        { name: "xUrl", type: "string" },
+        { name: "xTubeUrl", type: "string" },
+        { name: "telegramUrl", type: "string" },
+        { name: "discordUrl", type: "string" }
+      ],
+      payable: false,
+      type: "function",
+    },
+  ] as ContractAbi,
+};

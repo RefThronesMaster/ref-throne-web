@@ -12,6 +12,7 @@ import {
   EthTreasuryContract,
   RefThroneContract,
   TORTokenContract,
+  UserContract,
   UserHistoryContract,
 } from "@/libs/web3/abi";
 
@@ -36,6 +37,7 @@ type TMyAccountContext = {
     TORToken: Contract<ContractAbi> | null;
     EthTreasury: Contract<ContractAbi> | null;
     UserHistory: Contract<ContractAbi> | null;
+    User: Contract<ContractAbi> | null;
   };
   utils: {
     fromWei: (value: string | number) => string;
@@ -52,6 +54,7 @@ export const MyAccountContext = React.createContext<TMyAccountContext>({
     TORToken: null,
     EthTreasury: null,
     UserHistory: null,
+    User: null,
   },
   utils: {
     fromWei: (value: string | number) => "0",
@@ -150,6 +153,13 @@ export const MyAccountProvider = ({
     return null;
   }, [web3]);
 
+  const contractUser = React.useMemo(() => {
+    if (web3) {
+      return new web3.eth.Contract(UserContract.ABI, UserContract.ADDRESS);
+    }
+    return null;
+  }, [web3]);
+
   React.useEffect(() => {
     if (signedIn) {
       const query = searchParams.get("p");
@@ -223,6 +233,7 @@ export const MyAccountProvider = ({
           TORToken: contractTORToken,
           RefThrone: contractRefThrone,
           UserHistory: contractUserHistory,
+          User: contractUser,
         },
         utils: {
           toWei,
