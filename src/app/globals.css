@@ -113,13 +113,14 @@ select {
 
 ::-webkit-scrollbar {
   display: block;
+  height: 6px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
-  border-radius: 12px;
-  background-color: darkgray;
+  border-radius: 6px;
+  background-color: #404833;
 }
-
-::-webkit-scrollbar-hover {
-  background-color: darkgray;
+::-webkit-scrollbar-track {
+  background-color: #11140c;
 }
