@@ -72,11 +72,19 @@ const Deposit = () => {
       const { value } = event.target;
 
       setMessage("");
-      if (parseFloat(value) < 0) {
+      const floatVal = parseFloat(value);
+      if (Number.isNaN(floatVal)) {
+        setValue("0.0000");
+      } else if (floatVal < 0) {
         setValue("0.0000");
       } else {
-        setValue(value);
+        setValue(floatVal.toString());
       }
+      // if (parseFloat(value) < 0) {
+      //   setValue("0.0000");
+      // } else {
+      //   setValue(value);
+      // }
     },
     []
   );
@@ -119,7 +127,9 @@ const Deposit = () => {
   const receivedTor = React.useMemo(() => {
     try {
       const tor = ethToTor(parseFloat(value));
-      return tor.toFixed(value.length - 3).replace(/\.?0+$/, "");
+      return tor
+        .toFixed(value.length > 3 ? value.length - 3 : value.length)
+        .replace(/\.?0+$/, "");
     } catch (err) {
       console.log(err);
     }
@@ -127,7 +137,7 @@ const Deposit = () => {
   }, [value]);
 
   const depositFeeWei = React.useMemo(() => {
-    console.log({depositFeeRate});
+    console.log({ depositFeeRate });
     try {
       const feeWei =
         (BigInt(utils.toWei(value)) / BigInt(100)) * BigInt(depositFeeRate);
