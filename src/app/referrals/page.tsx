@@ -239,7 +239,9 @@ export default function PageReferral() {
           <DataTable
             columns={Columns}
             data={data
-              .filter((item) => item.referralCode.includes(search))
+              .filter((item) =>
+                item.referralCode.toUpperCase().includes(search.toUpperCase())
+              )
               .sort(handleSort)}
             sort={sort}
             onChangeSort={handleChangeSort}
