@@ -1,8 +1,9 @@
 import React, { ChangeEvent } from "react";
-import { DataInfo, InputData, Dialog } from ".";
+import { DataInfo, InputData, Dialog, SelectData } from ".";
 import type { TService } from ".";
 import { MyAccountContext } from "@/app/MyAccountProvider";
 import { RefThroneContract } from "@/libs/web3/abi";
+import { BENEFIT_TYPES } from "@/libs/web3/types";
 
 type ModalProps = {
   open: boolean;
@@ -72,8 +73,11 @@ export const UsurpReferralModal = ({
     const currentTorAmount = BigInt(data?.torAmount.toString() ?? "");
     const newTorAmount = BigInt(utils.toWei(formData.torAmount));
 
-    if ((newBenefitAmount > currentBenefitAmount) ||
-        ((newBenefitAmount == currentBenefitAmount) && (newTorAmount > currentTorAmount))) {
+    if (
+      newBenefitAmount > currentBenefitAmount ||
+      (newBenefitAmount == currentBenefitAmount &&
+        newTorAmount > currentTorAmount)
+    ) {
       return false;
     }
 
@@ -237,6 +241,14 @@ export const NewReferralModal = ({ open, onClose }: ModalProps) => {
     []
   );
 
+  const handleSelectChange = React.useCallback(
+    (event: ChangeEvent<HTMLSelectElement>) => {
+      const { id, value } = event.target;
+      setFormData((oldValue) => ({ ...oldValue, [id]: value }));
+    },
+    []
+  );
+
   const disabled = React.useMemo(() => {
     if (!formData.linkUrl) return true;
     if (!formData.referralCode) return true;
@@ -327,13 +339,16 @@ export const NewReferralModal = ({ open, onClose }: ModalProps) => {
         onChange={handleChange}
         type="text"
       />
-      <InputData
+      <SelectData
         id="benefitType"
         label="Benefit Type"
-        className="pl-2 text-right"
+        className="pl-2"
         value={formData.benefitType}
-        onChange={handleChange}
-        type="text"
+        onChange={handleSelectChange}
+        options={Object.keys(BENEFIT_TYPES).map((key) => ({
+          label: key,
+          value: key,
+        }))}
       />
       <InputData
         id="benefitAmount"
