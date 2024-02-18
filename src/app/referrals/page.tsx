@@ -17,25 +17,88 @@ import {
 import { MyAccountContext } from "../MyAccountProvider";
 import { BENEFIT_LABEL } from "@/libs/web3/types";
 
-export default function PageReferral() {
-  const onChange = React.useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target.value);
-  }, []);
+type SORT = {
+  field: string;
+  order: "ASC" | "DESC";
+};
 
+const defaultSort: SORT = {
+  field: "torAmount",
+  order: "DESC",
+};
+
+export default function PageReferral() {
   const [openUsurpModal, setOpenUsurpModal] = React.useState<boolean>(false);
   const [openNewModal, setOpenNewModal] = React.useState<boolean>(false);
   const [selected, setSelected] = React.useState<TService | undefined>();
-  // const [selected, setSelected] = React.useState<BigInt | undefined>();
+  const [search, setSearch] = React.useState<string>("");
   const { account, getBalance, web3, contracts, utils } =
     React.useContext(MyAccountContext);
 
+  const [sort, setSort] = React.useState<SORT>(defaultSort);
+
+  const handleSearch = React.useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setSearch(event.target.value);
+    },
+    []
+  );
+
+  const handleChangeSort = React.useCallback(
+    (fieldName: string) => {
+      const newSort: SORT = {
+        field: fieldName,
+        order: "DESC",
+      };
+
+      if (sort.field == fieldName && sort.order == "DESC") {
+        newSort.order = "ASC";
+      }
+      setSort(newSort);
+    },
+    [sort]
+  );
+
   const [data, setData] = React.useState<TService[]>([]);
+
+  const handleSort = React.useCallback(
+    (a: TService, b: TService) => {
+      let front, back;
+      if (sort.order == "ASC") {
+        front = a;
+        back = b;
+      } else {
+        front = b;
+        back = a;
+      }
+      switch (sort.field) {
+        case "torAmount":
+          return front.torAmount.valueOf() - back.torAmount.valueOf() >
+            BigInt(0)
+            ? 1
+            : -1;
+        case "benefitAmount":
+          return front.benefitAmount.valueOf() - back.benefitAmount.valueOf() >
+            BigInt(0)
+            ? 1
+            : -1;
+        case "name":
+          return front.name > back.name ? 1 : -1;
+        case "serviceType":
+          return front.serviceType > back.serviceType ? 1 : -1;
+        default:
+          return 0;
+      }
+    },
+    [sort]
+  );
 
   const getAllOwnedThrones = React.useCallback(() => {
     contracts.RefThrone?.methods
       .getAllOwnedThrones()
       .call<TService[]>()
       .then((res) => {
+        // res.sort(handleSort);
         setData(res);
       });
   }, [contracts.RefThrone]);
@@ -53,12 +116,14 @@ export default function PageReferral() {
           field: "name",
           displayName: "Throne",
           width: 140,
+          sortable: true,
           value: (row: TService) => row.name,
         },
         {
           field: "serviceType",
           displayName: "Service Type",
           width: 140,
+          sortable: true,
           value: (row: TService) => row.serviceType,
         },
         {
@@ -77,9 +142,10 @@ export default function PageReferral() {
           value: (row: TService) => row.referralCode,
         },
         {
-          field: "benefit",
+          field: "benefitAmount",
           displayName: "Benefit",
           width: 150,
+          sortable: true,
           value: (row: TService) =>
             `${utils?.fromWei(row.benefitAmount.toString())} ${
               BENEFIT_LABEL[row.benefitType]
@@ -89,6 +155,7 @@ export default function PageReferral() {
           field: "torAmount",
           displayName: "Price of the throne",
           width: 170,
+          sortable: true,
           value: (row: TService) => (
             <div className="flex items-center">
               <span>{utils?.fromWei(row.torAmount.toString())} TOR</span>
@@ -164,13 +231,29 @@ export default function PageReferral() {
             <Search
               id="search_referral"
               className="w-full max-w-[calc(100%_-_220px)] shrink px-2 py-1 bg-transparent"
-              onChange={onChange}
+              onChange={handleSearch}
             />
             <Button className="w-[190px] py-1" onClick={openNewReferral}>
               + Create New Throne
             </Button>
           </div>
-          <DataTable columns={Columns} data={data} />
+          <DataTable
+            columns={Columns}
+            data={data
+              .filter(
+                (item) =>
+                  item.referralCode
+                    .toUpperCase()
+                    .includes(search.toUpperCase()) ||
+                  item.serviceType
+                    .toUpperCase()
+                    .includes(search.toUpperCase()) ||
+                  item.name.toUpperCase().includes(search.toUpperCase())
+              )
+              .sort(handleSort)}
+            sort={sort}
+            onChangeSort={handleChangeSort}
+          />
         </div>
       </div>
       <UsurpReferralModal
