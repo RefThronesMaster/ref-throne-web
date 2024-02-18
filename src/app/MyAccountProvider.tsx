@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import Web3, { Contract, ContractAbi } from "web3";
 import { Web3ReactHooks, useWeb3React } from "@web3-react/core";
 import { Web3ReactProvider } from "@web3-react/core";
@@ -20,7 +20,9 @@ const connectors: [MetaMask, Web3ReactHooks][] = [[metaMask, hooks]];
 export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <Web3ReactProvider connectors={connectors}>
-      <MyAccountProvider>{children}</MyAccountProvider>
+      <Suspense>
+        <MyAccountProvider>{children}</MyAccountProvider>
+      </Suspense>
     </Web3ReactProvider>
   );
 };
