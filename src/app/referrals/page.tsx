@@ -239,8 +239,15 @@ export default function PageReferral() {
           <DataTable
             columns={Columns}
             data={data
-              .filter((item) =>
-                item.referralCode.toUpperCase().includes(search.toUpperCase())
+              .filter(
+                (item) =>
+                  item.referralCode
+                    .toUpperCase()
+                    .includes(search.toUpperCase()) ||
+                  item.serviceType
+                    .toUpperCase()
+                    .includes(search.toUpperCase()) ||
+                  item.name.toUpperCase().includes(search.toUpperCase())
               )
               .sort(handleSort)}
             sort={sort}
