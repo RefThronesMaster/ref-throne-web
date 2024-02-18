@@ -1636,13 +1636,16 @@ export const UserContract: TContract = {
     {
       name: "getUserInfo",
       inputs: [],
-      outputs: [
-        { name: "nickName", type: "string" },
-        { name: "xUrl", type: "string" },
-        { name: "xTubeUrl", type: "string" },
-        { name: "telegramUrl", type: "string" },
-        { name: "discordUrl", type: "string" }
-      ],
+      outputs: [{
+        name: 'getUserInfo', type: 'tuple',
+        components: [
+          { name: "nickName", type: "string" },
+          { name: "xUrl", type: "string" },
+          { name: "xTubeUrl", type: "string" },
+          { name: "telegramUrl", type: "string" },
+          { name: "discordUrl", type: "string" }
+        ]
+      }],
       payable: false,
       type: "function",
     },

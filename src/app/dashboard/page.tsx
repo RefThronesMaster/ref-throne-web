@@ -197,16 +197,18 @@ export default function PageDashboard() {
   }, [contracts.EthTreasury, utils]);
 
   const getMyInfo = React.useCallback(async () => {
-    try {
-      const result = await contracts.User?.methods.getUserInfo().call();
+    if (account) {
+      try {
+        const result = await contracts.User?.methods.getUserInfo().call();
 
-      if (result) {
-        console.log({ userInfo: result });
+        if (result) {
+          console.log({ userInfo: result });
+        }
+      } catch (err) {
+        console.log(err);
       }
-    } catch (err) {
-      console.log(err);
     }
-  }, [contracts.User, utils]);
+  }, [contracts.User, utils, account]);
 
   const getMyInvitees = React.useCallback(async () => {
     try {
