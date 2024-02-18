@@ -51,6 +51,17 @@ select {
   outline: none;
 }
 
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
 .chakra-petch-light {
   font-family: "Chakra Petch", sans-serif;
   font-weight: 300;
