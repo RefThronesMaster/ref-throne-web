@@ -230,7 +230,7 @@ const Deposit = () => {
               </span> */}
             </div>
             <Button
-              className="mt-5 mb-2 py-1 w-full chakra-petch-bold rounded-md bg-yellow-100 active:bg-amber-200 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-200 text-black"
+              className="mt-5 mb-2 py-1 w-full chakra-petch-bold rounded-md bg-yello-100 active:bg-amber-200 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-200 text-black"
               disabled={parseFloat(value) <= 0 || transacting}
               onClick={handleTransaction}
             >
@@ -495,7 +495,7 @@ const Withdraw = () => {
               <span className="text-sm">{withdrawFeeEth} ETH</span>
             </div>
             <Button
-              className="mt-5 mb-2 py-1 w-full chakra-petch-bold rounded-md bg-yellow-100 active:bg-amber-200 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-200 text-black"
+              className="mt-5 mb-2 py-1 w-full chakra-petch-bold rounded-md bg-yello-100 active:bg-amber-200 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-200 text-black"
               disabled={parseFloat(value) <= 0 || transacting}
               onClick={handleTransaction}
             >

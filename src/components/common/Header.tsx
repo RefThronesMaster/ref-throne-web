@@ -149,7 +149,7 @@ export const Header = () => {
         </Button>
         <Button
           className={
-            "lg:ml-4 bg-yellow-300 rounded-sm text-black active:bg-amber-400 w-[180px] h-[36px] text-sm font-bold"
+            "lg:ml-4 bg-yello-300 rounded-sm text-black active:bg-amber-400 w-[180px] h-[36px] text-sm font-bold"
           }
           onClick={handleConnect}
         >

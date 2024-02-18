@@ -41,7 +41,7 @@ export const Input = ({
       step={step}
       readOnly={readOnly}
       onChange={onChange}
-      value={value ?? 0}
+      value={value ?? ""}
     />
   );
 };

@@ -1634,6 +1634,13 @@ export const UserContract: TContract = {
       type: "function",
     },
     {
+      name: "addInvitee",
+      inputs: [{ name: 'code', type: 'string' }],
+      outputs: [],
+      payable: true,
+      type: "function",
+    },
+    {
       name: "getUserInfo",
       inputs: [],
       outputs: [{
@@ -1647,6 +1654,24 @@ export const UserContract: TContract = {
         ]
       }],
       payable: false,
+      type: "function",
+    },
+    {
+      name: "getInvitaionCode",
+      inputs: [{ name: 'account', type: 'address', }],
+      outputs: [{
+        name: 'getInvitaionCode', type: 'string',
+      }],
+      payable: false,
+      type: "function",
+    },
+    {
+      name: "generateInvitationCode",
+      inputs: [],
+      outputs: [{
+        name: 'generateInvitationCode', type: 'boolean',
+      }],
+      payable: true,
       type: "function",
     },
   ] as ContractAbi,
