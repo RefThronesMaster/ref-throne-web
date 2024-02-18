@@ -4,15 +4,9 @@ import Image from "next/image";
 import { MyAccountContext } from "@/app/MyAccountProvider";
 import React, { ChangeEvent } from "react";
 import { Button, Input } from "@/common/components";
-import { Decimal } from "decimal.js";
-import {
-  EthTreasuryContract,
-  RefThroneContract,
-  TORTokenContract,
-} from "@/libs/web3/abi";
+import { EthTreasuryContract } from "@/libs/web3/abi";
 import { RpcError } from "web3";
-import { ethToTor, torToEth } from "@/libs/web3/utils";
-import { Truculenta } from "next/font/google";
+import { ethToTor } from "@/libs/web3/utils";
 
 type MODE = "deposit" | "withdraw";
 
@@ -69,24 +63,19 @@ const Deposit = () => {
 
   const handleChange = React.useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      const { value } = event.target;
+      const { value: newValue } = event.target;
 
       setMessage("");
-      const floatVal = parseFloat(value);
+      const floatVal = parseFloat(newValue);
       if (Number.isNaN(floatVal)) {
-        setValue("0.0000");
+        setValue(value);
       } else if (floatVal < 0) {
-        setValue("0.0000");
+        setValue(value);
       } else {
-        setValue(floatVal.toString());
+        setValue(newValue);
       }
-      // if (parseFloat(value) < 0) {
-      //   setValue("0.0000");
-      // } else {
-      //   setValue(value);
-      // }
     },
-    []
+    [value]
   );
 
   const transact = React.useCallback(
@@ -126,9 +115,11 @@ const Deposit = () => {
 
   const receivedTor = React.useMemo(() => {
     try {
-      const tor = ethToTor(parseFloat(value));
+      const floatVal = parseFloat(value);
+      const tor = ethToTor(floatVal);
+      const stringVal = floatVal.toString();
       return tor
-        .toFixed(value.length > 3 ? value.length - 3 : value.length)
+        .toFixed(stringVal.length > 3 ? stringVal.length - 3 : stringVal.length)
         .replace(/\.?0+$/, "");
     } catch (err) {
       console.log(err);
@@ -137,7 +128,6 @@ const Deposit = () => {
   }, [value]);
 
   const depositFeeWei = React.useMemo(() => {
-    console.log({ depositFeeRate });
     try {
       const feeWei =
         (BigInt(utils.toWei(value)) / BigInt(100)) * BigInt(depositFeeRate);
