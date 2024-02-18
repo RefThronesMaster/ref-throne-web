@@ -77,7 +77,7 @@ export const MyAccountProvider = ({
     () => (accounts?.length ? accounts[0] : null),
     [accounts]
   );
-  console.log({ envs: process.env });
+  
   const [web3, setWeb3] = React.useState<Web3 | null>(null);
   const pathname = usePathname();
   const router = useRouter();
