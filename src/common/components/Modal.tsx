@@ -3,7 +3,7 @@ import { DataInfo, InputData, Dialog, SelectData } from ".";
 import type { TService } from ".";
 import { MyAccountContext } from "@/app/MyAccountProvider";
 import { RefThroneContract } from "@/libs/web3/abi";
-import { BENEFIT_TYPES } from "@/libs/web3/types";
+import { BENEFIT_LABEL, TBenefit } from "@/libs/web3/types";
 
 type ModalProps = {
   open: boolean;
@@ -345,8 +345,8 @@ export const NewReferralModal = ({ open, onClose }: ModalProps) => {
         className="pl-2"
         value={formData.benefitType}
         onChange={handleSelectChange}
-        options={Object.keys(BENEFIT_TYPES).map((key) => ({
-          label: key,
+        options={Object.keys(BENEFIT_LABEL).map((key: string) => ({
+          label: BENEFIT_LABEL[key as TBenefit],
           value: key,
         }))}
       />

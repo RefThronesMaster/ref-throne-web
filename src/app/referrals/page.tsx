@@ -15,7 +15,7 @@ import {
   NewReferralModal,
 } from "@/common/components";
 import { MyAccountContext } from "../MyAccountProvider";
-import { BENEFIT_TYPES } from "@/libs/web3/types";
+import { BENEFIT_LABEL } from "@/libs/web3/types";
 
 export default function PageReferral() {
   const onChange = React.useCallback((event: ChangeEvent<HTMLInputElement>) => {
@@ -82,7 +82,7 @@ export default function PageReferral() {
           width: 150,
           value: (row: TService) =>
             `${utils?.fromWei(row.benefitAmount.toString())} ${
-              BENEFIT_TYPES[row.benefitType]
+              BENEFIT_LABEL[row.benefitType]
             }`,
         },
         {
