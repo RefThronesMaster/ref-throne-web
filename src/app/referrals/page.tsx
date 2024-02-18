@@ -27,18 +27,21 @@ const defaultSort: SORT = {
 };
 
 export default function PageReferral() {
-  const onChange = React.useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target.value);
-  }, []);
-
   const [openUsurpModal, setOpenUsurpModal] = React.useState<boolean>(false);
   const [openNewModal, setOpenNewModal] = React.useState<boolean>(false);
   const [selected, setSelected] = React.useState<TService | undefined>();
-  // const [selected, setSelected] = React.useState<BigInt | undefined>();
+  const [search, setSearch] = React.useState<string>("");
   const { account, getBalance, web3, contracts, utils } =
     React.useContext(MyAccountContext);
 
   const [sort, setSort] = React.useState<SORT>(defaultSort);
+
+  const handleSearch = React.useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setSearch(event.target.value);
+    },
+    []
+  );
 
   const handleChangeSort = React.useCallback(
     (fieldName: string) => {
@@ -227,7 +230,7 @@ export default function PageReferral() {
             <Search
               id="search_referral"
               className="w-full max-w-[calc(100%_-_220px)] shrink px-2 py-1 bg-transparent"
-              onChange={onChange}
+              onChange={handleSearch}
             />
             <Button className="w-[190px] py-1" onClick={openNewReferral}>
               + Create New Throne
@@ -235,7 +238,9 @@ export default function PageReferral() {
           </div>
           <DataTable
             columns={Columns}
-            data={data.sort(handleSort)}
+            data={data
+              .filter((item) => item.referralCode.includes(search))
+              .sort(handleSort)}
             sort={sort}
             onChangeSort={handleChangeSort}
           />
