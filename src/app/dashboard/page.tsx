@@ -60,7 +60,7 @@ const SampleMyReferralsRecords = [
 ];
 
 export default function PageDashboard() {
-  const { contracts, utils } = React.useContext(MyAccountContext);
+  const { contracts, utils, account } = React.useContext(MyAccountContext);
 
   const [totalTorDeposited, setTotalTorDeposited] =
     React.useState<string>("0.00");
@@ -165,32 +165,34 @@ export default function PageDashboard() {
         setTotalTorDeposited(
           Number(utils.fromWei(result?.toString())).toLocaleString("en-US", {
             minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
+            maximumFractionDigits: 5,
           })
         );
       }
     } catch (err) {
       console.log(err);
     }
-  }, [contracts.RefThrone, utils]);
+  }, [contracts.RefThrone, utils, account]);
 
   const getMyTotalEthBalance = React.useCallback(async () => {
-    try {
-      const result = await contracts.EthTreasury?.methods
-        ._totalEthBalance()
-        .call<bigint>();
+    if (account) {
+      try {
+        const result = await contracts.EthTreasury?.methods
+          .getSwappedUserEthBalance(account)
+          .call<bigint>();
 
-      if (result) {
-        console.log({ eth: result });
-        setMyTotalEthDeposited(
-          Number(utils.fromWei(result?.toString())).toLocaleString("en-US", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })
-        );
+        if (result) {
+          console.log({ eth: result });
+          setMyTotalEthDeposited(
+            Number(utils.fromWei(result?.toString())).toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 5,
+            })
+          );
+        }
+      } catch (err) {
+        console.log(err);
       }
-    } catch (err) {
-      console.log(err);
     }
   }, [contracts.EthTreasury, utils]);
 
@@ -219,23 +221,26 @@ export default function PageDashboard() {
   }, [contracts.User, utils]);
 
   const getMyTotalTorBalance = React.useCallback(async () => {
-    try {
-      const result = await contracts.EthTreasury?.methods
-        ._totalTorBalance()
-        .call<bigint>();
-      if (result) {
-        console.log({ tor: result });
-        setMyTotalTorDeposited(
-          Number(utils.fromWei(result?.toString())).toLocaleString("en-US", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })
-        );
+    if (account) {
+      try {
+        const result = await contracts.EthTreasury?.methods
+          .getSwappedUserTorBalance(account)
+          .call<bigint>();
+
+        if (result) {
+          console.log({ tor: result });
+          setMyTotalTorDeposited(
+            Number(utils.fromWei(result?.toString())).toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 5,
+            })
+          );
+        }
+      } catch (err) {
+        console.log(err);
       }
-    } catch (err) {
-      console.log(err);
     }
-  }, [contracts.EthTreasury, utils]);
+  }, [contracts.EthTreasury, utils, account]);
 
   React.useEffect(() => {
     getTotalTorDeposited();
