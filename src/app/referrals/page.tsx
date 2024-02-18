@@ -16,6 +16,16 @@ import {
 } from "@/common/components";
 import { MyAccountContext } from "../MyAccountProvider";
 
+type SORT = {
+  field: string;
+  order: "ASC" | "DESC";
+};
+
+const defaultSort: SORT = {
+  field: "torAmount",
+  order: "DESC",
+};
+
 export default function PageReferral() {
   const onChange = React.useCallback((event: ChangeEvent<HTMLInputElement>) => {
     console.log(event.target.value);
@@ -28,13 +38,63 @@ export default function PageReferral() {
   const { account, getBalance, web3, contracts, utils } =
     React.useContext(MyAccountContext);
 
+  const [sort, setSort] = React.useState<SORT>(defaultSort);
+
+  const handleChangeSort = React.useCallback(
+    (fieldName: string) => {
+      const newSort: SORT = {
+        field: fieldName,
+        order: "DESC",
+      };
+
+      if (sort.field == fieldName && sort.order == "DESC") {
+        newSort.order = "ASC";
+      }
+      setSort(newSort);
+    },
+    [sort]
+  );
+
   const [data, setData] = React.useState<TService[]>([]);
+
+  const handleSort = React.useCallback(
+    (a: TService, b: TService) => {
+      let front, back;
+      if (sort.order == "ASC") {
+        front = a;
+        back = b;
+      } else {
+        front = b;
+        back = a;
+      }
+      switch (sort.field) {
+        case "torAmount":
+          return front.torAmount.valueOf() - back.torAmount.valueOf() >
+            BigInt(0)
+            ? 1
+            : -1;
+        case "benefitAmount":
+          return front.benefitAmount.valueOf() - back.benefitAmount.valueOf() >
+            BigInt(0)
+            ? 1
+            : -1;
+        case "name":
+          return front.name > back.name ? 1 : -1;
+        case "serviceType":
+          return front.serviceType > back.serviceType ? 1 : -1;
+        default:
+          return 0;
+      }
+    },
+    [sort]
+  );
 
   const getAllOwnedThrones = React.useCallback(() => {
     contracts.RefThrone?.methods
       .getAllOwnedThrones()
       .call<TService[]>()
       .then((res) => {
+        // res.sort(handleSort);
         setData(res);
       });
   }, [contracts.RefThrone]);
@@ -52,12 +112,14 @@ export default function PageReferral() {
           field: "name",
           displayName: "Throne",
           width: 140,
+          sortable: true,
           value: (row: TService) => row.name,
         },
         {
           field: "serviceType",
           displayName: "Service Type",
           width: 140,
+          sortable: true,
           value: (row: TService) => row.serviceType,
         },
         {
@@ -76,15 +138,20 @@ export default function PageReferral() {
           value: (row: TService) => row.referralCode,
         },
         {
-          field: "benefit",
+          field: "benefitAmount",
           displayName: "Benefit",
           width: 150,
-          value: (row: TService) => `${utils?.fromWei(row.benefitAmount.toString())} ${row.benefitType}`,
+          sortable: true,
+          value: (row: TService) =>
+            `${utils?.fromWei(row.benefitAmount.toString())} ${
+              row.benefitType
+            }`,
         },
         {
           field: "torAmount",
           displayName: "Price of the throne",
           width: 170,
+          sortable: true,
           value: (row: TService) => (
             <div className="flex items-center">
               <span>{utils?.fromWei(row.torAmount.toString())} TOR</span>
@@ -166,7 +233,12 @@ export default function PageReferral() {
               + Create New Throne
             </Button>
           </div>
-          <DataTable columns={Columns} data={data} />
+          <DataTable
+            columns={Columns}
+            data={data.sort(handleSort)}
+            sort={sort}
+            onChangeSort={handleChangeSort}
+          />
         </div>
       </div>
       <UsurpReferralModal
