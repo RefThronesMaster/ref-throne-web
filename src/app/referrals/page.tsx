@@ -8,12 +8,12 @@ import {
   SwordIcon,
   DataTable,
   DataRowProps,
-  TService,
+  TThrone,
   UsurpReferralModal,
   NewReferralModal,
 } from "@/components/common";
 import { MyAccountContext } from "../MyAccountProvider";
-import { BENEFIT_LABEL } from "@/components/types";
+import { BENEFIT_TYPE_LABEL } from "@/components/types";
 
 type SORT = {
   field: string;
@@ -56,10 +56,10 @@ export default function PageReferral() {
     [sort]
   );
 
-  const [data, setData] = React.useState<TService[]>([]);
+  const [data, setData] = React.useState<TThrone[]>([]);
 
   const handleSort = React.useCallback(
-    (a: TService, b: TService) => {
+    (a: TThrone, b: TThrone) => {
       let front, back;
       if (sort.order == "ASC") {
         front = a;
@@ -94,7 +94,7 @@ export default function PageReferral() {
   const getAllOwnedThrones = React.useCallback(() => {
     contracts.RefThrone?.methods
       .getAllOwnedThrones()
-      .call<TService[]>()
+      .call<TThrone[]>()
       .then(setData);
   }, [contracts.RefThrone]);
 
@@ -110,20 +110,20 @@ export default function PageReferral() {
           displayName: "Throne",
           width: 140,
           sortable: true,
-          value: (row: TService) => row.name,
+          value: (row: TThrone) => row.name,
         },
         {
           field: "serviceType",
           displayName: "Service Type",
           width: 140,
           sortable: true,
-          value: (row: TService) => row.serviceType,
+          value: (row: TThrone) => row.serviceType,
         },
         {
           field: "referrer",
           displayName: "Referrer",
           width: 140,
-          value: (row: TService) =>
+          value: (row: TThrone) =>
             `${row.referrer.substring(0, 5)}...${row.referrer.substring(
               row.referrer.length - 2
             )}`,
@@ -132,16 +132,16 @@ export default function PageReferral() {
           field: "referralCode",
           displayName: "Referral Code",
           width: 130,
-          value: (row: TService) => row.referralCode,
+          value: (row: TThrone) => row.referralCode,
         },
         {
           field: "benefitAmount",
           displayName: "Benefit",
           width: 150,
           sortable: true,
-          value: (row: TService) =>
+          value: (row: TThrone) =>
             `${utils?.fromWei(row.benefitAmount.toString())} ${
-              BENEFIT_LABEL[row.benefitType]
+              BENEFIT_TYPE_LABEL[row.benefitType]
             }`,
         },
         {
@@ -149,7 +149,7 @@ export default function PageReferral() {
           displayName: "Price of the throne",
           width: 170,
           sortable: true,
-          value: (row: TService) => (
+          value: (row: TThrone) => (
             <div className="flex items-center">
               <span>{utils?.fromWei(row.torAmount.toString())} TOR</span>
               <Button
@@ -168,7 +168,7 @@ export default function PageReferral() {
           field: "linkUrl",
           displayName: "Link [Verified]",
           width: "*",
-          value: (row: TService) =>
+          value: (row: TThrone) =>
             row.linkUrl.length > 30
               ? `${row.linkUrl.substring(0, 16)}...${row.linkUrl.substring(
                   row.linkUrl.length - 6

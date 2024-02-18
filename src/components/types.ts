@@ -5,31 +5,34 @@ export const ColorSet = {
   secondary: "#404833",
 } as const;
 
-export type TService = {
-  id: BigInt;
-  benefitAmount: BigInt;
-  benefitType: "USDT";
-  linkUrl: string;
-  name: string;
-  referralCode: string;
-  referrer: string;
-  serviceType: "CEX" | "DEX";
-  status: BigInt;
-  torAmount: BigInt;
-  timestamp: BigInt;
-};
+export type TServiceType = "DEX" | "CEX" | "MISC"
 
-export type TBenefit = "Fee discount" |
+export type TBenefitType = "Fee discount" |
   "USDT" |
   "USDC" |
   "BTC" |
   "ETH"
 
-export type TBenefitLabel = {
-  [key in TBenefit]: string
+export type TThrone = {
+  id: BigInt;
+  name: string;
+  serviceType: TBenefitType;
+  benefitAmount: BigInt;
+  benefitType: TBenefitType;
+  torAmount: BigInt;
+  linkUrl: string;
+  referralCode: string;
+  referrer: string;
+  status: BigInt;
+  timestamp: BigInt;
+};
+
+
+export type TBenefitTypeLabel = {
+  [key in TBenefitType]: string
 }
 
-export const BENEFIT_LABEL: TBenefitLabel = {
+export const BENEFIT_TYPE_LABEL: TBenefitTypeLabel = {
   "Fee discount": "% Fee discount",
   "USDT": "USDT",
   "USDC": "USDC",
