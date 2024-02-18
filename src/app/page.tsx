@@ -10,7 +10,7 @@ export default function PageMain() {
   const { connector } = useWeb3React();
 
   React.useEffect(() => {}, []);
-
+  console.log({ envs: process.env });
   const handleConnect = React.useCallback(async () => {
     if (!window.ethereum?.isMetaMask) {
       window.open("https://metamask.io/", "_blank");
