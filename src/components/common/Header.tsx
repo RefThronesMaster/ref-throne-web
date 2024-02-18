@@ -5,25 +5,16 @@ import { AttendIcon, Button } from ".";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
-import {
-  EthTreasuryContract,
-  RefThroneContract,
-  TORTokenContract,
-} from "@/libs/web3/abi";
+
 import { useWeb3React } from "@web3-react/core";
-import { hooks, metaMask } from "@/libs/web3/connectors/metamask";
-import {
-  CHAIN_IDS,
-  TESTNET_CHAINS,
-  getAddChainParameters,
-} from "@/libs/web3/chains";
-import Web3, { ContractAbi } from "web3";
+import { hooks } from "@/libs/web3/connectors/metamask";
+import { CHAIN_IDS, getAddChainParameters } from "@/libs/web3/chains";
 import { MyAccountContext } from "@/app/MyAccountProvider";
 
 const MENU = {
   "/referrals": "Referral Thrones",
   "/swap": "TOR Swap",
-  "/dashboard": "Dashboard",
+  "/dashboard": "My Dashboard",
   "/guides": "Guides",
   "/torg": "TORG Token",
 };
@@ -66,29 +57,6 @@ export const Header = () => {
       }
     }
   }, [connector, chainId]);
-
-  // React.useEffect(() => {
-  //   if (web3Client) {
-  //     const contract = new web3Client.eth.Contract(
-  //       ABI,
-  //       // "0xDEBFe2b66662AaB932F9Dacb9C76ff047dF4CCa2"
-  //       "0xF7a2a089fb174f7e3d283b8d314B099f299324b3"
-  //     );
-  //     contract.methods
-  //       // .getBenefitTypes()
-  //       .totalSupply()
-  //       .call()
-  //       .then((res) => console.log(res))
-  //       .catch((err) => console.error(err));
-  //   }
-  // }, [web3Client]);
-  // console.log({ chainId, account, isActive });
-  // console.log(accounts);
-
-  // React.useEffect(() => {
-  //   if (accounts?.length) {
-  //   }
-  // }, [accounts]);
 
   const handleDailyCheck = React.useCallback(() => {}, [contracts.UserHistory]);
 
