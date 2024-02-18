@@ -7,6 +7,7 @@ import { SearchIcon } from ".";
 
 type InputProps = {
   id?: string;
+  name?: string;
   type?: HTMLInputTypeAttribute;
   className?: string;
   placeholder?: string;
@@ -19,6 +20,7 @@ type InputProps = {
 
 export const Input = ({
   id,
+  name,
   type,
   className,
   placeholder,
@@ -31,6 +33,7 @@ export const Input = ({
   return (
     <input
       id={id}
+      name={name ?? id}
       type={type}
       className={className}
       placeholder={placeholder}
@@ -74,6 +77,7 @@ export const Search = ({
       </label>
       <input
         id={id}
+        name={id}
         className={"bg-transparent w-full p-1 px-4"}
         style={style}
         onFocus={() => setFocused(true)}
