@@ -15,6 +15,7 @@ import {
   NewReferralModal,
 } from "@/common/components";
 import { MyAccountContext } from "../MyAccountProvider";
+import { BENEFIT_LABEL } from "@/libs/web3/types";
 
 type SORT = {
   field: string;
@@ -147,7 +148,7 @@ export default function PageReferral() {
           sortable: true,
           value: (row: TService) =>
             `${utils?.fromWei(row.benefitAmount.toString())} ${
-              row.benefitType
+              BENEFIT_LABEL[row.benefitType]
             }`,
         },
         {
