@@ -45,7 +45,8 @@ body {
 }
 
 input,
-button {
+button,
+select {
   appearance: none;
   outline: none;
 }
@@ -115,7 +116,8 @@ button {
 }
 
 ::-webkit-scrollbar-thumb {
-  border-radius: 12px; background-color: darkgray;
+  border-radius: 12px;
+  background-color: darkgray;
 }
 
 ::-webkit-scrollbar-hover {
