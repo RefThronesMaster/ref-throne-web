@@ -10,7 +10,7 @@ import {
   DataRowProps,
   Dialog,
   Input,
-} from "@/common/components";
+} from "@/components/common";
 import { CHAIN_IDS, getAddChainParameters } from "@/libs/web3/chains";
 import { hooks } from "@/libs/web3/connectors/metamask";
 import { useWeb3React } from "@web3-react/core";

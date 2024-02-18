@@ -11,9 +11,9 @@ import {
   TService,
   UsurpReferralModal,
   NewReferralModal,
-} from "@/common/components";
+} from "@/components/common";
 import { MyAccountContext } from "../MyAccountProvider";
-import { BENEFIT_LABEL } from "@/common/components/types";
+import { BENEFIT_LABEL } from "@/components/types";
 
 type SORT = {
   field: string;

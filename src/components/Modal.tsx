@@ -1,9 +1,9 @@
 import React, { ChangeEvent } from "react";
-import { DataInfo, InputData, Dialog, SelectData } from ".";
-import type { TService } from ".";
+import { DataInfo, InputData, Dialog, SelectData } from "./common";
+import type { TService } from "./common";
 import { MyAccountContext } from "@/app/MyAccountProvider";
 import { RefThroneContract } from "@/libs/web3/abi";
-import { BENEFIT_LABEL, TBenefit } from "@/common/components/types";
+import { BENEFIT_LABEL, TBenefit } from "@/components/types";
 
 type ModalProps = {
   open: boolean;

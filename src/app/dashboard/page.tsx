@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { DataRowProps, DataTable, Dialog } from "@/common/components";
+import { DataRowProps, DataTable, Dialog } from "@/components/common";
 import Image from "next/image";
 
 const SampleLeadersRecords = [
