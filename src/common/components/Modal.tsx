@@ -3,7 +3,7 @@ import { DataInfo, InputData, Dialog, SelectData } from ".";
 import type { TService } from ".";
 import { MyAccountContext } from "@/app/MyAccountProvider";
 import { RefThroneContract } from "@/libs/web3/abi";
-import { BENEFIT_LABEL, TBenefit } from "@/libs/web3/types";
+import { BENEFIT_LABEL, TBenefit } from "@/common/components/types";
 
 type ModalProps = {
   open: boolean;
@@ -11,8 +11,8 @@ type ModalProps = {
 };
 
 type UsurpReferralModal = ModalProps & {
-  data?: TService;
-  // id: BigInt;
+  // data?: TService;
+  dataId?: BigInt;
 };
 
 type TFormReferral = {
@@ -29,10 +29,23 @@ const initFormUsurpReferral = {
   linkUrl: "",
 } as const;
 
+// const defaultData: TService = {
+//   id: BigInt(-1),
+//   benefitAmount: BigInt(0),
+//   serviceType: "CEX",
+//   benefitType: "USDT",
+//   status: BigInt(-1),
+//   timestamp: BigInt(-1),
+//   torAmount: BigInt(-1),
+//   linkUrl: "",
+//   name: "",
+//   referralCode: "",
+//   referrer: "",
+// };
+
 export const UsurpReferralModal = ({
   open,
-  data,
-  // id,
+  dataId,
   onClose,
 }: UsurpReferralModal) => {
   const { account, utils, contracts } = React.useContext(MyAccountContext);
@@ -40,12 +53,32 @@ export const UsurpReferralModal = ({
     initFormUsurpReferral
   );
   const [transacting, setTransacting] = React.useState<boolean>(false);
+  const [data, setData] = React.useState<TService | undefined>();
+
+  const getThroneById = React.useCallback(
+    async (id: BigInt) => {
+      try {
+        const result = await contracts.RefThrone?.methods
+          .getThroneById(id)
+          .call<TService>();
+        setData(result);
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    [contracts.RefThrone]
+  );
 
   React.useEffect(() => {
+    if (open && dataId) {
+      getThroneById(dataId);
+    }
+
     return () => {
+      setData(undefined);
       setFormData(initFormUsurpReferral);
     };
-  }, [open, data]);
+  }, [open, dataId, getThroneById]);
 
   const handleChange = React.useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -82,7 +115,7 @@ export const UsurpReferralModal = ({
     }
 
     return true;
-  }, [formData, data]);
+  }, [formData, data, utils]);
 
   const transact = React.useCallback(
     async (data?: TService, formData?: TFormReferral) => {
@@ -149,16 +182,18 @@ export const UsurpReferralModal = ({
           "border-camo-500 bg-camo-500 text-primary chakra-petch-medium rounded-md w-[180px] py-1 active:bg-camo-300 disabled:cursor-not-allowed disabled:bg-gray-400 disabled:text-gray-500",
       }}
     >
-      <DataInfo label={"Service"} value={data?.name} />
-      <DataInfo label={"Service Type"} value={data?.serviceType} />
-      <DataInfo label={"Benefit Type"} value={data?.benefitType} />
+      <DataInfo label={"Service"} value={data?.name ?? "-"} />
+      <DataInfo label={"Service Type"} value={data?.serviceType ?? "-"} />
+      <DataInfo label={"Benefit Type"} value={data?.benefitType ?? "-"} />
       <DataInfo
         label={"Current Benefit"}
-        value={utils.fromWei(data?.benefitAmount.toString() ?? "")}
+        value={data ? utils.fromWei(data?.benefitAmount.toString() ?? "") : "-"}
       />
       <DataInfo
         label={"Current Deposited TOR"}
-        value={`${utils.fromWei(data?.torAmount.toString() ?? "")} TOR`}
+        value={
+          data ? `${utils.fromWei(data?.torAmount.toString() ?? "")} TOR` : "-"
+        }
       />
       <InputData
         id="benefitAmount"

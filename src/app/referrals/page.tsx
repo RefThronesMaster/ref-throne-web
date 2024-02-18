@@ -13,7 +13,7 @@ import {
   NewReferralModal,
 } from "@/common/components";
 import { MyAccountContext } from "../MyAccountProvider";
-import { BENEFIT_LABEL } from "@/libs/web3/types";
+import { BENEFIT_LABEL } from "@/common/components/types";
 
 type SORT = {
   field: string;
@@ -28,7 +28,7 @@ const defaultSort: SORT = {
 export default function PageReferral() {
   const [openUsurpModal, setOpenUsurpModal] = React.useState<boolean>(false);
   const [openNewModal, setOpenNewModal] = React.useState<boolean>(false);
-  const [selected, setSelected] = React.useState<TService | undefined>();
+  const [selectedId, setSelectedId] = React.useState<BigInt | undefined>();
   const [search, setSearch] = React.useState<string>("");
   const { contracts, utils } = React.useContext(MyAccountContext);
 
@@ -156,7 +156,7 @@ export default function PageReferral() {
                 className="mx-1"
                 onClick={() => {
                   setOpenUsurpModal(true);
-                  setSelected(row);
+                  setSelectedId(row.id);
                 }}
               >
                 <SwordIcon className="w-6 h-6 fill-primary" />
@@ -181,7 +181,7 @@ export default function PageReferral() {
 
   const handleUsurpModalClose = React.useCallback(() => {
     setOpenUsurpModal(false);
-    setSelected(undefined);
+    setSelectedId(undefined);
   }, []);
 
   const handleNewModalClose = React.useCallback(() => {
@@ -251,8 +251,7 @@ export default function PageReferral() {
       </div>
       <UsurpReferralModal
         open={openUsurpModal}
-        data={selected}
-        // dataId={selected}
+        dataId={selectedId}
         onClose={handleUsurpModalClose}
       />
       <NewReferralModal open={openNewModal} onClose={handleNewModalClose} />
