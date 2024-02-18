@@ -72,11 +72,11 @@ export const UsurpReferralModal = ({
   const handleChange = React.useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const { id, value } = event.target;
-      if (
-        (id == "benefitAmount" || id == "torAmount") &&
-        parseFloat(value) <= 0
-      ) {
-        setFormData((oldValue) => ({ ...oldValue, [id]: 0 }));
+      if (id == "benefitAmount" || id == "torAmount") {
+        const floatVal = parseFloat(value);
+        if (!Number.isNaN(floatVal) && floatVal >= 0) {
+          setFormData((oldValue) => ({ ...oldValue, [id]: value }));
+        }
       } else {
         setFormData((oldValue) => ({ ...oldValue, [id]: value }));
       }
@@ -243,14 +243,15 @@ export const NewReferralModal = ({ open, onClose }: ModalProps) => {
   const [formData, setFormData] =
     React.useState<TNewFormReferral>(initFormNewReferral);
   const [serviceTypes, setServiceTypes] = React.useState<TServiceType[]>([]);
+  const [benefitTypes, setBenefitTypes] = React.useState<TBenefitType[]>([]);
   const [transacting, setTransacting] = React.useState<boolean>(false);
 
   const getServiceTypes = React.useCallback(async () => {
     try {
       const result = await contracts.RefThrone?.methods
         .getServiceTypes()
-        .call();
-      console.log({ result });
+        .call<TServiceType[]>();
+      setServiceTypes(result ?? []);
     } catch (err) {
       console.log(err);
     }
@@ -260,8 +261,8 @@ export const NewReferralModal = ({ open, onClose }: ModalProps) => {
     try {
       const result = await contracts.RefThrone?.methods
         .getBenefitTypes()
-        .call();
-      console.log({ result });
+        .call<TBenefitType[]>();
+      setBenefitTypes(result ?? []);
     } catch (err) {
       console.log(err);
     }
@@ -375,18 +376,21 @@ export const NewReferralModal = ({ open, onClose }: ModalProps) => {
       <InputData
         id="name"
         label="New Service"
-        className="pl-2 text-right"
+        className="pl-2"
         value={formData.name}
         onChange={handleChange}
         type="text"
       />
-      <InputData
+      <SelectData
         id="serviceType"
         label="Service Type"
-        className="pl-2 text-right"
+        className="pl-2"
         value={formData.serviceType}
-        onChange={handleChange}
-        type="text"
+        onChange={handleSelectChange}
+        options={serviceTypes.map((type) => ({
+          label: type,
+          value: type,
+        }))}
       />
       <SelectData
         id="benefitType"
@@ -394,9 +398,9 @@ export const NewReferralModal = ({ open, onClose }: ModalProps) => {
         className="pl-2"
         value={formData.benefitType}
         onChange={handleSelectChange}
-        options={Object.keys(BENEFIT_TYPE_LABEL).map((key: string) => ({
-          label: BENEFIT_TYPE_LABEL[key as TBenefitType],
-          value: key,
+        options={benefitTypes.map((type) => ({
+          label: BENEFIT_TYPE_LABEL[type],
+          value: type,
         }))}
       />
       <InputData

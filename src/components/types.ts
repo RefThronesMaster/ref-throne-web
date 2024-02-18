@@ -11,7 +11,8 @@ export type TBenefitType = "Fee discount" |
   "USDT" |
   "USDC" |
   "BTC" |
-  "ETH"
+  "ETH" |
+  "Fee Discount"
 
 export type TThrone = {
   id: BigInt;
@@ -34,6 +35,7 @@ export type TBenefitTypeLabel = {
 
 export const BENEFIT_TYPE_LABEL: TBenefitTypeLabel = {
   "Fee discount": "% Fee discount",
+  "Fee Discount": "% Fee discount",
   "USDT": "USDT",
   "USDC": "USDC",
   "BTC": "BTC",

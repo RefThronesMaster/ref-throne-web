@@ -67,15 +67,11 @@ const Deposit = () => {
 
       setMessage("");
       const floatVal = parseFloat(newValue);
-      if (Number.isNaN(floatVal)) {
-        setValue(value);
-      } else if (floatVal < 0) {
-        setValue(value);
-      } else {
+      if (!Number.isNaN(floatVal) && floatVal >= 0) {
         setValue(newValue);
       }
     },
-    [value]
+    []
   );
 
   const transact = React.useCallback(
