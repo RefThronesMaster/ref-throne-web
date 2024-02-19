@@ -1634,16 +1634,44 @@ export const UserContract: TContract = {
       type: "function",
     },
     {
+      name: "addInvitee",
+      inputs: [{ name: 'code', type: 'string' }],
+      outputs: [],
+      payable: true,
+      type: "function",
+    },
+    {
       name: "getUserInfo",
       inputs: [],
-      outputs: [
-        { name: "nickName", type: "string" },
-        { name: "xUrl", type: "string" },
-        { name: "xTubeUrl", type: "string" },
-        { name: "telegramUrl", type: "string" },
-        { name: "discordUrl", type: "string" }
-      ],
+      outputs: [{
+        name: 'getUserInfo', type: 'tuple',
+        components: [
+          { name: "nickName", type: "string" },
+          { name: "xUrl", type: "string" },
+          { name: "xTubeUrl", type: "string" },
+          { name: "telegramUrl", type: "string" },
+          { name: "discordUrl", type: "string" }
+        ]
+      }],
       payable: false,
+      type: "function",
+    },
+    {
+      name: "getInvitaionCode",
+      inputs: [{ name: 'account', type: 'address', }],
+      outputs: [{
+        name: 'getInvitaionCode', type: 'string',
+      }],
+      payable: false,
+      type: "function",
+    },
+    {
+      name: "generateInvitationCode",
+      inputs: [],
+      outputs: [{
+        name: 'generateInvitationCode', type: 'boolean',
+      }],
+      payable: true,
       type: "function",
     },
   ] as ContractAbi,

@@ -1,28 +1,75 @@
 "use client";
 
-import React, { ChangeEvent } from "react";
-import {
-  Button,
-  DataRowProps,
-  DataTable,
-  Dialog,
-  Input,
-} from "@/components/common";
+import React from "react";
+import { DataRowProps, DataTable, Dialog } from "@/components/common";
 import Image from "next/image";
 import { MyAccountContext } from "../MyAccountProvider";
 
+const SampleLeadersRecords = [
+  {
+    tier: "Diamond",
+    rank: 1,
+    user: "0xC2334441231233",
+    owned_thrones: 10,
+    deposited_eth: 32,
+    referrals: 32,
+    points: 32,
+  },
+  {
+    tier: "Platinum",
+    rank: 11,
+    user: "0x98HASDSADB7D",
+    owned_thrones: 13,
+    deposited_eth: 21,
+    referrals: 21,
+    points: 21,
+  },
+  {
+    tier: "Gold",
+    rank: 31,
+    user: "0x2E123123DD",
+    owned_thrones: 4,
+    deposited_eth: 15,
+    referrals: 15,
+    points: 15,
+  },
+];
+const SampleMyReferralsRecords = [
+  {
+    throne: "Binance",
+    service: "CEX",
+    referrer: "0xC2334441231233",
+    referral_code: "HBD887JH",
+    benefit: "30% discount on fees",
+    price: 20000,
+    link: "https://hhydasdasdasda.co.kr",
+    date: 1707621971608,
+    status: "active",
+  },
+  {
+    throne: "OKX",
+    service: "CEX",
+    referrer: "0x98HASDSADB7D",
+    referral_code: "NMO187hJ",
+    benefit: "200 USDT",
+    price: 15000,
+    link: "https://okxd.asssdsd.co.kr",
+    date: 1707601971608,
+    status: "active",
+  },
+];
+
 export default function PageDashboard() {
   const { contracts, utils, account } = React.useContext(MyAccountContext);
-  const [invitationCode, setInvitationCode] = React.useState<string>("");
 
+  const [totalTorDeposited, setTotalTorDeposited] =
+    React.useState<string>("0.00");
   const [myTotalEthDeposited, setMyTotalEthDeposited] =
     React.useState<string>("0.00");
   const [myTotalTorDeposited, setMyTotalTorDeposited] =
     React.useState<string>("0.00");
 
   const [myInvitees, setMyInvitees] = React.useState<any[]>([]);
-
-  const [myInvitationCode, setMyInvitationCode] = React.useState<string>("");
 
   const ColumnsLeaders: DataRowProps[] = React.useMemo(
     () => [
@@ -60,6 +107,72 @@ export default function PageDashboard() {
     ],
     []
   );
+
+  const ColumnsMyReferrals: DataRowProps[] = React.useMemo(
+    () => [
+      { field: "throne", displayName: "Throne", value: (row) => row["throne"] },
+      {
+        field: "service",
+        displayName: "Service Type",
+        value: (row) => row["service"],
+      },
+      {
+        field: "referrer",
+        displayName: "Referrer",
+        value: (row) => row["referrer"],
+      },
+      {
+        field: "referral_code",
+        displayName: "Referral Code",
+        value: (row) => row["referral_code"],
+      },
+      {
+        field: "benefit",
+        displayName: "Benefit",
+        value: (row) => row["benefit"],
+      },
+      {
+        field: "price",
+        displayName: "Price of the throne",
+        value: (row) => row["price"],
+      },
+      {
+        field: "link",
+        displayName: "Link [Verified]",
+        value: (row) => row["link"],
+      },
+      {
+        field: "date",
+        displayName: "Date",
+        value: (row) => new Date(row["date"]).toUTCString(),
+      },
+      {
+        field: "status",
+        displayName: "Status",
+        value: (row) => row["status"],
+      },
+    ],
+    []
+  );
+
+  const getTotalTorDeposited = React.useCallback(async () => {
+    try {
+      const result = await contracts.RefThrone?.methods
+        .getTotalTorDeposited()
+        .call<bigint>();
+
+      if (result) {
+        setTotalTorDeposited(
+          Number(utils.fromWei(result?.toString())).toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 5,
+          })
+        );
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }, [contracts.RefThrone, utils, account]);
 
   const getMyTotalEthBalance = React.useCallback(async () => {
     if (account) {
@@ -131,68 +244,51 @@ export default function PageDashboard() {
     }
   }, [contracts.EthTreasury, utils, account]);
 
-  const bindingInvitationCode = React.useCallback(async () => {
-    if (account) {
-      try {
-        const result = await contracts.User?.methods
-          .addInvitee(invitationCode)
-          .send({ from: account });
-
-        console.log({ result });
-      } catch (err) {
-        console.log(err);
-      }
-    }
-  }, [contracts.User, invitationCode, account]);
-
-  const getMyInvitaionCode = React.useCallback(async () => {
-    if (account) {
-      try {
-        const result = await contracts.User?.methods
-          .getInvitaionCode(account)
-          .call<string>();
-
-        if (result) setMyInvitationCode(result);
-      } catch (err) {
-        console.log(err);
-      }
-    }
-  }, [contracts.User, account]);
-
-  const generateMyInvitationCode = React.useCallback(async () => {
-    if (account) {
-      try {
-        const result = await contracts.User?.methods
-          .generateInvitationCode()
-          .send({ from: account });
-
-        if (result) {
-          getMyInvitaionCode();
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    }
-  }, [contracts.User, account]);
-
   React.useEffect(() => {
-    getMyInfo();
+    getTotalTorDeposited();
     getMyTotalEthBalance();
     getMyTotalTorBalance();
+    getMyInfo();
     getMyInvitees();
-    getMyInvitaionCode();
   }, []);
-
-  const handleInputChange = React.useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      const { value } = event.target;
-      setInvitationCode(value);
-    },
-    []
-  );
 
   return (
     <div className="mt-10 w-full">
+      <div className="flex flex-wrap justify-center md:justify-between">
+        <PanelTitle
+          name={"Total ETH Deposited"}
+          result={"0.00 ETH"}
+          className="w-full max-w-[90%] md:w-1/6 md:max-w-[170px]"
+        />
+        <PanelTitle
+          name={"Total TOR Supply"}
+          result={totalTorDeposited}
+          className="w-full max-w-[90%] mt-3 md:mt-0 md:w-1/6 md:max-w-[170px]"
+        />
+        <PanelTitle
+          name={"Total Users"}
+          result={0}
+          className="w-full max-w-[90%] mt-3 md:mt-0 md:w-1/6 md:max-w-[170px]"
+        />
+        <PanelTitle
+          name={"Total Reward Points"}
+          result={0}
+          className="w-full max-w-[90%] mt-3 md:mt-0 md:w-1/6 md:max-w-[170px]"
+        />
+        <PanelTitle
+          name={"Total Referral Thrones"}
+          result={0}
+          className="w-full max-w-[90%] mt-3 md:mt-0 md:w-1/6 md:max-w-[170px]"
+        />
+      </div>
+      <div className="mt-6">
+        <h2 className="text-lg text-primary chakra-petch-bold">
+          Reward Points Leaderboard
+        </h2>
+        <div>
+          <DataTable columns={ColumnsLeaders} data={SampleLeadersRecords} />
+        </div>
+      </div>
       <div className="mt-6">
         <h2 className="text-lg text-primary chakra-petch-bold">My Dashboard</h2>
         <div className="mt-4 flex flex-wrap justify-center md:justify-between">
@@ -226,46 +322,6 @@ export default function PageDashboard() {
             result={"Stone"}
             className="w-full max-w-[90%] mt-3 md:mt-0 md:w-1/6 md:max-w-[170px]"
           />
-        </div>
-      </div>
-      <div className="mt-8">
-        <h2 className="text-lg text-primary chakra-petch-bold">My Inviter</h2>
-        <div className="mt-4">
-          <label htmlFor="invitationCode">
-            Bind invitation code & Earn reward points
-          </label>
-          <div className="flex flex-wrap justify-between">
-            <Input
-              className="w-full max-w-[calc(100%_-_200px)] py-1 px-2 chakra-petch-regular rounded-sm text-white placeholder:text-camo-300 bg-camo-700 border border-gray-400"
-              id="invitationCode"
-              type="text"
-              value={invitationCode}
-              onChange={handleInputChange}
-            />
-            <Button
-              className="w-[180px] h-[32px] chakra-petch-bold rounded-md bg-yello-300 text-black"
-              onClick={bindingInvitationCode}
-            >
-              Bind Invitation Code
-            </Button>
-          </div>
-        </div>
-      </div>
-      <div className="mt-8">
-        <h2 className="text-lg text-primary chakra-petch-bold">
-          My Invitations
-        </h2>
-        <div className="mt-4">
-          {myInvitationCode ? (
-            <span>{myInvitationCode}</span>
-          ) : (
-            <Button
-              className="w-[240px] h-[32px] chakra-petch-bold rounded-md bg-yello-300 text-black"
-              onClick={generateMyInvitationCode}
-            >
-              Create My Invitation Code
-            </Button>
-          )}
         </div>
       </div>
       <div className="mt-6">
