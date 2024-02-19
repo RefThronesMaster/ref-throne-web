@@ -77,7 +77,7 @@ export const MyAccountProvider = ({
     () => (accounts?.length ? accounts[0] : null),
     [accounts]
   );
-  
+
   const [web3, setWeb3] = React.useState<Web3 | null>(null);
   const pathname = usePathname();
   const router = useRouter();
@@ -115,6 +115,7 @@ export const MyAccountProvider = ({
 
   const contractRefThrone = React.useMemo(() => {
     if (web3) {
+      console.log({ refThroneContract: RefThroneContract.ADDRESS });
       return new web3.eth.Contract(
         RefThroneContract.ABI,
         RefThroneContract.ADDRESS
@@ -125,6 +126,7 @@ export const MyAccountProvider = ({
 
   const contractEthTreasury = React.useMemo(() => {
     if (web3) {
+      console.log({ ethTreasuryContract: EthTreasuryContract.ADDRESS });
       return new web3.eth.Contract(
         EthTreasuryContract.ABI,
         EthTreasuryContract.ADDRESS
@@ -135,6 +137,7 @@ export const MyAccountProvider = ({
 
   const contractTORToken = React.useMemo(() => {
     if (web3) {
+      console.log({ torTokenContract: TORTokenContract.ADDRESS });
       return new web3.eth.Contract(
         TORTokenContract.ABI,
         TORTokenContract.ADDRESS
@@ -145,6 +148,7 @@ export const MyAccountProvider = ({
 
   const contractUserHistory = React.useMemo(() => {
     if (web3) {
+      console.log({ userHistoryContract: UserHistoryContract.ADDRESS });
       return new web3.eth.Contract(
         UserHistoryContract.ABI,
         UserHistoryContract.ADDRESS
@@ -155,6 +159,7 @@ export const MyAccountProvider = ({
 
   const contractUser = React.useMemo(() => {
     if (web3) {
+      console.log({ userContract: UserContract.ADDRESS });
       return new web3.eth.Contract(UserContract.ABI, UserContract.ADDRESS);
     }
     return null;
