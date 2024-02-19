@@ -257,7 +257,7 @@ export default function PageDashboard() {
         </h2>
         <div className="mt-4">
           {myInvitationCode ? (
-            <span>{myInvitationCode}</span>
+            <span>My Code: {myInvitationCode}</span>
           ) : (
             <Button
               className="w-[240px] h-[32px] chakra-petch-bold rounded-md bg-yello-300 text-black"
