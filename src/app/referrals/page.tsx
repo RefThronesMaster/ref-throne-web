@@ -14,6 +14,7 @@ import {
 } from "@/components/common";
 import { MyAccountContext } from "../MyAccountProvider";
 import { BENEFIT_TYPE_LABEL } from "@/components/types";
+import Link from "next/link";
 
 type SORT = {
   field: string;
@@ -168,12 +169,15 @@ export default function PageReferral() {
           field: "linkUrl",
           displayName: "Link [Verified]",
           width: "*",
-          value: (row: TThrone) =>
-            row.linkUrl.length > 30
-              ? `${row.linkUrl.substring(0, 16)}...${row.linkUrl.substring(
-                  row.linkUrl.length - 6
-                )}`
-              : row.linkUrl,
+          value: (row: TThrone) => (
+            <Link href={row.linkUrl} target="_blank">
+              {row.linkUrl.length > 30
+                ? `${row.linkUrl.substring(0, 16)}...${row.linkUrl.substring(
+                    row.linkUrl.length - 6
+                  )}`
+                : row.linkUrl}
+            </Link>
+          ),
         },
       ] as DataRowProps[],
     []
