@@ -1,47 +1,104 @@
 "use client";
 
 import Image from "next/image";
-import React, { ChangeEvent, HTMLInputTypeAttribute } from "react";
+import React, { ChangeEvent } from "react";
 import {
   Button,
   Search,
   SwordIcon,
   DataTable,
   DataRowProps,
-  Dialog,
-  Input,
-  TService,
+  TThrone,
   UsurpReferralModal,
   NewReferralModal,
-} from "@/common/components";
+} from "@/components/common";
 import { MyAccountContext } from "../MyAccountProvider";
+import { BENEFIT_TYPE_LABEL } from "@/components/types";
+
+type SORT = {
+  field: string;
+  order: "ASC" | "DESC";
+};
+
+const defaultSort: SORT = {
+  field: "torAmount",
+  order: "DESC",
+};
 
 export default function PageReferral() {
-  const onChange = React.useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target.value);
-  }, []);
-
   const [openUsurpModal, setOpenUsurpModal] = React.useState<boolean>(false);
   const [openNewModal, setOpenNewModal] = React.useState<boolean>(false);
-  const [selected, setSelected] = React.useState<TService | undefined>();
-  // const [selected, setSelected] = React.useState<BigInt | undefined>();
-  const { account, getBalance, web3, contracts, utils } =
-    React.useContext(MyAccountContext);
+  const [selectedId, setSelectedId] = React.useState<BigInt | undefined>();
+  const [search, setSearch] = React.useState<string>("");
+  const { contracts, utils } = React.useContext(MyAccountContext);
 
-  const [data, setData] = React.useState<TService[]>([]);
+  const [sort, setSort] = React.useState<SORT>(defaultSort);
+
+  const handleSearch = React.useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setSearch(event.target.value);
+    },
+    []
+  );
+
+  const handleChangeSort = React.useCallback(
+    (fieldName: string) => {
+      const newSort: SORT = {
+        field: fieldName,
+        order: "DESC",
+      };
+
+      if (sort.field == fieldName && sort.order == "DESC") {
+        newSort.order = "ASC";
+      }
+      setSort(newSort);
+    },
+    [sort]
+  );
+
+  const [data, setData] = React.useState<TThrone[]>([]);
+
+  const handleSort = React.useCallback(
+    (a: TThrone, b: TThrone) => {
+      let front, back;
+      if (sort.order == "ASC") {
+        front = a;
+        back = b;
+      } else {
+        front = b;
+        back = a;
+      }
+
+      switch (sort.field) {
+        case "torAmount":
+          return front.torAmount.valueOf() - back.torAmount.valueOf() >
+            BigInt(0)
+            ? 1
+            : -1;
+        case "benefitAmount":
+          return front.benefitAmount.valueOf() - back.benefitAmount.valueOf() >
+            BigInt(0)
+            ? 1
+            : -1;
+        case "name":
+          return front.name > back.name ? 1 : -1;
+        case "serviceType":
+          return front.serviceType > back.serviceType ? 1 : -1;
+        default:
+          return 0;
+      }
+    },
+    [sort]
+  );
 
   const getAllOwnedThrones = React.useCallback(() => {
     contracts.RefThrone?.methods
       .getAllOwnedThrones()
-      .call<TService[]>()
-      .then((res) => {
-        setData(res);
-      });
+      .call<TThrone[]>()
+      .then(setData);
   }, [contracts.RefThrone]);
 
   React.useEffect(() => {
-    // web3Client?.eth.
-    // console.log(web3Client?.eth.defaultAccount);
     getAllOwnedThrones();
   }, [getAllOwnedThrones]);
 
@@ -52,19 +109,21 @@ export default function PageReferral() {
           field: "name",
           displayName: "Throne",
           width: 140,
-          value: (row: TService) => row.name,
+          sortable: true,
+          value: (row: TThrone) => row.name,
         },
         {
           field: "serviceType",
           displayName: "Service Type",
           width: 140,
-          value: (row: TService) => row.serviceType,
+          sortable: true,
+          value: (row: TThrone) => row.serviceType,
         },
         {
           field: "referrer",
           displayName: "Referrer",
           width: 140,
-          value: (row: TService) =>
+          value: (row: TThrone) =>
             `${row.referrer.substring(0, 5)}...${row.referrer.substring(
               row.referrer.length - 2
             )}`,
@@ -73,26 +132,31 @@ export default function PageReferral() {
           field: "referralCode",
           displayName: "Referral Code",
           width: 130,
-          value: (row: TService) => row.referralCode,
+          value: (row: TThrone) => row.referralCode,
         },
         {
-          field: "benefit",
+          field: "benefitAmount",
           displayName: "Benefit",
           width: 150,
-          value: (row: TService) => `${utils?.fromWei(row.benefitAmount.toString())} ${row.benefitType}`,
+          sortable: true,
+          value: (row: TThrone) =>
+            `${utils?.fromWei(row.benefitAmount.toString())} ${
+              BENEFIT_TYPE_LABEL[row.benefitType]
+            }`,
         },
         {
           field: "torAmount",
           displayName: "Price of the throne",
           width: 170,
-          value: (row: TService) => (
+          sortable: true,
+          value: (row: TThrone) => (
             <div className="flex items-center">
               <span>{utils?.fromWei(row.torAmount.toString())} TOR</span>
               <Button
                 className="mx-1"
                 onClick={() => {
                   setOpenUsurpModal(true);
-                  setSelected(row);
+                  setSelectedId(row.id);
                 }}
               >
                 <SwordIcon className="w-6 h-6 fill-primary" />
@@ -104,7 +168,7 @@ export default function PageReferral() {
           field: "linkUrl",
           displayName: "Link [Verified]",
           width: "*",
-          value: (row: TService) =>
+          value: (row: TThrone) =>
             row.linkUrl.length > 30
               ? `${row.linkUrl.substring(0, 16)}...${row.linkUrl.substring(
                   row.linkUrl.length - 6
@@ -117,7 +181,7 @@ export default function PageReferral() {
 
   const handleUsurpModalClose = React.useCallback(() => {
     setOpenUsurpModal(false);
-    setSelected(undefined);
+    setSelectedId(undefined);
   }, []);
 
   const handleNewModalClose = React.useCallback(() => {
@@ -160,19 +224,34 @@ export default function PageReferral() {
             <Search
               id="search_referral"
               className="w-full max-w-[calc(100%_-_220px)] shrink px-2 py-1 bg-transparent"
-              onChange={onChange}
+              onChange={handleSearch}
             />
             <Button className="w-[190px] py-1" onClick={openNewReferral}>
               + Create New Throne
             </Button>
           </div>
-          <DataTable columns={Columns} data={data} />
+          <DataTable
+            columns={Columns}
+            data={data
+              .filter(
+                (item) =>
+                  item.referralCode
+                    .toUpperCase()
+                    .includes(search.toUpperCase()) ||
+                  item.serviceType
+                    .toUpperCase()
+                    .includes(search.toUpperCase()) ||
+                  item.name.toUpperCase().includes(search.toUpperCase())
+              )
+              .sort(handleSort)}
+            sort={sort}
+            onChangeSort={handleChangeSort}
+          />
         </div>
       </div>
       <UsurpReferralModal
         open={openUsurpModal}
-        data={selected}
-        // dataId={selected}
+        dataId={selectedId}
         onClose={handleUsurpModalClose}
       />
       <NewReferralModal open={openNewModal} onClose={handleNewModalClose} />

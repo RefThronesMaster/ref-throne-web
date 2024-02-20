@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import Web3, { Contract, ContractAbi } from "web3";
 import { Web3ReactHooks, useWeb3React } from "@web3-react/core";
 import { Web3ReactProvider } from "@web3-react/core";
@@ -12,6 +12,7 @@ import {
   EthTreasuryContract,
   RefThroneContract,
   TORTokenContract,
+  UserContract,
   UserHistoryContract,
 } from "@/libs/web3/abi";
 
@@ -20,7 +21,9 @@ const connectors: [MetaMask, Web3ReactHooks][] = [[metaMask, hooks]];
 export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <Web3ReactProvider connectors={connectors}>
-      <MyAccountProvider>{children}</MyAccountProvider>
+      <Suspense>
+        <MyAccountProvider>{children}</MyAccountProvider>
+      </Suspense>
     </Web3ReactProvider>
   );
 };
@@ -34,6 +37,7 @@ type TMyAccountContext = {
     TORToken: Contract<ContractAbi> | null;
     EthTreasury: Contract<ContractAbi> | null;
     UserHistory: Contract<ContractAbi> | null;
+    User: Contract<ContractAbi> | null;
   };
   utils: {
     fromWei: (value: string | number) => string;
@@ -50,6 +54,7 @@ export const MyAccountContext = React.createContext<TMyAccountContext>({
     TORToken: null,
     EthTreasury: null,
     UserHistory: null,
+    User: null,
   },
   utils: {
     fromWei: (value: string | number) => "0",
@@ -110,6 +115,7 @@ export const MyAccountProvider = ({
 
   const contractRefThrone = React.useMemo(() => {
     if (web3) {
+      console.log({ refThroneContract: RefThroneContract.ADDRESS });
       return new web3.eth.Contract(
         RefThroneContract.ABI,
         RefThroneContract.ADDRESS
@@ -120,6 +126,7 @@ export const MyAccountProvider = ({
 
   const contractEthTreasury = React.useMemo(() => {
     if (web3) {
+      console.log({ ethTreasuryContract: EthTreasuryContract.ADDRESS });
       return new web3.eth.Contract(
         EthTreasuryContract.ABI,
         EthTreasuryContract.ADDRESS
@@ -130,6 +137,7 @@ export const MyAccountProvider = ({
 
   const contractTORToken = React.useMemo(() => {
     if (web3) {
+      console.log({ torTokenContract: TORTokenContract.ADDRESS });
       return new web3.eth.Contract(
         TORTokenContract.ABI,
         TORTokenContract.ADDRESS
@@ -140,10 +148,19 @@ export const MyAccountProvider = ({
 
   const contractUserHistory = React.useMemo(() => {
     if (web3) {
+      console.log({ userHistoryContract: UserHistoryContract.ADDRESS });
       return new web3.eth.Contract(
         UserHistoryContract.ABI,
         UserHistoryContract.ADDRESS
       );
+    }
+    return null;
+  }, [web3]);
+
+  const contractUser = React.useMemo(() => {
+    if (web3) {
+      console.log({ userContract: UserContract.ADDRESS });
+      return new web3.eth.Contract(UserContract.ABI, UserContract.ADDRESS);
     }
     return null;
   }, [web3]);
@@ -221,6 +238,7 @@ export const MyAccountProvider = ({
           TORToken: contractTORToken,
           RefThrone: contractRefThrone,
           UserHistory: contractUserHistory,
+          User: contractUser,
         },
         utils: {
           toWei,

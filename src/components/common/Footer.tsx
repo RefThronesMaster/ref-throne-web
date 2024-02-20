@@ -25,10 +25,10 @@ export const Footer = () => {
         <span>©2024 RefThrones. All rights reserved</span>
       </div>
       <div className="flex flex-wrap items-end justify-end">
-        <a href="https://github.com" target="_blank">
+        <a href="https://github.com/RefThrones" target="_blank">
           <GithubIcon className="w-8 h-8 fill-primary" />
         </a>
-        <a href="https://twitter.com" target="_blank">
+        <a href="https://twitter.com/RefThrones" target="_blank">
           <TwitterIcon className="w-8 h-8 fill-primary ml-4" />
         </a>
         <a href="https://discord.com" target="_blank">

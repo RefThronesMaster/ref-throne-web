@@ -6,7 +6,7 @@ export type TContract = {
 };
 
 export const TORTokenContract: TContract = {
-  ADDRESS: "0xcc6E4AC4C748F4aD235e1a3Bde52Eec0C5C62A2F",
+  ADDRESS: process.env.NEXT_PUBLIC_TOR_TOKEN_CONTRACT_ADDRESS,
   ABI: [
     {
       inputs: [
@@ -309,10 +309,9 @@ export const TORTokenContract: TContract = {
     },
   ] as ContractAbi,
 };
-// const a: AbiOutput;
 
 export const RefThroneContract: TContract = {
-  ADDRESS: "0xa81dF2481ce429412a339B85c1edB7Bc92bB1Ed9",
+  ADDRESS: process.env.NEXT_PUBLIC_REF_THRONE_CONTRACT_ADDRESS,
   ABI: [
     {
       inputs: [
@@ -1043,7 +1042,7 @@ export const RefThroneContract: TContract = {
 };
 
 export const EthTreasuryContract: TContract = {
-  ADDRESS: "0x7f53Ea7151043E5596D437C4E116416398EEF7Ee",
+  ADDRESS: process.env.NEXT_PUBLIC_ETH_TREASURY_CONTRACT_ADDRESS,
   ABI: [
     {
       "inputs": [
@@ -1605,7 +1604,7 @@ export const EthTreasuryContract: TContract = {
 };
 
 export const UserHistoryContract: TContract = {
-  ADDRESS: "0xfb1ee26A9DC3B8462FF0664F0B4a9aC1a87A2B7F",
+  ADDRESS: process.env.NEXT_PUBLIC_USER_HISTORY_CONTRACT_ADDRESS,
   ABI: [
     {
       name: "checkDuplicateCheckIn",
@@ -1619,6 +1618,60 @@ export const UserHistoryContract: TContract = {
       inputs: [],
       outputs: [],
       payable: false,
+      type: "function",
+    },
+  ] as ContractAbi,
+};
+
+export const UserContract: TContract = {
+  ADDRESS: process.env.NEXT_PUBLIC_USER_CONTRACT_ADDRESS,
+  ABI: [
+    {
+      name: "getInvitees",
+      inputs: [],
+      outputs: [{ name: "getInvitees", type: "address[]" }],
+      payable: false,
+      type: "function",
+    },
+    {
+      name: "addInvitee",
+      inputs: [{ name: 'code', type: 'string' }],
+      outputs: [],
+      payable: true,
+      type: "function",
+    },
+    {
+      name: "getUserInfo",
+      inputs: [],
+      outputs: [{
+        name: 'getUserInfo', type: 'tuple',
+        components: [
+          { name: "nickName", type: "string" },
+          { name: "xUrl", type: "string" },
+          { name: "xTubeUrl", type: "string" },
+          { name: "telegramUrl", type: "string" },
+          { name: "discordUrl", type: "string" }
+        ]
+      }],
+      payable: false,
+      type: "function",
+    },
+    {
+      name: "getInvitaionCode",
+      inputs: [{ name: 'account', type: 'address', }],
+      outputs: [{
+        name: 'getInvitaionCode', type: 'string',
+      }],
+      payable: false,
+      type: "function",
+    },
+    {
+      name: "generateInvitationCode",
+      inputs: [],
+      outputs: [{
+        name: 'generateInvitationCode', type: 'boolean',
+      }],
+      payable: true,
       type: "function",
     },
   ] as ContractAbi,

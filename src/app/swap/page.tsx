@@ -3,16 +3,10 @@
 import Image from "next/image";
 import { MyAccountContext } from "@/app/MyAccountProvider";
 import React, { ChangeEvent } from "react";
-import { Button, Input } from "@/common/components";
-import { Decimal } from "decimal.js";
-import {
-  EthTreasuryContract,
-  RefThroneContract,
-  TORTokenContract,
-} from "@/libs/web3/abi";
+import { Button, Input } from "@/components/common";
+import { EthTreasuryContract } from "@/libs/web3/abi";
 import { RpcError } from "web3";
-import { ethToTor, torToEth } from "@/libs/web3/utils";
-import { Truculenta } from "next/font/google";
+import { ethToTor } from "@/libs/web3/utils";
 
 type MODE = "deposit" | "withdraw";
 
@@ -69,13 +63,12 @@ const Deposit = () => {
 
   const handleChange = React.useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      const { value } = event.target;
+      const { value: newValue } = event.target;
 
       setMessage("");
-      if (parseFloat(value) < 0) {
-        setValue("0.0000");
-      } else {
-        setValue(value);
+      const floatVal = parseFloat(newValue);
+      if (!Number.isNaN(floatVal) && floatVal >= 0) {
+        setValue(newValue);
       }
     },
     []
@@ -118,8 +111,12 @@ const Deposit = () => {
 
   const receivedTor = React.useMemo(() => {
     try {
-      const tor = ethToTor(parseFloat(value));
-      return tor.toFixed(value.length - 3).replace(/\.?0+$/, "");
+      const floatVal = parseFloat(value);
+      const tor = ethToTor(floatVal);
+      const stringVal = floatVal.toString();
+      return tor
+        .toFixed(stringVal.length > 3 ? stringVal.length - 3 : stringVal.length)
+        .replace(/\.?0+$/, "");
     } catch (err) {
       console.log(err);
     }
@@ -127,7 +124,6 @@ const Deposit = () => {
   }, [value]);
 
   const depositFeeWei = React.useMemo(() => {
-    console.log({depositFeeRate});
     try {
       const feeWei =
         (BigInt(utils.toWei(value)) / BigInt(100)) * BigInt(depositFeeRate);
@@ -234,7 +230,7 @@ const Deposit = () => {
               </span> */}
             </div>
             <Button
-              className="mt-5 mb-2 py-1 w-full chakra-petch-bold rounded-md bg-yellow-100 active:bg-amber-200 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-200 text-black"
+              className="mt-5 mb-2 py-1 w-full chakra-petch-bold rounded-md bg-yello-100 active:bg-amber-200 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-200 text-black"
               disabled={parseFloat(value) <= 0 || transacting}
               onClick={handleTransaction}
             >
@@ -499,7 +495,7 @@ const Withdraw = () => {
               <span className="text-sm">{withdrawFeeEth} ETH</span>
             </div>
             <Button
-              className="mt-5 mb-2 py-1 w-full chakra-petch-bold rounded-md bg-yellow-100 active:bg-amber-200 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-200 text-black"
+              className="mt-5 mb-2 py-1 w-full chakra-petch-bold rounded-md bg-yello-100 active:bg-amber-200 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-200 text-black"
               disabled={parseFloat(value) <= 0 || transacting}
               onClick={handleTransaction}
             >

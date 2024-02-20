@@ -1,8 +1,13 @@
 import React, { ChangeEvent } from "react";
-import { DataInfo, InputData, Dialog } from ".";
-import type { TService } from ".";
+import { DataInfo, InputData, Dialog, SelectData } from "./common";
 import { MyAccountContext } from "@/app/MyAccountProvider";
 import { RefThroneContract } from "@/libs/web3/abi";
+import {
+  BENEFIT_TYPE_LABEL,
+  TBenefitType,
+  TThrone,
+  TServiceType,
+} from "@/components/types";
 
 type ModalProps = {
   open: boolean;
@@ -10,8 +15,7 @@ type ModalProps = {
 };
 
 type UsurpReferralModal = ModalProps & {
-  data?: TService;
-  // id: BigInt;
+  dataId?: BigInt;
 };
 
 type TFormReferral = {
@@ -30,8 +34,7 @@ const initFormUsurpReferral = {
 
 export const UsurpReferralModal = ({
   open,
-  data,
-  // id,
+  dataId,
   onClose,
 }: UsurpReferralModal) => {
   const { account, utils, contracts } = React.useContext(MyAccountContext);
@@ -39,21 +42,41 @@ export const UsurpReferralModal = ({
     initFormUsurpReferral
   );
   const [transacting, setTransacting] = React.useState<boolean>(false);
+  const [data, setData] = React.useState<TThrone | undefined>();
+
+  const getThroneById = React.useCallback(
+    async (id: BigInt) => {
+      try {
+        const result = await contracts.RefThrone?.methods
+          .getThroneById(id)
+          .call<TThrone>();
+        setData(result);
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    [contracts.RefThrone]
+  );
 
   React.useEffect(() => {
+    if (open && dataId) {
+      getThroneById(dataId);
+    }
+
     return () => {
+      setData(undefined);
       setFormData(initFormUsurpReferral);
     };
-  }, [open, data]);
+  }, [open, dataId, getThroneById]);
 
   const handleChange = React.useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const { id, value } = event.target;
-      if (
-        (id == "benefitAmount" || id == "torAmount") &&
-        parseFloat(value) <= 0
-      ) {
-        setFormData((oldValue) => ({ ...oldValue, [id]: 0 }));
+      if (id == "benefitAmount" || id == "torAmount") {
+        const floatVal = parseFloat(value);
+        if (!Number.isNaN(floatVal) && floatVal >= 0) {
+          setFormData((oldValue) => ({ ...oldValue, [id]: value }));
+        }
       } else {
         setFormData((oldValue) => ({ ...oldValue, [id]: value }));
       }
@@ -72,16 +95,19 @@ export const UsurpReferralModal = ({
     const currentTorAmount = BigInt(data?.torAmount.toString() ?? "");
     const newTorAmount = BigInt(utils.toWei(formData.torAmount));
 
-    if ((newBenefitAmount > currentBenefitAmount) ||
-        ((newBenefitAmount == currentBenefitAmount) && (newTorAmount > currentTorAmount))) {
+    if (
+      newBenefitAmount > currentBenefitAmount ||
+      (newBenefitAmount == currentBenefitAmount &&
+        newTorAmount > currentTorAmount)
+    ) {
       return false;
     }
 
     return true;
-  }, [formData, data]);
+  }, [formData, data, utils]);
 
   const transact = React.useCallback(
-    async (data?: TService, formData?: TFormReferral) => {
+    async (data?: TThrone, formData?: TFormReferral) => {
       if (data && formData && account) {
         try {
           setTransacting(true);
@@ -145,16 +171,18 @@ export const UsurpReferralModal = ({
           "border-camo-500 bg-camo-500 text-primary chakra-petch-medium rounded-md w-[180px] py-1 active:bg-camo-300 disabled:cursor-not-allowed disabled:bg-gray-400 disabled:text-gray-500",
       }}
     >
-      <DataInfo label={"Service"} value={data?.name} />
-      <DataInfo label={"Service Type"} value={data?.serviceType} />
-      <DataInfo label={"Benefit Type"} value={data?.benefitType} />
+      <DataInfo label={"Service"} value={data?.name ?? "-"} />
+      <DataInfo label={"Service Type"} value={data?.serviceType ?? "-"} />
+      <DataInfo label={"Benefit Type"} value={data?.benefitType ?? "-"} />
       <DataInfo
         label={"Current Benefit"}
-        value={utils.fromWei(data?.benefitAmount.toString() ?? "")}
+        value={data ? utils.fromWei(data?.benefitAmount.toString() ?? "") : "-"}
       />
       <DataInfo
         label={"Current Deposited TOR"}
-        value={`${utils.fromWei(data?.torAmount.toString() ?? "")} TOR`}
+        value={
+          data ? `${utils.fromWei(data?.torAmount.toString() ?? "")} TOR` : "-"
+        }
       />
       <InputData
         id="benefitAmount"
@@ -214,13 +242,39 @@ export const NewReferralModal = ({ open, onClose }: ModalProps) => {
   const { account, utils, contracts } = React.useContext(MyAccountContext);
   const [formData, setFormData] =
     React.useState<TNewFormReferral>(initFormNewReferral);
+  const [serviceTypes, setServiceTypes] = React.useState<TServiceType[]>([]);
+  const [benefitTypes, setBenefitTypes] = React.useState<TBenefitType[]>([]);
   const [transacting, setTransacting] = React.useState<boolean>(false);
 
+  const getServiceTypes = React.useCallback(async () => {
+    try {
+      const result = await contracts.RefThrone?.methods
+        .getServiceTypes()
+        .call<TServiceType[]>();
+      setServiceTypes(result ?? []);
+    } catch (err) {
+      console.log(err);
+    }
+  }, [contracts]);
+
+  const getBenefitTypes = React.useCallback(async () => {
+    try {
+      const result = await contracts.RefThrone?.methods
+        .getBenefitTypes()
+        .call<TBenefitType[]>();
+      setBenefitTypes(result ?? []);
+    } catch (err) {
+      console.log(err);
+    }
+  }, [contracts]);
+
   React.useEffect(() => {
+    getServiceTypes();
+    getBenefitTypes();
     return () => {
       setFormData(initFormNewReferral);
     };
-  }, [open]);
+  }, [open, getServiceTypes, getBenefitTypes]);
 
   const handleChange = React.useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -233,6 +287,14 @@ export const NewReferralModal = ({ open, onClose }: ModalProps) => {
       } else {
         setFormData((oldValue) => ({ ...oldValue, [id]: value }));
       }
+    },
+    []
+  );
+
+  const handleSelectChange = React.useCallback(
+    (event: ChangeEvent<HTMLSelectElement>) => {
+      const { id, value } = event.target;
+      setFormData((oldValue) => ({ ...oldValue, [id]: value }));
     },
     []
   );
@@ -314,26 +376,32 @@ export const NewReferralModal = ({ open, onClose }: ModalProps) => {
       <InputData
         id="name"
         label="New Service"
-        className="pl-2 text-right"
+        className="pl-2"
         value={formData.name}
         onChange={handleChange}
         type="text"
       />
-      <InputData
+      <SelectData
         id="serviceType"
         label="Service Type"
-        className="pl-2 text-right"
+        className="pl-2"
         value={formData.serviceType}
-        onChange={handleChange}
-        type="text"
+        onChange={handleSelectChange}
+        options={serviceTypes.map((type) => ({
+          label: type,
+          value: type,
+        }))}
       />
-      <InputData
+      <SelectData
         id="benefitType"
         label="Benefit Type"
-        className="pl-2 text-right"
+        className="pl-2"
         value={formData.benefitType}
-        onChange={handleChange}
-        type="text"
+        onChange={handleSelectChange}
+        options={benefitTypes.map((type) => ({
+          label: BENEFIT_TYPE_LABEL[type],
+          value: type,
+        }))}
       />
       <InputData
         id="benefitAmount"

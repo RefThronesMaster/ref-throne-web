@@ -1,4 +1,4 @@
-export * from "./types";
+export * from "../types";
 
 export * from "./Header";
 export * from "./DataTable";
@@ -8,5 +8,5 @@ export * from "./Button";
 export * from "./Icon";
 export * from "./Input";
 
-export * from "./Modal";
+export * from "../Modal";
 export * from "./DataInput";

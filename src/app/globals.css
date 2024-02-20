@@ -45,9 +45,21 @@ body {
 }
 
 input,
-button {
+button,
+select {
   appearance: none;
   outline: none;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
 }
 
 .chakra-petch-light {

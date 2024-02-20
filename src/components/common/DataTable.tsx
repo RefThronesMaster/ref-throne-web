@@ -1,12 +1,18 @@
 "use client";
 
 import React, { ReactNode } from "react";
-import { SortIcon } from ".";
+import { Button, SortIcon } from ".";
+
+export type SORT = {
+  field: string;
+  order: "ASC" | "DESC";
+};
 
 export type DataRowProps = {
   field: string;
   displayName?: string;
-  width?: number | string | undefined;
+  width?: number | string;
+  sortable?: boolean;
   value: (
     record: any,
     field?: string,
@@ -18,12 +24,16 @@ export type DataTableProps = {
   className?: string;
   columns?: DataRowProps[];
   data: any[];
+  sort?: SORT;
+  onChangeSort?: (fieldName: string) => void;
 };
 
 export const DataTable = React.memo(function FnDataTable({
   className,
   columns,
   data,
+  sort,
+  onChangeSort,
 }: DataTableProps) {
   return (
     <div className="flex w-full flex-wrap items-end justify-between mt-4 overflow-x-scroll">
@@ -42,9 +52,18 @@ export const DataTable = React.memo(function FnDataTable({
               >
                 <div className="flex items-center">
                   <span>{column.displayName}</span>
-                  <span>
-                    <SortIcon className="fill-white" />
-                  </span>
+                  {column.sortable && (
+                    <Button
+                      onClick={() => onChangeSort && onChangeSort(column.field)}
+                    >
+                      <SortIcon
+                        className="fill-white"
+                        order={
+                          sort?.field == column.field ? sort.order : undefined
+                        }
+                      />
+                    </Button>
+                  )}
                 </div>
               </th>
             ))}
