@@ -16,50 +16,15 @@ export default function PageDashboard() {
   const [invitationCode, setInvitationCode] = React.useState<string>("");
 
   const [myTotalEthDeposited, setMyTotalEthDeposited] =
-    React.useState<string>("0.00");
+    React.useState<string>("-");
   const [myTotalTorDeposited, setMyTotalTorDeposited] =
-    React.useState<string>("0.00");
+    React.useState<string>("-");
 
-  const [myInvitees, setMyInvitees] = React.useState<any[]>([]);
+  const [myInvitees, setMyInvitees] = React.useState<any[] | null>(null);
 
-  const [myInvitationCode, setMyInvitationCode] = React.useState<string>("");
-
-  const ColumnsLeaders: DataRowProps[] = React.useMemo(
-    () => [
-      { field: "tier", displayName: "Tier", value: (row) => row["tier"] },
-      {
-        field: "rank",
-        displayName: "Rank",
-        value: (row) => row["rank"],
-      },
-      {
-        field: "user",
-        displayName: "User",
-        value: (row) => row["user"],
-      },
-      {
-        field: "owned_thrones",
-        displayName: "Owned Thrones",
-        value: (row) => row["owned_thrones"],
-      },
-      {
-        field: "deposited_eth",
-        displayName: "Deposited ETH",
-        value: (row) => row["deposited_eth"],
-      },
-      {
-        field: "referrals",
-        displayName: "Referrals",
-        value: (row) => row["referrals"],
-      },
-      {
-        field: "points",
-        displayName: "Points",
-        value: (row) => row["points"],
-      },
-    ],
-    []
-  );
+  const [myInvitationCode, setMyInvitationCode] = React.useState<
+    string | null
+  >();
 
   const getMyTotalEthBalance = React.useCallback(async () => {
     if (account) {
@@ -102,7 +67,7 @@ export default function PageDashboard() {
       const result = await contracts.User?.methods.getInvitees().call<any[]>();
 
       if (result) {
-        setMyInvitees(result);
+        setMyInvitees(result || "");
       }
     } catch (err) {
       console.log(err);
@@ -208,7 +173,7 @@ export default function PageDashboard() {
           />
           <PanelTitle
             name={"My Invitees"}
-            result={myInvitees.length}
+            result={myInvitees ? myInvitees.length : "-"}
             className="w-full max-w-[90%] mt-3 md:mt-0 md:w-1/6 md:max-w-[170px]"
           />
           <PanelTitle
@@ -218,7 +183,7 @@ export default function PageDashboard() {
                 <p>(Realtime Estimated)</p>
               </div>
             }
-            result={0}
+            result={"-"}
             className="w-full max-w-[90%] mt-3 md:mt-0 md:w-1/6 md:max-w-[170px]"
           />
           <PanelTitle
@@ -260,7 +225,8 @@ export default function PageDashboard() {
             <span>My Code: {myInvitationCode}</span>
           ) : (
             <Button
-              className="w-[240px] h-[32px] chakra-petch-bold rounded-md bg-yello-300 text-black"
+              className="w-[240px] h-[32px] chakra-petch-bold rounded-md bg-yello-300 text-black disabled:bg-yello-100 disabled:text-gray-300"
+              disabled={myInvitees == null}
               onClick={generateMyInvitationCode}
             >
               Create My Invitation Code
