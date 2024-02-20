@@ -250,7 +250,9 @@ const Withdraw = () => {
   const [message, setMessage] = React.useState<string>("");
   const [withdrawFeeRate, setWithdrawFeeRate] = React.useState<number>(2);
   const [transacting, setTransacting] = React.useState<boolean>(false);
-  const [torBalanceWei, setTorBalanceWei] = React.useState<string>("");
+  const [torBalanceWei, setTorBalanceWei] = React.useState<string>("0");
+
+  const [loaded, setLoaded] = React.useState<boolean>(false);
 
   const getMyTorBalance = React.useCallback(async () => {
     try {
@@ -273,50 +275,16 @@ const Withdraw = () => {
       })
       .catch((err) => console.error(err));
     getMyTorBalance().then((result) => {
+      setLoaded(true);
       setTorBalanceWei(result);
     });
   }, [contracts.EthTreasury, getMyTorBalance]);
-
-  const getAvailableBalance = React.useCallback(
-    async (amount: string) => {
-      if (account) {
-        try {
-          const allowance = await contracts.TORToken?.methods
-            .allowance(account, EthTreasuryContract.ADDRESS)
-            .call<bigint>();
-
-          // if (allowance && allowance > BigInt(amount)) {
-          //   console.log({ allowance, amount });
-          //   return true;
-          // }
-          console.log("need approve");
-
-          await contracts.TORToken?.methods
-            .approve(
-              EthTreasuryContract.ADDRESS,
-              BigInt("1267650600228229401496703205376")
-            )
-            .send({ from: account });
-          console.log("approved");
-          return true;
-        } catch (err: any) {
-          if (err?.message?.includes("Internal JSON-RPC")) {
-            setMessage(
-              (err.data as RpcError).message.replace("execution reverted: ", "")
-            );
-          }
-        }
-      }
-      return false;
-    },
-    [contracts.TORToken, account]
-  );
 
   const torBalance = React.useMemo(() => {
     try {
       return utils.fromWei(torBalanceWei);
     } catch (err) {}
-    return 0;
+    return "-";
   }, [torBalanceWei, utils]);
 
   const handleChange = React.useCallback(
@@ -410,10 +378,6 @@ const Withdraw = () => {
     return BigInt(utils.toWei(value));
   }, [value, utils]);
 
-  // const withdrawTorFeeWei = React.useMemo(() => {
-  //   return (withdrawTorWei / BigInt(100)) * BigInt(withdrawFeeRate);
-  // }, [withdrawTorWei, withdrawFeeRate]);
-
   const handleTransaction = React.useCallback(async () => {
     try {
       // const total = withdrawTorWei + withdrawTorFeeWei;
@@ -457,7 +421,7 @@ const Withdraw = () => {
           </label>
         </div>
         <div className="flex justify-end px-2 text-sm text-camo-300">
-          Available: {torBalance} TOR
+          Available: {loaded ? torBalance : "-"} TOR
         </div>
         {message && (
           <div className="flex justify-end px-2 text-red-400">
