@@ -65,7 +65,7 @@ export default function PageDashboard() {
   const getMyInvitees = React.useCallback(async () => {
     try {
       const result = await contracts.User?.methods.getInvitees().call<any[]>();
-
+      console.log({ invitees: result });
       if (result) {
         setMyInvitees(result || "");
       }
@@ -104,6 +104,7 @@ export default function PageDashboard() {
           .send({ from: account });
 
         console.log({ result });
+        setInvitationCode("");
       } catch (err) {
         console.log(err);
       }
