@@ -125,6 +125,21 @@ export default function PageDashboard() {
     }
   }, [contracts.User, account]);
 
+  const getMyHistories = React.useCallback(async () => {
+    if (account) {
+      try {
+        console.log({ account });
+        const result = await contracts.UserHistory?.methods
+          .getHistory(account)
+          .call({ from: account });
+
+        console.log({ histories: result });
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  }, [contracts.UserHistory, account]);
+
   const generateMyInvitationCode = React.useCallback(async () => {
     if (account) {
       try {
@@ -147,6 +162,7 @@ export default function PageDashboard() {
     getMyTotalTorBalance();
     getMyInvitees();
     getMyInvitaionCode();
+    getMyHistories();
   }, []);
 
   const handleInputChange = React.useCallback(
