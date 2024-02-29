@@ -169,15 +169,18 @@ export default function PageReferral() {
           field: "linkUrl",
           displayName: "Link [Verified]",
           width: "*",
-          value: (row: TThrone) => (
-            <Link href={row.linkUrl} target="_blank">
-              {row.linkUrl.length > 30
-                ? `${row.linkUrl.substring(0, 16)}...${row.linkUrl.substring(
-                    row.linkUrl.length - 6
-                  )}`
-                : row.linkUrl}
-            </Link>
-          ),
+          value: (row: TThrone) => {
+            const url = row.linkUrl?.startsWith("http")
+              ? row.linkUrl
+              : `https://${row.linkUrl}`;
+            return (
+              <Link href={url} target="_blank">
+                {url.length > 30
+                  ? `${url.substring(0, 16)}...${url.substring(url.length - 6)}`
+                  : url}
+              </Link>
+            );
+          },
         },
       ] as DataRowProps[],
     []
