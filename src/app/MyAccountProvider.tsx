@@ -169,17 +169,17 @@ export const MyAccountProvider = ({
     if (signedIn) {
       const query = searchParams.get("p");
 
-      if (query) {
-        router.replace(query);
-      } else {
-        router.replace("/referrals");
-      }
-    } else {
-      if (pathname == "/") {
-        router.replace("/");
-      } else {
-        router.replace(`/?p=${pathname}`);
-      }
+      //   if (query) {
+      //     router.replace(query);
+      //   } else {
+      //     router.replace("/referrals");
+      //   }
+      // } else {
+      //   if (pathname == "/") {
+      //     router.replace("/");
+      //   } else {
+      //     router.replace(`/?p=${pathname}`);
+      //   }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [signedIn]);
