@@ -178,7 +178,8 @@ export const MyAccountProvider = ({
       if (pathname == "/") {
         router.replace("/");
       } else {
-        router.replace(`/?p=${pathname}`);
+        // console.log(encodeURIComponent(`p=${pathname}`));
+        router.replace(`/?p=${encodeURIComponent(pathname)}`);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
