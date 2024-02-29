@@ -4,7 +4,7 @@ import Image from "next/image";
 import { MyAccountContext } from "@/app/MyAccountProvider";
 import React, { ChangeEvent } from "react";
 import { Button, Input } from "@/components/common";
-import { EthTreasuryContract } from "@/libs/web3/abi";
+import { EthTreasuryContract } from "@/libs/web3/contracts";
 import { RpcError } from "web3";
 import { ethToTor } from "@/libs/web3/utils";
 

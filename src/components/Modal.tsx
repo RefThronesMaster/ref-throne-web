@@ -1,7 +1,7 @@
 import React, { ChangeEvent } from "react";
 import { DataInfo, InputData, Dialog, SelectData } from "./common";
 import { MyAccountContext } from "@/app/MyAccountProvider";
-import { RefThroneContract } from "@/libs/web3/abi";
+import { RefThroneContract } from "@/libs/web3/contracts";
 import {
   BENEFIT_TYPE_LABEL,
   TBenefitType,

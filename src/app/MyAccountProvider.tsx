@@ -14,7 +14,7 @@ import {
   TORTokenContract,
   UserContract,
   UserHistoryContract,
-} from "@/libs/web3/abi";
+} from "@/libs/web3/contracts";
 
 const connectors: [MetaMask, Web3ReactHooks][] = [[metaMask, hooks]];
 
