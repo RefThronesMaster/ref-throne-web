@@ -4,7 +4,8 @@ import "./globals.css";
 import { AppProvider } from "./MyAccountProvider";
 import { Footer, Header } from "@/components/common";
 import React from "react";
-
+import Error from "./error";
+import { ErrorBoundary } from "react-error-boundary";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -24,7 +25,7 @@ export default function RootLayout({
           <main className="flex flex-col w-full max-w-[1280px] p-4">
             <AppProvider>
               <Header />
-              {children}
+              <ErrorBoundary fallback={<Error />}>{children}</ErrorBoundary>
               <Footer />
             </AppProvider>
           </main>
