@@ -175,11 +175,18 @@ export const MyAccountProvider = ({
         router.replace("/referrals");
       }
     } else {
-      if (pathname == "/") {
+      if (
+        pathname.startsWith("/referrals") ||
+        pathname.startsWith("/dashboard") ||
+        pathname.startsWith("/swap")
+      ) {
         router.replace("/");
-      } else {
-        router.replace(`/?p=${pathname.substring(1)}`);
       }
+      // if (pathname == "/") {
+      //   router.replace("/");
+      // } else {
+      //   router.replace(`/?p=${pathname.substring(1)}`);
+      // }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [signedIn]);
