@@ -167,10 +167,10 @@ export const MyAccountProvider = ({
 
   React.useEffect(() => {
     if (signedIn) {
-      const query = searchParams.get("p");
+      const lastPage = searchParams.get("p");
 
-      if (query) {
-        router.replace(query);
+      if (lastPage) {
+        router.replace(`/${lastPage}`);
       } else {
         router.replace("/referrals");
       }
@@ -178,8 +178,7 @@ export const MyAccountProvider = ({
       if (pathname == "/") {
         router.replace("/");
       } else {
-        // console.log(encodeURIComponent(`p=${pathname}`));
-        router.replace(`/?p=${encodeURIComponent(pathname)}`);
+        router.replace(`/?p=${pathname}`);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
