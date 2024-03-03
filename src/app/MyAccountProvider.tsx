@@ -1,12 +1,19 @@
 "use client";
 
 import React, { Suspense } from "react";
-import Web3, { Contract, ContractAbi } from "web3";
+import Web3, {
+  BaseWeb3Error,
+  Contract,
+  ContractAbi,
+  RpcError,
+  Web3ContractError,
+  Web3WSProviderError,
+} from "web3";
 import { Web3ReactHooks, useWeb3React } from "@web3-react/core";
 import { Web3ReactProvider } from "@web3-react/core";
 import type { MetaMask } from "@web3-react/metamask";
 import { hooks, metaMask } from "@/libs/web3/connectors/metamask";
-import { CHAIN_IDS } from "@/libs/web3/chains";
+import { CHAIN_IDS, getAddChainParameters } from "@/libs/web3/chains";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   EthTreasuryContract,
@@ -15,6 +22,8 @@ import {
   UserContract,
   UserHistoryContract,
 } from "@/libs/web3/contracts";
+import Image from "next/image";
+import { Button, Footer, Header } from "@/components/common";
 
 const connectors: [MetaMask, Web3ReactHooks][] = [[metaMask, hooks]];
 
@@ -165,31 +174,31 @@ export const MyAccountProvider = ({
     return null;
   }, [web3]);
 
-  React.useEffect(() => {
-    if (signedIn) {
-      const lastPage = searchParams.get("p");
+  // React.useEffect(() => {
+  //   if (signedIn) {
+  //     // const lastPage = searchParams.get("p");
 
-      if (lastPage) {
-        router.replace(`/${lastPage}`);
-      } else {
-        router.replace("/referrals");
-      }
-    } else {
-      if (
-        pathname.startsWith("/referrals") ||
-        pathname.startsWith("/dashboard") ||
-        pathname.startsWith("/swap")
-      ) {
-        router.replace("/");
-      }
-      // if (pathname == "/") {
-      //   router.replace("/");
-      // } else {
-      //   router.replace(`/?p=${pathname.substring(1)}`);
-      // }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [signedIn]);
+  //   //   if (lastPage) {
+  //   //     router.replace(`/${lastPage}`);
+  //   //   } else {
+  //   //     router.replace("/referrals");
+  //   //   }
+  //   // } else {
+  //   //   if (
+  //   //     pathname.startsWith("/referrals") ||
+  //   //     pathname.startsWith("/dashboard") ||
+  //   //     pathname.startsWith("/swap")
+  //   //   ) {
+  //   //     router.replace("/");
+  //   //   }
+  //     // if (pathname == "/") {
+  //     //   router.replace("/");
+  //     // } else {
+  //     //   router.replace(`/?p=${pathname.substring(1)}`);
+  //     // }
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [signedIn]);
 
   const toWei = React.useCallback(
     (value: string | number) => {
@@ -234,6 +243,26 @@ export const MyAccountProvider = ({
     [web3]
   );
 
+  const handleConnect = React.useCallback(async () => {
+    if (!window.ethereum?.isMetaMask) {
+      window.open("https://metamask.io/", "_blank");
+      return;
+    } else {
+      const actId = getAddChainParameters(CHAIN_IDS.BLAST_SEPOLIA);
+      try {
+        await connector.activate(actId);
+      } catch (err: any) {
+        connector.deactivate && connector.deactivate(actId);
+        if (err.code == -32002) {
+          connector.provider?.request({
+            method: "wallet_requestPermissions",
+            params: [{ eth_accounts: {} }],
+          });
+        }
+      }
+    }
+  }, [connector]);
+
   return (
     <MyAccountContext.Provider
       value={{
@@ -254,7 +283,40 @@ export const MyAccountProvider = ({
         },
       }}
     >
-      {children}
+      <>
+        <Header />
+        {signedIn ? (
+          children
+        ) : (
+          <>
+            <div className="mt-10">
+              <div className="flex items-center justify-center">
+                <Image
+                  src="/assets/images/concept.png"
+                  width={650}
+                  height={360}
+                  alt="tor_concept"
+                  className="w-full md:max-w-[480px] lg:max-w-[640px]"
+                  style={{ objectFit: "contain" }}
+                />
+              </div>
+              <div className="mt-6 text-center">
+                <h2 className="text-lg text-primary chakra-petch-medium">
+                  Connect your wallet and get the best Referral Codes!
+                </h2>
+
+                <Button
+                  className="mt-6 lg:ml-4 bg-yello-300 rounded-sm text-black active:bg-amber-400 w-[180px] h-[36px] text-sm font-bold"
+                  onClick={handleConnect}
+                >
+                  Connect Wallet
+                </Button>
+              </div>
+            </div>
+          </>
+        )}
+        <Footer />
+      </>
     </MyAccountContext.Provider>
   );
 };

@@ -1,54 +1,267 @@
 "use client";
 
 import Image from "next/image";
-import React from "react";
-import { Button } from "@/components/common";
-import { CHAIN_IDS, getAddChainParameters } from "@/libs/web3/chains";
-import { useWeb3React } from "@web3-react/core";
+import React, { ChangeEvent } from "react";
+import {
+  Button,
+  Search,
+  SwordIcon,
+  DataTable,
+  DataRowProps,
+  TThrone,
+  UsurpReferralModal,
+  NewReferralModal,
+} from "@/components/common";
+import { MyAccountContext } from "./MyAccountProvider";
+import { BENEFIT_TYPE_LABEL } from "@/components/types";
+import Link from "next/link";
 
-export default function PageMain() {
-  const { connector } = useWeb3React();
+type SORT = {
+  field: string;
+  order: "ASC" | "DESC";
+};
 
-  React.useEffect(() => {}, []);
-  const handleConnect = React.useCallback(async () => {
-    if (!window.ethereum?.isMetaMask) {
-      window.open("https://metamask.io/", "_blank");
-      return;
-    } else {
-      try {
-        await connector.activate(
-          getAddChainParameters(CHAIN_IDS.BLAST_SEPOLIA)
-        );
-      } catch (err) {
-        console.log(err);
+const defaultSort: SORT = {
+  field: "torAmount",
+  order: "DESC",
+};
+
+export default function PageReferral() {
+  const [openUsurpModal, setOpenUsurpModal] = React.useState<boolean>(false);
+  const [openNewModal, setOpenNewModal] = React.useState<boolean>(false);
+  const [selectedId, setSelectedId] = React.useState<BigInt | undefined>();
+  const [search, setSearch] = React.useState<string>("");
+  const { contracts, utils } = React.useContext(MyAccountContext);
+
+  const [sort, setSort] = React.useState<SORT>(defaultSort);
+
+  const handleSearch = React.useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setSearch(event.target.value);
+    },
+    []
+  );
+
+  const handleChangeSort = React.useCallback(
+    (fieldName: string) => {
+      const newSort: SORT = {
+        field: fieldName,
+        order: "DESC",
+      };
+
+      if (sort.field == fieldName && sort.order == "DESC") {
+        newSort.order = "ASC";
       }
-    }
-  }, [connector]);
+      setSort(newSort);
+    },
+    [sort]
+  );
+
+  const [data, setData] = React.useState<TThrone[]>([]);
+
+  const handleSort = React.useCallback(
+    (a: TThrone, b: TThrone) => {
+      let front, back;
+      if (sort.order == "ASC") {
+        front = a;
+        back = b;
+      } else {
+        front = b;
+        back = a;
+      }
+
+      switch (sort.field) {
+        case "torAmount":
+          return front.torAmount.valueOf() - back.torAmount.valueOf() >
+            BigInt(0)
+            ? 1
+            : -1;
+        case "benefitAmount":
+          return front.benefitAmount.valueOf() - back.benefitAmount.valueOf() >
+            BigInt(0)
+            ? 1
+            : -1;
+        case "name":
+          return front.name > back.name ? 1 : -1;
+        case "serviceType":
+          return front.serviceType > back.serviceType ? 1 : -1;
+        default:
+          return 0;
+      }
+    },
+    [sort]
+  );
+
+  const getAllOwnedThrones = React.useCallback(() => {
+    contracts.RefThrone?.methods
+      .getAllOwnedThrones()
+      .call<TThrone[]>()
+      .then(setData);
+  }, [contracts.RefThrone]);
+
+  React.useEffect(() => {
+    getAllOwnedThrones();
+  }, [getAllOwnedThrones]);
+
+  const Columns: DataRowProps[] = React.useMemo(
+    () =>
+      [
+        {
+          field: "name",
+          displayName: "Throne",
+          width: 140,
+          sortable: true,
+          value: (row: TThrone) => row.name,
+        },
+        {
+          field: "serviceType",
+          displayName: "Service Type",
+          width: 140,
+          sortable: true,
+          value: (row: TThrone) => row.serviceType,
+        },
+        {
+          field: "referrer",
+          displayName: "Referrer",
+          width: 140,
+          value: (row: TThrone) =>
+            `${row.referrer.substring(0, 5)}...${row.referrer.substring(
+              row.referrer.length - 2
+            )}`,
+        },
+        {
+          field: "referralCode",
+          displayName: "Referral Code",
+          width: 130,
+          value: (row: TThrone) => row.referralCode,
+        },
+        {
+          field: "benefitAmount",
+          displayName: "Benefit",
+          width: 150,
+          sortable: true,
+          value: (row: TThrone) =>
+            `${utils?.fromWei(row.benefitAmount.toString())} ${
+              BENEFIT_TYPE_LABEL[row.benefitType]
+            }`,
+        },
+        {
+          field: "torAmount",
+          displayName: "Price of the throne",
+          width: 170,
+          sortable: true,
+          value: (row: TThrone) => (
+            <div className="flex items-center">
+              <span>{utils?.fromWei(row.torAmount.toString())} TOR</span>
+              <Button
+                className="mx-1"
+                onClick={() => {
+                  setOpenUsurpModal(true);
+                  setSelectedId(row.id);
+                }}
+              >
+                <SwordIcon className="w-6 h-6 fill-primary" />
+              </Button>
+            </div>
+          ),
+        },
+        {
+          field: "linkUrl",
+          displayName: "Link [Verified]",
+          width: "*",
+          value: (row: TThrone) => {
+            const url = row.linkUrl?.startsWith("http")
+              ? row.linkUrl
+              : `https://${row.linkUrl}`;
+            return (
+              <Link href={url} target="_blank">
+                {url.length > 30
+                  ? `${url.substring(0, 16)}...${url.substring(url.length - 6)}`
+                  : url}
+              </Link>
+            );
+          },
+        },
+      ] as DataRowProps[],
+    []
+  );
+
+  const handleUsurpModalClose = React.useCallback(() => {
+    setOpenUsurpModal(false);
+    setSelectedId(undefined);
+  }, []);
+
+  const handleNewModalClose = React.useCallback(() => {
+    setOpenNewModal(false);
+  }, []);
+
+  const openNewReferral = React.useCallback(() => {
+    setOpenNewModal(true);
+  }, []);
 
   return (
     <div className="mt-10">
-      <div className="flex items-center justify-center">
+      <div className="flex flex-wrap items-center">
         <Image
           src="/assets/images/concept.png"
           width={650}
           height={360}
           alt="tor_concept"
-          className="w-full md:max-w-[480px] lg:max-w-[640px]"
-          style={{ objectFit: "contain" }}
+          className="w-full md:max-w-[320px] lg:max-w-[480px]"
+          style={{ objectFit: "cover" }}
         />
+        <div className="md:max-w-[calc(100%_-_340px)] lg:max-w-[calc(100%_-_500px)] md:ml-[20px] mt-2 md:mt-0">
+          <h2 className="text-lg text-primary chakra-petch-medium">
+            Thrones of Referral
+          </h2>
+          <p className="mt-4 md:mt-6">
+            Only one verified referral code, offering the highest benefits, can
+            ascend to the referral throne. Everyone is eligible to conquer the
+            throne. Seize the throne and increase your referral income by taking
+            it away from others.
+          </p>
+        </div>
       </div>
-      <div className="mt-6 text-center">
+      <div className="mt-6">
         <h2 className="text-lg text-primary chakra-petch-medium">
-          Connect your wallet and get the best Referral Codes!
+          Referral Codes
         </h2>
-
-        <Button
-          className="mt-6 lg:ml-4 bg-yello-300 rounded-sm text-black active:bg-amber-400 w-[180px] h-[36px] text-sm font-bold"
-          onClick={handleConnect}
-        >
-          Connect Wallet
-        </Button>
+        <div>
+          <div className="mt-2 flex flex-wrap justify-between items-center">
+            <Search
+              id="search_referral"
+              className="w-full max-w-[calc(100%_-_220px)] shrink px-2 py-1 bg-transparent"
+              onChange={handleSearch}
+            />
+            <Button className="w-[190px] py-1" onClick={openNewReferral}>
+              + Create New Throne
+            </Button>
+          </div>
+          <DataTable
+            columns={Columns}
+            data={data
+              .filter(
+                (item) =>
+                  item.referralCode
+                    .toUpperCase()
+                    .includes(search.toUpperCase()) ||
+                  item.serviceType
+                    .toUpperCase()
+                    .includes(search.toUpperCase()) ||
+                  item.name.toUpperCase().includes(search.toUpperCase())
+              )
+              .sort(handleSort)}
+            sort={sort}
+            onChangeSort={handleChangeSort}
+          />
+        </div>
       </div>
+      <UsurpReferralModal
+        open={openUsurpModal}
+        dataId={selectedId}
+        onClose={handleUsurpModalClose}
+      />
+      <NewReferralModal open={openNewModal} onClose={handleNewModalClose} />
     </div>
   );
 }
