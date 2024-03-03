@@ -44,29 +44,34 @@ const BindCode = () => {
   );
 
   return (
-    <div className="flex flex-wrap justify-between">
-      <Input
-        className="w-full max-w-[calc(100%_-_200px)] py-1 px-2 chakra-petch-regular rounded-sm text-white placeholder:text-camo-300 bg-camo-700 border border-gray-400"
-        id="invitationCode"
-        type="text"
-        value={invitationCode}
-        onChange={handleInputChange}
-      />
-      <Button
-        className="w-[180px] h-[32px] chakra-petch-bold rounded-md bg-yellow-300 text-black disabled:bg-camo-300 disabled:text-gray-100"
-        onClick={bindingInvitationCode}
-        disabled={!invitationCode || transacting}
-      >
-        {transacting && (
-          <ProgressCircleIcon
-            className="animate-spin inline-block mr-1 w-[20px] h-[20px]"
-            color="text-yellow-100"
-            bgColor="text-gray-300"
-          />
-        )}
-        <span>{transacting ? "Binding..." : "Bind Invitation Code"}</span>
-      </Button>
-    </div>
+    <>
+      <label htmlFor="invitationCode">
+        Bind invitation code & Earn reward points
+      </label>
+      <div className="flex flex-wrap justify-between">
+        <Input
+          className="w-full max-w-[calc(100%_-_200px)] py-1 px-2 chakra-petch-regular rounded-sm text-white placeholder:text-camo-300 bg-camo-700 border border-gray-400"
+          id="invitationCode"
+          type="text"
+          value={invitationCode}
+          onChange={handleInputChange}
+        />
+        <Button
+          className="w-[180px] h-[32px] chakra-petch-bold rounded-md bg-yellow-300 text-black disabled:bg-camo-300 disabled:text-gray-100"
+          onClick={bindingInvitationCode}
+          disabled={!invitationCode || transacting}
+        >
+          {transacting && (
+            <ProgressCircleIcon
+              className="animate-spin inline-block mr-1 w-[20px] h-[20px]"
+              color="text-yellow-100"
+              bgColor="text-gray-300"
+            />
+          )}
+          <span>{transacting ? "Binding..." : "Bind Invitation Code"}</span>
+        </Button>
+      </div>
+    </>
   );
 };
 
@@ -267,9 +272,6 @@ export default function PageDashboard() {
       <div className="mt-8">
         <h2 className="text-lg text-primary chakra-petch-bold">My Inviter</h2>
         <div className="mt-4">
-          <label htmlFor="invitationCode">
-            Bind invitation code & Earn reward points
-          </label>
           <BindCode />
         </div>
       </div>
