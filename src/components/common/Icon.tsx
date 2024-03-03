@@ -1,5 +1,3 @@
-import { Color } from ".";
-
 type IconProps = {
   className?: string;
   onClick?: () => void;

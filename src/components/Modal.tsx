@@ -1,5 +1,6 @@
 import React, { ChangeEvent } from "react";
-import { DataInfo, InputData, Dialog, SelectData } from "./common";
+import { DataInfo, InputData, Dialog, SelectData } from "@/components/common";
+
 import { MyAccountContext } from "@/app/MyAccountProvider";
 import { RefThroneContract } from "@/libs/web3/contracts";
 import {

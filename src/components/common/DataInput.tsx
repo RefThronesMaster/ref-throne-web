@@ -1,5 +1,5 @@
 import React, { ChangeEvent, HTMLInputTypeAttribute } from "react";
-import { Input } from ".";
+import { Input } from "@/components/common/Input";
 
 type DataInfoProps = {
   label: string;

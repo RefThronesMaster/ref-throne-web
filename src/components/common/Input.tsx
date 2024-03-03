@@ -3,7 +3,7 @@ import React, {
   ChangeEvent,
   HTMLInputTypeAttribute,
 } from "react";
-import { SearchIcon } from ".";
+import { SearchIcon } from "@/components/common/Icon";
 
 type InputProps = {
   id?: string;

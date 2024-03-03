@@ -1,8 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { DiscordIcon, GithubIcon, TwitterIcon } from ".";
-import Link from "next/link";
+import { DiscordIcon, GithubIcon, TwitterIcon } from "./common";
 
 export const Footer = () => {
   return (

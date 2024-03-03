@@ -17,7 +17,7 @@ const config: Config = {
       backgroundColor: {
         primary: "#fcfc03",
         secondary: "#404833",
-        yello: {
+        yellow: {
           300: "#FCFC03",
           100: "#FCFDC7",
         },
@@ -31,7 +31,7 @@ const config: Config = {
       borderColor: {
         primary: "#fcfc03",
         secondary: "#404833",
-        yello: {
+        yellow: {
           300: "#FCFC03",
           100: "#FCFDC7",
         },
@@ -45,7 +45,7 @@ const config: Config = {
       textColor: {
         primary: "#fcfc03",
         secondary: "#404833",
-        yello: {
+        yellow: {
           300: "#FCFC03",
           100: "#FCFDC7",
         },
@@ -59,7 +59,7 @@ const config: Config = {
       fill: {
         primary: "#fcfc03",
         secondary: "#404833",
-        yello: {
+        yellow: {
           300: "#FCFC03",
           100: "#FCFDC7",
         },
