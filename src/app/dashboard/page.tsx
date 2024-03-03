@@ -7,13 +7,141 @@ import {
   DataTable,
   Dialog,
   Input,
+  ProgressCircleIcon,
 } from "@/components/common";
 import Image from "next/image";
 import { MyAccountContext } from "../MyAccountProvider";
 
+export const BindCode = () => {
+  const [invitationCode, setInvitationCode] = React.useState<string>("");
+  const { contracts, account } = React.useContext(MyAccountContext);
+  const [transacting, setTransacting] = React.useState<boolean>(false);
+
+  const bindingInvitationCode = React.useCallback(async () => {
+    if (account) {
+      try {
+        setTransacting(true);
+        const result = await contracts.User?.methods
+          .addInvitee(invitationCode)
+          .send({ from: account });
+
+        console.log({ result });
+        setInvitationCode("");
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setTransacting(false);
+      }
+    }
+  }, [contracts.User, invitationCode, account]);
+
+  const handleInputChange = React.useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const { value } = event.target;
+      setInvitationCode(value);
+    },
+    []
+  );
+
+  return (
+    <div className="flex flex-wrap justify-between">
+      <Input
+        className="w-full max-w-[calc(100%_-_200px)] py-1 px-2 chakra-petch-regular rounded-sm text-white placeholder:text-camo-300 bg-camo-700 border border-gray-400"
+        id="invitationCode"
+        type="text"
+        value={invitationCode}
+        onChange={handleInputChange}
+      />
+      <Button
+        className="w-[180px] h-[32px] chakra-petch-bold rounded-md bg-yellow-300 text-black disabled:bg-camo-300 disabled:text-gray-100"
+        onClick={bindingInvitationCode}
+        disabled={!invitationCode || transacting}
+      >
+        {transacting && (
+          <ProgressCircleIcon
+            className="animate-spin inline-block mr-1 w-[20px] h-[20px]"
+            color="text-yellow-100"
+            bgColor="text-gray-300"
+          />
+        )}
+        <span>{transacting ? "Binding..." : "Bind Invitation Code"}</span>
+      </Button>
+    </div>
+  );
+};
+
+export const MyInvitationCode = () => {
+  const [myInvitationCode, setMyInvitationCode] = React.useState<string>("");
+
+  const { contracts, account } = React.useContext(MyAccountContext);
+  const [transacting, setTransacting] = React.useState<boolean>(false);
+
+  const getMyInvitaionCode = React.useCallback(async () => {
+    if (account) {
+      try {
+        const result = await contracts.User?.methods
+          .getInvitaionCode(account)
+          .call<string>();
+
+        console.log({ result });
+        if (result) setMyInvitationCode(result);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  }, [contracts.User, account]);
+
+  const generateMyInvitationCode = React.useCallback(async () => {
+    if (account) {
+      try {
+        setTransacting(true);
+        const result = await contracts.User?.methods
+          .generateInvitationCode()
+          .send({ from: account });
+
+        if (result) {
+          getMyInvitaionCode();
+        }
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setTransacting(false);
+      }
+    }
+  }, [contracts.User, account]);
+
+  React.useEffect(() => {
+    getMyInvitaionCode();
+  }, []);
+
+  return (
+    <>
+      {myInvitationCode ? (
+        <span>My Code: {myInvitationCode}</span>
+      ) : (
+        <Button
+          className="w-[240px] h-[32px] chakra-petch-bold rounded-md bg-yellow-300 text-black disabled:bg-camo-300 disabled:text-gray-100"
+          onClick={generateMyInvitationCode}
+          disabled={!transacting}
+        >
+          {transacting && (
+            <ProgressCircleIcon
+              className="animate-spin inline-block mr-1 w-[20px] h-[20px]"
+              color="text-yellow-100"
+              bgColor="text-gray-300"
+            />
+          )}
+          <span>
+            {transacting ? "Creating..." : "Create My Invitation Code"}
+          </span>
+        </Button>
+      )}
+    </>
+  );
+};
+
 export default function PageDashboard() {
   const { contracts, utils, account } = React.useContext(MyAccountContext);
-  const [invitationCode, setInvitationCode] = React.useState<string>("");
 
   const [myTotalEthDeposited, setMyTotalEthDeposited] =
     React.useState<string>("-");
@@ -21,10 +149,6 @@ export default function PageDashboard() {
     React.useState<string>("-");
 
   const [myInvitees, setMyInvitees] = React.useState<any[] | null>(null);
-
-  const [myInvitationCode, setMyInvitationCode] = React.useState<
-    string | null
-  >();
 
   const getMyTotalEthBalance = React.useCallback(async () => {
     if (account) {
@@ -96,65 +220,12 @@ export default function PageDashboard() {
     }
   }, [contracts.EthTreasury, utils, account]);
 
-  const bindingInvitationCode = React.useCallback(async () => {
-    if (account) {
-      try {
-        const result = await contracts.User?.methods
-          .addInvitee(invitationCode)
-          .send({ from: account });
-
-        console.log({ result });
-      } catch (err) {
-        console.log(err);
-      }
-    }
-  }, [contracts.User, invitationCode, account]);
-
-  const getMyInvitaionCode = React.useCallback(async () => {
-    if (account) {
-      try {
-        const result = await contracts.User?.methods
-          .getInvitaionCode(account)
-          .call<string>();
-
-        if (result) setMyInvitationCode(result);
-      } catch (err) {
-        console.log(err);
-      }
-    }
-  }, [contracts.User, account]);
-
-  const generateMyInvitationCode = React.useCallback(async () => {
-    if (account) {
-      try {
-        const result = await contracts.User?.methods
-          .generateInvitationCode()
-          .send({ from: account });
-
-        if (result) {
-          getMyInvitaionCode();
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    }
-  }, [contracts.User, account]);
-
   React.useEffect(() => {
     getMyInfo();
     getMyTotalEthBalance();
     getMyTotalTorBalance();
     getMyInvitees();
-    getMyInvitaionCode();
   }, []);
-
-  const handleInputChange = React.useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      const { value } = event.target;
-      setInvitationCode(value);
-    },
-    []
-  );
 
   return (
     <div className="mt-10 w-full">
@@ -199,21 +270,7 @@ export default function PageDashboard() {
           <label htmlFor="invitationCode">
             Bind invitation code & Earn reward points
           </label>
-          <div className="flex flex-wrap justify-between">
-            <Input
-              className="w-full max-w-[calc(100%_-_200px)] py-1 px-2 chakra-petch-regular rounded-sm text-white placeholder:text-camo-300 bg-camo-700 border border-gray-400"
-              id="invitationCode"
-              type="text"
-              value={invitationCode}
-              onChange={handleInputChange}
-            />
-            <Button
-              className="w-[180px] h-[32px] chakra-petch-bold rounded-md bg-yellow-300 text-black"
-              onClick={bindingInvitationCode}
-            >
-              Bind Invitation Code
-            </Button>
-          </div>
+          <BindCode />
         </div>
       </div>
       <div className="mt-8">
@@ -221,17 +278,7 @@ export default function PageDashboard() {
           My Invitations
         </h2>
         <div className="mt-4">
-          {myInvitationCode ? (
-            <span>My Code: {myInvitationCode}</span>
-          ) : (
-            <Button
-              className="w-[240px] h-[32px] chakra-petch-bold rounded-md bg-yellow-300 text-black disabled:bg-yellow-100 disabled:text-gray-300"
-              disabled={myInvitees == null}
-              onClick={generateMyInvitationCode}
-            >
-              Create My Invitation Code
-            </Button>
-          )}
+          <MyInvitationCode />
         </div>
       </div>
       <div className="mt-6">

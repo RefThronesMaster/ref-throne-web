@@ -37,7 +37,8 @@ export const Button = ({
     <button
       type="button"
       className={
-        (disabled ? "disabled:text-gray-400 disabled:cursor-not-allowed" : "") +
+        "inline-flex justify-center items-center" +
+        (disabled ? " disabled:text-gray-400 disabled:cursor-not-allowed" : "") +
         (colorSet ? ` ${colorSet}` : "") +
         (className ? ` ${className}` : "")
       }
