@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { AttendIcon, Button } from ".";
+import { AttendIcon, Button } from "./common";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
@@ -20,6 +20,46 @@ const MENU = {
 };
 const { useChainId } = hooks;
 
+type TAttendButton = {
+  signedIn?: boolean;
+};
+
+export const AttendButton = ({ signedIn = false }: TAttendButton) => {
+  const { account, contracts } = React.useContext(MyAccountContext);
+  const [transacting, setTransacting] = React.useState<boolean>(false);
+
+  const handleDailyCheck = React.useCallback(async () => {
+    if (account) {
+      try {
+        setTransacting(true);
+        const already = await contracts.UserHistory?.methods
+          .checkDuplicateCheckIn(account)
+          .call<boolean>();
+
+        if (!already) {
+          await contracts.UserHistory?.methods
+            .doDailyCheckIn()
+            .send({ from: account });
+        }
+      } catch (err) {
+      } finally {
+        setTransacting(false);
+      }
+    }
+  }, [account, contracts.UserHistory]);
+
+  return (
+    <Button className="lg:ml-8" disabled={!signedIn} onClick={handleDailyCheck}>
+      <AttendIcon
+        className={
+          "w-[32px] h-[32px]" +
+          (!transacting && signedIn ? " fill-primary" : " fill-secondary")
+        }
+      />
+    </Button>
+  );
+};
+
 export const Header = () => {
   const pathname = usePathname();
   const { connector } = useWeb3React();
@@ -27,7 +67,7 @@ export const Header = () => {
   const { account, getBalance, contracts } = React.useContext(MyAccountContext);
 
   const signedIn = React.useMemo(() => {
-    return CHAIN_IDS.BLAST_SEPOLIA == chainId && account;
+    return Boolean(CHAIN_IDS.BLAST_SEPOLIA == chainId && account);
   }, [account, chainId]);
 
   React.useEffect(() => {
@@ -57,8 +97,6 @@ export const Header = () => {
       }
     }
   }, [connector, chainId]);
-
-  const handleDailyCheck = React.useCallback(() => {}, [contracts.UserHistory]);
 
   return (
     <nav className="flex flex-wrap items-center justify-between">
@@ -142,16 +180,10 @@ export const Header = () => {
           })}
         </div>
 
-        <Button
-          className="lg:ml-8"
-          disabled={!signedIn}
-          onClick={handleDailyCheck}
-        >
-          <AttendIcon className="w-[32px] h-[32px] fill-primary" />
-        </Button>
+        <AttendButton signedIn={signedIn} />
         <Button
           className={
-            "lg:ml-4 bg-yello-300 rounded-sm text-black active:bg-amber-400 w-[180px] h-[36px] text-sm font-bold"
+            "lg:ml-4 bg-yellow-300 rounded-sm text-black active:bg-amber-400 w-[180px] h-[36px] text-sm font-bold"
           }
           onClick={handleConnect}
         >

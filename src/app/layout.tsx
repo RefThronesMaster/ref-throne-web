@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AppProvider } from "./MyAccountProvider";
-import { Footer, Header } from "@/components/common";
+import { Footer, Header } from "@/components";
 import React from "react";
 import Error from "./error";
 import { ErrorBoundary } from "react-error-boundary";

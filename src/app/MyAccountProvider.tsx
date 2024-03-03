@@ -23,7 +23,8 @@ import {
   UserHistoryContract,
 } from "@/libs/web3/contracts";
 import Image from "next/image";
-import { Button, Footer, Header } from "@/components/common";
+import { Footer, Header } from "@/components";
+import { Button } from "@/components/common";
 
 const connectors: [MetaMask, Web3ReactHooks][] = [[metaMask, hooks]];
 
@@ -306,7 +307,7 @@ export const MyAccountProvider = ({
                 </h2>
 
                 <Button
-                  className="mt-6 lg:ml-4 bg-yello-300 rounded-sm text-black active:bg-amber-400 w-[180px] h-[36px] text-sm font-bold"
+                  className="mt-6 lg:ml-4 bg-yellow-300 rounded-sm text-black active:bg-amber-400 w-[180px] h-[36px] text-sm font-bold"
                   onClick={handleConnect}
                 >
                   Connect Wallet

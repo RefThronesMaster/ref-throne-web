@@ -208,7 +208,7 @@ export default function PageDashboard() {
               onChange={handleInputChange}
             />
             <Button
-              className="w-[180px] h-[32px] chakra-petch-bold rounded-md bg-yello-300 text-black"
+              className="w-[180px] h-[32px] chakra-petch-bold rounded-md bg-yellow-300 text-black"
               onClick={bindingInvitationCode}
             >
               Bind Invitation Code
@@ -225,7 +225,7 @@ export default function PageDashboard() {
             <span>My Code: {myInvitationCode}</span>
           ) : (
             <Button
-              className="w-[240px] h-[32px] chakra-petch-bold rounded-md bg-yello-300 text-black disabled:bg-yello-100 disabled:text-gray-300"
+              className="w-[240px] h-[32px] chakra-petch-bold rounded-md bg-yellow-300 text-black disabled:bg-yellow-100 disabled:text-gray-300"
               disabled={myInvitees == null}
               onClick={generateMyInvitationCode}
             >
