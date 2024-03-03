@@ -12,7 +12,7 @@ import {
 import Image from "next/image";
 import { MyAccountContext } from "../MyAccountProvider";
 
-export const BindCode = () => {
+const BindCode = () => {
   const [invitationCode, setInvitationCode] = React.useState<string>("");
   const { contracts, account } = React.useContext(MyAccountContext);
   const [transacting, setTransacting] = React.useState<boolean>(false);
@@ -70,7 +70,7 @@ export const BindCode = () => {
   );
 };
 
-export const MyInvitationCode = () => {
+const MyInvitationCode = () => {
   const [myInvitationCode, setMyInvitationCode] = React.useState<string>("");
 
   const { contracts, account } = React.useContext(MyAccountContext);
