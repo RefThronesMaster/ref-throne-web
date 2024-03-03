@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { AttendIcon, Button } from "./common";
+import { AttendIcon, Button, ProgressCircleIcon } from "@/components/common";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
@@ -49,13 +49,22 @@ export const AttendButton = ({ signedIn = false }: TAttendButton) => {
   }, [account, contracts.UserHistory]);
 
   return (
-    <Button className="lg:ml-8" disabled={!signedIn} onClick={handleDailyCheck}>
-      <AttendIcon
-        className={
-          "w-[32px] h-[32px]" +
-          (!transacting && signedIn ? " fill-primary" : " fill-secondary")
-        }
-      />
+    <Button
+      className="lg:ml-8 text-center w-[36px] h-[36px]"
+      disabled={!signedIn}
+      onClick={handleDailyCheck}
+    >
+      {transacting && (
+        <ProgressCircleIcon className="animate-spin" color="stroke-primary" />
+      )}
+      {!transacting && (
+        <AttendIcon
+          className={
+            "w-[32px] h-[32px]" +
+            (signedIn ? " fill-primary" : " fill-secondary")
+          }
+        />
+      )}
     </Button>
   );
 };

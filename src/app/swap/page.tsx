@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { MyAccountContext } from "@/app/MyAccountProvider";
 import React, { ChangeEvent } from "react";
-import { Button, Input } from "@/components/common";
+import { Button, Input, ProgressCircleIcon } from "@/components/common";
 import { EthTreasuryContract } from "@/libs/web3/contracts";
 import { RpcError } from "web3";
 import { ethToTor } from "@/libs/web3/utils";
@@ -230,11 +230,18 @@ const Deposit = () => {
               </span> */}
             </div>
             <Button
-              className="mt-5 mb-2 py-1 w-full chakra-petch-bold rounded-md bg-yellow-100 active:bg-amber-200 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-200 text-black"
+              className="mt-5 mb-2 py-1 w-full chakra-petch-bold rounded-md bg-yellow-100 active:bg-amber-200 disabled:cursor-not-allowed text-black disabled:bg-camo-300 disabled:text-gray-100"
               disabled={parseFloat(value) <= 0 || transacting}
               onClick={handleTransaction}
             >
-              {transacting ? "Transacting" : "Send transaction"}
+              {transacting && (
+                <ProgressCircleIcon
+                  className="animate-spin inline-block mr-2"
+                  color="text-yellow-100"
+                  bgColor="text-gray-300"
+                />
+              )}
+              <span>{transacting ? "Transacting" : "Send transaction"}</span>
             </Button>
           </div>
         </div>
@@ -459,11 +466,18 @@ const Withdraw = () => {
               <span className="text-sm">{withdrawFeeEth} ETH</span>
             </div>
             <Button
-              className="mt-5 mb-2 py-1 w-full chakra-petch-bold rounded-md bg-yellow-100 active:bg-amber-200 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-200 text-black"
+              className="mt-5 mb-2 py-1 w-full chakra-petch-bold rounded-md bg-yellow-100 active:bg-amber-200 disabled:cursor-not-allowed text-black disabled:bg-camo-300 disabled:text-gray-100"
               disabled={parseFloat(value) <= 0 || transacting}
               onClick={handleTransaction}
             >
-              Send transaction
+              {transacting && (
+                <ProgressCircleIcon
+                  className="animate-spin inline-block mr-2"
+                  color="text-yellow-100"
+                  bgColor="text-gray-300"
+                />
+              )}
+              <span>{transacting ? "Transacting" : "Send transaction"}</span>
             </Button>
           </div>
         </div>
