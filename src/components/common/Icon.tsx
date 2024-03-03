@@ -5,6 +5,7 @@ type IconProps = {
 
 type ColorIconProps = IconProps & {
   color?: string;
+  bgColor?: string;
 };
 
 export const DiscordIcon = ({ className, ...props }: IconProps) => {
@@ -94,6 +95,7 @@ export const SearchIcon = ({ className, ...props }: IconProps) => {
 export const ProgressCircleIcon = ({
   className,
   color,
+  bgColor,
   ...props
 }: ColorIconProps) => {
   const dasharray = 500;
@@ -114,7 +116,7 @@ export const ProgressCircleIcon = ({
         stroke="currentColor"
         strokeWidth="30"
         fill="transparent"
-        className="text-gray-700"
+        className={bgColor ?? "text-gray-700"}
       />
 
       <circle
