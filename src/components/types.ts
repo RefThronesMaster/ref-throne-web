@@ -41,3 +41,11 @@ export const BENEFIT_TYPE_LABEL: TBenefitTypeLabel = {
   "BTC": "BTC",
   "ETH": "ETH",
 }
+
+export type TUserInfo = {
+  nickName: string;
+  telegramUrl: string;
+  uTubeUrl: string;
+  discordUrl: string;
+  xUrl: string;
+}

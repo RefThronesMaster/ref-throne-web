@@ -11,6 +11,7 @@ import {
 } from "@/components/common";
 import Image from "next/image";
 import { MyAccountContext } from "../MyAccountProvider";
+import { TUserInfo } from "@/components";
 
 const BindCode = () => {
   const [invitationCode, setInvitationCode] = React.useState<string>("");
@@ -153,16 +154,18 @@ const MyInfo = () => {
 
   const [myInvitees, setMyInvitees] = React.useState<any[] | null>(null);
   const { contracts, utils, account } = React.useContext(MyAccountContext);
+  const [myInfo, setMyInfo] = React.useState<TUserInfo | undefined>();
 
   const getMyInfo = React.useCallback(async () => {
     if (account) {
       try {
-        const result = await contracts.User?.methods.getUserInfo().call();
+        const result = await contracts.User?.methods
+          .getUserInfo()
+          .call<TUserInfo>();
 
-        if (result) {
-          console.log({ userInfo: result });
-        }
+        setMyInfo(result);
       } catch (err) {
+        setMyInfo(undefined);
         console.log(err);
       }
     }
@@ -171,12 +174,13 @@ const MyInfo = () => {
   const getMyInvitees = React.useCallback(async () => {
     try {
       const result = await contracts.User?.methods.getInvitees().call<any[]>();
-      console.log({ result });
+      console.log({ getMyInvitees: result });
 
       if (result) {
-        setMyInvitees(result || "");
+        setMyInvitees(result || []);
       }
     } catch (err) {
+      setMyInvitees(null);
       console.log(err);
     }
   }, [contracts.User, utils]);
