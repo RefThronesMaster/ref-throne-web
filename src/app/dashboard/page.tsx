@@ -57,7 +57,7 @@ const BindCode = () => {
           onChange={handleInputChange}
         />
         <Button
-          className="w-[180px] h-[32px] chakra-petch-bold rounded-md bg-yellow-300 text-black disabled:bg-camo-300 disabled:text-gray-100"
+          className="w-[180px] h-[32px] chakra-petch-bold rounded-md bg-yellow-300 text-black disabled:bg-camo-300 disabled:text-gray-300"
           onClick={bindingInvitationCode}
           disabled={!invitationCode || transacting}
         >
@@ -81,20 +81,20 @@ const MyInvitationCode = () => {
   const { contracts, account } = React.useContext(MyAccountContext);
   const [transacting, setTransacting] = React.useState<boolean>(false);
 
-  const getMyInvitaionCode = React.useCallback(async () => {
-    if (account) {
+  const getMyInvitaionCode = React.useCallback(
+    async (account: string) => {
       try {
         const result = await contracts.User?.methods
           .getInvitaionCode(account)
           .call<string>();
 
-        console.log({ result });
         if (result) setMyInvitationCode(result);
       } catch (err) {
         console.log(err);
       }
-    }
-  }, [contracts.User, account]);
+    },
+    [contracts.User]
+  );
 
   const generateMyInvitationCode = React.useCallback(async () => {
     if (account) {
@@ -105,7 +105,7 @@ const MyInvitationCode = () => {
           .send({ from: account });
 
         if (result) {
-          getMyInvitaionCode();
+          getMyInvitaionCode(account);
         }
       } catch (err) {
         console.log(err);
@@ -116,8 +116,8 @@ const MyInvitationCode = () => {
   }, [contracts.User, account]);
 
   React.useEffect(() => {
-    getMyInvitaionCode();
-  }, []);
+    contracts.User && account && getMyInvitaionCode(account);
+  }, [contracts.User, account]);
 
   return (
     <>
@@ -125,7 +125,7 @@ const MyInvitationCode = () => {
         <span>My Code: {myInvitationCode}</span>
       ) : (
         <Button
-          className="w-[240px] h-[32px] chakra-petch-bold rounded-md bg-yellow-300 text-black disabled:bg-camo-300 disabled:text-gray-100"
+          className="w-[240px] h-[32px] chakra-petch-bold rounded-md bg-yellow-300 text-black disabled:bg-camo-300 disabled:text-gray-300"
           onClick={generateMyInvitationCode}
           disabled={!transacting}
         >
@@ -145,15 +145,41 @@ const MyInvitationCode = () => {
   );
 };
 
-export default function PageDashboard() {
-  const { contracts, utils, account } = React.useContext(MyAccountContext);
-
+const MyInfo = () => {
   const [myTotalEthDeposited, setMyTotalEthDeposited] =
     React.useState<string>("-");
   const [myTotalTorDeposited, setMyTotalTorDeposited] =
     React.useState<string>("-");
 
   const [myInvitees, setMyInvitees] = React.useState<any[] | null>(null);
+  const { contracts, utils, account } = React.useContext(MyAccountContext);
+
+  const getMyInfo = React.useCallback(async () => {
+    if (account) {
+      try {
+        const result = await contracts.User?.methods.getUserInfo().call();
+
+        if (result) {
+          console.log({ userInfo: result });
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  }, [contracts.User, utils, account]);
+
+  const getMyInvitees = React.useCallback(async () => {
+    try {
+      const result = await contracts.User?.methods.getInvitees().call<any[]>();
+      console.log({ result });
+
+      if (result) {
+        setMyInvitees(result || "");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }, [contracts.User, utils]);
 
   const getMyTotalEthBalance = React.useCallback(async () => {
     if (account) {
@@ -176,32 +202,6 @@ export default function PageDashboard() {
       }
     }
   }, [contracts.EthTreasury, utils]);
-
-  const getMyInfo = React.useCallback(async () => {
-    if (account) {
-      try {
-        const result = await contracts.User?.methods.getUserInfo().call();
-
-        if (result) {
-          console.log({ userInfo: result });
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    }
-  }, [contracts.User, utils, account]);
-
-  const getMyInvitees = React.useCallback(async () => {
-    try {
-      const result = await contracts.User?.methods.getInvitees().call<any[]>();
-
-      if (result) {
-        setMyInvitees(result || "");
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  }, [contracts.User, utils]);
 
   const getMyTotalTorBalance = React.useCallback(async () => {
     if (account) {
@@ -226,47 +226,58 @@ export default function PageDashboard() {
   }, [contracts.EthTreasury, utils, account]);
 
   React.useEffect(() => {
+    getMyInvitees();
     getMyInfo();
+  }, [contracts.User]);
+
+  React.useEffect(() => {
     getMyTotalEthBalance();
     getMyTotalTorBalance();
-    getMyInvitees();
-  }, []);
+  }, [contracts.EthTreasury]);
 
+  return (
+    <>
+      <PanelTitle
+        name={"My Deposited ETH"}
+        result={myTotalEthDeposited}
+        className="w-full max-w-[90%] md:w-1/6 md:max-w-[170px]"
+      />
+      <PanelTitle
+        name={"My TOR"}
+        result={myTotalTorDeposited}
+        className="w-full max-w-[90%] mt-3 md:mt-0 md:w-1/6 md:max-w-[170px]"
+      />
+      <PanelTitle
+        name={"My Invitees"}
+        result={myInvitees ? myInvitees.length : "-"}
+        className="w-full max-w-[90%] mt-3 md:mt-0 md:w-1/6 md:max-w-[170px]"
+      />
+      <PanelTitle
+        name={
+          <div>
+            <p>My Reward Points</p>
+            <p>(Realtime Estimated)</p>
+          </div>
+        }
+        result={"-"}
+        className="w-full max-w-[90%] mt-3 md:mt-0 md:w-1/6 md:max-w-[170px]"
+      />
+      <PanelTitle
+        name={"My Tier"}
+        result={"Stone"}
+        className="w-full max-w-[90%] mt-3 md:mt-0 md:w-1/6 md:max-w-[170px]"
+      />
+    </>
+  );
+};
+
+export default function PageDashboard() {
   return (
     <div className="mt-10 w-full">
       <div className="mt-6">
         <h2 className="text-lg text-primary chakra-petch-bold">My Dashboard</h2>
         <div className="mt-4 flex flex-wrap justify-center md:justify-between">
-          <PanelTitle
-            name={"My Deposited ETH"}
-            result={myTotalEthDeposited}
-            className="w-full max-w-[90%] md:w-1/6 md:max-w-[170px]"
-          />
-          <PanelTitle
-            name={"My TOR"}
-            result={myTotalTorDeposited}
-            className="w-full max-w-[90%] mt-3 md:mt-0 md:w-1/6 md:max-w-[170px]"
-          />
-          <PanelTitle
-            name={"My Invitees"}
-            result={myInvitees ? myInvitees.length : "-"}
-            className="w-full max-w-[90%] mt-3 md:mt-0 md:w-1/6 md:max-w-[170px]"
-          />
-          <PanelTitle
-            name={
-              <div>
-                <p>My Reward Points</p>
-                <p>(Realtime Estimated)</p>
-              </div>
-            }
-            result={"-"}
-            className="w-full max-w-[90%] mt-3 md:mt-0 md:w-1/6 md:max-w-[170px]"
-          />
-          <PanelTitle
-            name={"My Tier"}
-            result={"Stone"}
-            className="w-full max-w-[90%] mt-3 md:mt-0 md:w-1/6 md:max-w-[170px]"
-          />
+          <MyInfo />
         </div>
       </div>
       <div className="mt-8">
