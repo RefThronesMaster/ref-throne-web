@@ -1,7 +1,8 @@
 "use client";
 
 import React, { ReactNode } from "react";
-import { Button, SortIcon } from ".";
+import { Button } from "@/components/common/Button";
+import { SortIcon } from "@/components/common/Icon";
 
 export type SORT = {
   field: string;

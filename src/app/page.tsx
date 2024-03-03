@@ -8,10 +8,8 @@ import {
   SwordIcon,
   DataTable,
   DataRowProps,
-  TThrone,
-  UsurpReferralModal,
-  NewReferralModal,
 } from "@/components/common";
+import { TThrone, UsurpReferralModal, NewReferralModal } from "@/components";
 import { MyAccountContext } from "./MyAccountProvider";
 import { BENEFIT_TYPE_LABEL } from "@/components/types";
 import Link from "next/link";

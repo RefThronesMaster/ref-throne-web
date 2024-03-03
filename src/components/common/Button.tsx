@@ -1,5 +1,5 @@
 import React, { CSSProperties } from "react";
-import { Color } from ".";
+import { Color } from "@/components/types";
 
 type ButtonProps = {
   children: string | number | React.ReactNode;

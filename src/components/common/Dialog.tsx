@@ -1,7 +1,7 @@
 "use client";
 
-import React, { EventHandler, MouseEvent } from "react";
-import { Button } from ".";
+import React, { MouseEvent } from "react";
+import { Button } from "@/components/common/Button";
 
 type DialogProps = {
   // open: boolean;
