@@ -275,7 +275,6 @@ export default function PageDashboard() {
   return (
     <div className="mt-10 w-full">
       <div className="mt-6">
-        <h2 className="text-lg text-primary chakra-petch-bold">My Dashboard</h2>
         <div className="mt-4 flex flex-wrap justify-center md:justify-between">
           <MyInfo />
         </div>
