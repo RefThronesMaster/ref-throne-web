@@ -62,16 +62,18 @@ export const Header = () => {
 
   return (
     <nav className="flex flex-wrap items-center justify-between">
-      <Image
-        alt="header_logo"
-        src="/assets/images/tor_logo.png"
-        width={200}
-        height={72}
-        style={{
-          objectFit: "cover",
-        }}
-        priority={true}
-      />
+      <Link href={"/"}>
+        <Image
+          alt="header_logo"
+          src="/assets/images/tor_logo.png"
+          width={200}
+          height={72}
+          style={{
+            objectFit: "cover",
+          }}
+          priority={true}
+        />
+      </Link>
       <div className="flex lg:inline-flex items-center justify-between w-full lg:w-fit">
         <div className="lg:inline-block">
           {Object.entries(MENU).map((item) => {

@@ -24,9 +24,7 @@ export default function RootLayout({
         <div className="flex min-w-screen min-h-screen justify-center bg-black text-white chakra-petch-regular">
           <main className="flex flex-col w-full max-w-[1280px] p-4">
             <AppProvider>
-              <Header />
               <ErrorBoundary fallback={<Error />}>{children}</ErrorBoundary>
-              <Footer />
             </AppProvider>
           </main>
         </div>
