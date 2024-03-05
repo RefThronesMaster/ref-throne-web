@@ -8,10 +8,11 @@ import {
   Dialog,
   Input,
   ProgressCircleIcon,
+  SORT,
 } from "@/components/common";
 import Image from "next/image";
 import { MyAccountContext } from "../MyAccountProvider";
-import { TUserInfo } from "@/components";
+import { TActVal, TUserInfo } from "@/components";
 
 const BindCode = () => {
   const [invitationCode, setInvitationCode] = React.useState<string>("");
@@ -275,6 +276,149 @@ const MyInfo = () => {
   );
 };
 
+const defaultHistorySort: SORT = {
+  field: "timestamp",
+  order: "DESC",
+};
+
+const MyHistories = () => {
+  const { contracts, utils, account } = React.useContext(MyAccountContext);
+  const [sort, setSort] = React.useState<SORT>(defaultHistorySort);
+  // const [data, setData] = React.useState<TActVal[]>([]);
+  const [data, setData] = React.useState<TActVal[]>([
+    {
+      act_type: 1,
+      timestamp: BigInt(new Date().valueOf()),
+      activity_points: BigInt(1),
+      deposit_points: BigInt(1),
+      tor_balance: BigInt(1),
+      tor_changes: BigInt(1),
+      total_points: BigInt(1),
+    },
+  ]);
+
+  const getMyHistories = React.useCallback(async () => {
+    if (account) {
+      try {
+        const result = await contracts.UserHistory?.methods
+          .getHistory(account, 1, 100)
+          .call<TActVal[]>();
+
+        setData(result ?? []);
+        console.log({ result });
+      } catch (err) {
+        console.log(err);
+        setData([]);
+      }
+    }
+  }, [contracts.UserHistory, utils, account]);
+
+  const handleChangeSort = React.useCallback(
+    (fieldName: string) => {
+      const newSort: SORT = {
+        field: fieldName,
+        order: "DESC",
+      };
+
+      if (sort.field == fieldName && sort.order == "DESC") {
+        newSort.order = "ASC";
+      }
+      setSort(newSort);
+    },
+    [sort]
+  );
+
+  const Columns: DataRowProps[] = React.useMemo(
+    () =>
+      [
+        {
+          field: "timestamp",
+          displayName: "Date",
+          width: 140,
+          sortable: true,
+          value: (row: TActVal) => row.timestamp,
+        },
+        {
+          field: "act_type",
+          displayName: "Activity Type",
+          width: 140,
+          sortable: true,
+          value: (row: TActVal) => row.act_type,
+        },
+        {
+          field: "tor_changes",
+          displayName: "TOR Changes",
+          width: 140,
+          value: (row: TActVal) => row.tor_changes,
+        },
+        {
+          field: "tor_balance",
+          displayName: "TOR Balance",
+          width: 130,
+          value: (row: TActVal) => row.tor_balance,
+        },
+        {
+          field: "activity_points",
+          displayName: "Activity Points",
+          width: 150,
+          value: (row: TActVal) => row.activity_points,
+        },
+        {
+          field: "deposit_points",
+          displayName: "Deposit Points",
+          width: 170,
+          value: (row: TActVal) => row.deposit_points,
+        },
+        {
+          field: "total_points",
+          displayName: "Total Accumulated Points",
+          width: "*",
+          value: (row: TActVal) => row.total_points,
+        },
+      ] as DataRowProps[],
+    []
+  );
+
+  const handleSort = React.useCallback(
+    (a: TActVal, b: TActVal) => {
+      let front, back;
+      if (sort.order == "ASC") {
+        front = a;
+        back = b;
+      } else {
+        front = b;
+        back = a;
+      }
+
+      switch (sort.field) {
+        case "timestamp":
+          return front.timestamp.valueOf() - back.timestamp.valueOf() >
+            BigInt(0)
+            ? 1
+            : -1;
+        default:
+          return 0;
+      }
+    },
+    [sort]
+  );
+
+  React.useEffect(() => {
+    getMyHistories();
+  }, [contracts.UserHistory]);
+
+  return (
+    <>
+      <DataTable
+        columns={Columns}
+        data={data.sort(handleSort)}
+        sort={sort}
+        onChangeSort={handleChangeSort}
+      />
+    </>
+  );
+};
+
 export default function PageDashboard() {
   return (
     <div className="mt-10 w-full">
@@ -302,6 +446,7 @@ export default function PageDashboard() {
           My Referral Thrones
         </h2>
         <div className="flex items-center justify-center">
+          <MyHistories />
           <Image
             src="/assets/images/mythrones.png"
             width={1439}
