@@ -15,17 +15,26 @@ export type TBenefitType =
   | "ETH"
   | "Fee Discount";
 
+export enum ThroneStatus {
+  InReview = 0,
+  Owned = 1,
+  Rejected = 2,
+  Lost = 3,
+}
+
+export const LabelThroneStatus = ["InReview", "Owned", "Rejected", "Lost"];
+
 export type TThrone = {
   id: BigInt;
   name: string;
-  serviceType: TBenefitType;
+  serviceType: TServiceType;
   benefitAmount: BigInt;
   benefitType: TBenefitType;
   torAmount: BigInt;
   linkUrl: string;
   referralCode: string;
   referrer: string;
-  status: BigInt;
+  status: ThroneStatus;
   timestamp: BigInt;
 };
 
@@ -70,3 +79,24 @@ export type TActVal = {
   deposit_points: BigInt;
   total_points: BigInt;
 };
+
+export const LabelActType = [
+  "Deposit ETH",
+  "Withdraw ETH",
+  "Inviter",
+  "Invitee",
+  "Generate Code",
+  "Daily Attend",
+  "Throne",
+  "Usurp",
+];
+// export const LabelActType = {
+//   1: "Deposit ETH",
+//   2: "Withdraw ETH",
+//   3: "Inviter",
+//   4: "Invitee",
+//   5: "Generate Code",
+//   6: "Daily Attend",
+//   7: "Throne",
+//   8: "Usurp",
+// };

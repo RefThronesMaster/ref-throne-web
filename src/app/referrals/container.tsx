@@ -150,7 +150,12 @@ export default function PageReferral() {
           sortable: true,
           value: (row: TThrone) => (
             <div className="flex items-center">
-              <span>{utils?.fromWei(row.torAmount.toString())} TOR</span>
+              <span>
+                {Intl.NumberFormat("en-US").format(
+                  Number(utils?.fromWei(row.torAmount.toString()))
+                )}{" "}
+                TOR
+              </span>
               <Button
                 className="mx-1"
                 onClick={() => {

@@ -16,6 +16,7 @@ export type DataRowProps = {
   sortable?: boolean;
   value: (
     record: any,
+    index?: number,
     field?: string,
     fieldValue?: any
   ) => ReactNode | string | number;
@@ -78,7 +79,7 @@ export const DataTable = React.memo(function FnDataTable({
                   key={colIdx}
                   className="text-sm chakra-petch-bold py-4 px-2 bg-camo-700 border-y-[14px] border-y-black"
                 >
-                  {column.value(row, column.field, row[column.field])}
+                  {column.value(row, rowIdx, column.field, row[column.field])}
                 </td>
               ))}
             </tr>
