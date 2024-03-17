@@ -441,3 +441,33 @@ export const NewReferralDialog = ({open, onClose}: DialogProps) => {
 		<></>
 	);
 };
+
+export type TConfirmDialogProps = DialogProps & {
+	disabled?: boolean;
+	title: string | React.ReactNode;
+	children?: React.ReactNode;
+};
+
+export const ConfirmDialog = ({
+	open,
+	onClose,
+	title,
+	children,
+}: TConfirmDialogProps) => {
+	return open ? (
+		<Modal
+			title={title}
+			onClose={onClose}
+			btnConfirm={{
+				label: "Confirm",
+				onClick: onClose,
+				btnClass:
+					"border-camo-500 bg-camo-500 text-primary chakra-petch-medium rounded-md w-[180px] py-1 active:bg-camo-300 disabled:cursor-not-allowed disabled:bg-gray-400 disabled:text-gray-500",
+			}}
+		>
+			{children}
+		</Modal>
+	) : (
+		<></>
+	);
+};
