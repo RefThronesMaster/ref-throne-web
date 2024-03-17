@@ -15,6 +15,7 @@ import {MyDialogContext} from "@/app/MyDialogProvider";
 const MENU = {
 	"/referrals": "Referral Thrones",
 	"/swap": "TOR Swap",
+	"/leaderboard": "Leaderboard",
 	"/dashboard": "My Dashboard",
 	"/guides": "Guides",
 	"/torg": "TORG Token",
