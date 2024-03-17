@@ -9,7 +9,7 @@ import {
   DataTable,
   DataRowProps,
 } from "@/components/common";
-import { TThrone, UsurpReferralModal, NewReferralModal } from "@/components";
+import { TThrone, UsurpReferralDialog, NewReferralDialog } from "@/components";
 import { MyAccountContext } from "../MyAccountProvider";
 import { BENEFIT_TYPE_LABEL } from "@/components/types";
 import Link from "next/link";
@@ -25,8 +25,8 @@ const defaultSort: SORT = {
 };
 
 export default function PageReferral() {
-  const [openUsurpModal, setOpenUsurpModal] = React.useState<boolean>(false);
-  const [openNewModal, setOpenNewModal] = React.useState<boolean>(false);
+  const [openUsurpDialog, setOpenUsurpDialog] = React.useState<boolean>(false);
+  const [openNewDialog, setOpenNewDialog] = React.useState<boolean>(false);
   const [selectedId, setSelectedId] = React.useState<BigInt | undefined>();
   const [search, setSearch] = React.useState<string>("");
   const { contracts, utils } = React.useContext(MyAccountContext);
@@ -159,7 +159,7 @@ export default function PageReferral() {
               <Button
                 className="mx-1"
                 onClick={() => {
-                  setOpenUsurpModal(true);
+                  setOpenUsurpDialog(true);
                   setSelectedId(row.id);
                 }}
               >
@@ -189,17 +189,17 @@ export default function PageReferral() {
     []
   );
 
-  const handleUsurpModalClose = React.useCallback(() => {
-    setOpenUsurpModal(false);
+  const handleUsurpDialogClose = React.useCallback(() => {
+    setOpenUsurpDialog(false);
     setSelectedId(undefined);
   }, []);
 
-  const handleNewModalClose = React.useCallback(() => {
-    setOpenNewModal(false);
+  const handleNewDialogClose = React.useCallback(() => {
+    setOpenNewDialog(false);
   }, []);
 
   const openNewReferral = React.useCallback(() => {
-    setOpenNewModal(true);
+    setOpenNewDialog(true);
   }, []);
 
   return (
@@ -259,12 +259,12 @@ export default function PageReferral() {
           />
         </div>
       </div>
-      <UsurpReferralModal
-        open={openUsurpModal}
+      <UsurpReferralDialog
+        open={openUsurpDialog}
         dataId={selectedId}
-        onClose={handleUsurpModalClose}
+        onClose={handleUsurpDialogClose}
       />
-      <NewReferralModal open={openNewModal} onClose={handleNewModalClose} />
+      <NewReferralDialog open={openNewDialog} onClose={handleNewDialogClose} />
     </div>
   );
 }

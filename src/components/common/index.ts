@@ -1,5 +1,5 @@
 export * from "./DataTable";
-export * from "./Dialog";
+export * from "./Modal";
 export * from "./Button";
 export * from "./Icon";
 export * from "./Input";
