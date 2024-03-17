@@ -5,7 +5,7 @@ import {
   Button,
   DataRowProps,
   DataTable,
-  Dialog,
+  Modal,
   Input,
   OwnedIcon,
   ProgressCircleIcon,
@@ -22,7 +22,7 @@ import {
   TThrone,
   TUserInfo,
   ThroneStatus,
-  UsurpReferralModal,
+  UsurpReferralDialog,
 } from "@/components";
 import dayjs from "dayjs";
 import Link from "next/link";
@@ -370,11 +370,11 @@ const MyThrones = () => {
     },
     [sort]
   );
-  const [openUsurpModal, setOpenUsurpModal] = React.useState<boolean>(false);
+  const [openUsurpDialog, setOpenUsurpDialog] = React.useState<boolean>(false);
   const [selectedId, setSelectedId] = React.useState<BigInt | undefined>();
 
-  const handleUsurpModalClose = React.useCallback(() => {
-    setOpenUsurpModal(false);
+  const handleUsurpDialogClose = React.useCallback(() => {
+    setOpenUsurpDialog(false);
     setSelectedId(undefined);
   }, []);
 
@@ -478,7 +478,7 @@ const MyThrones = () => {
                 <StatusButton
                   status={Number(row.status)}
                   onClick={() => {
-                    setOpenUsurpModal(true);
+                    setOpenUsurpDialog(true);
                     setSelectedId(row.id);
                   }}
                 />
@@ -525,10 +525,10 @@ const MyThrones = () => {
         sort={sort}
         onChangeSort={handleChangeSort}
       />
-      <UsurpReferralModal
-        open={openUsurpModal}
+      <UsurpReferralDialog
+        open={openUsurpDialog}
         dataId={selectedId}
-        onClose={handleUsurpModalClose}
+        onClose={handleUsurpDialogClose}
       />
     </>
   );
@@ -824,10 +824,10 @@ const PanelTitle = ({ name, result, className }: TitleProps) => {
   );
 };
 
-// type ModalProps = {
+// type DialogProps = {
 //   open: boolean;
 // };
 
-// export const UsurpReferralModal = ({ open }: ModalProps) => {
-//   return <Dialog title={"Usurp the Referral Throne"}>asdsadad</Dialog>;
+// export const UsurpReferralDialog = ({ open }: DialogProps) => {
+//   return <Modal title={"Usurp the Referral Throne"}>asdsadad</Modal>;
 // };
