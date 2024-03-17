@@ -1,30 +1,8 @@
 "use client";
 
-import React, {Suspense} from "react";
-import Web3, {
-	BaseWeb3Error,
-	Contract,
-	ContractAbi,
-	RpcError,
-	Web3ContractError,
-	Web3WSProviderError,
-} from "web3";
-import {Web3ReactHooks, useWeb3React} from "@web3-react/core";
-import {Web3ReactProvider} from "@web3-react/core";
-import type {MetaMask} from "@web3-react/metamask";
-import {hooks, metaMask} from "@/libs/web3/connectors/metamask";
-import {CHAIN_IDS, getAddChainParameters} from "@/libs/web3/chains";
-import {usePathname, useRouter, useSearchParams} from "next/navigation";
-import {
-	EthTreasuryContract,
-	RefThroneContract,
-	TORTokenContract,
-	UserContract,
-	UserHistoryContract,
-} from "@/libs/web3/contracts";
-import Image from "next/image";
-import {ConfirmDialog, Footer, Header, TConfirmDialogProps} from "@/components";
-import {Button} from "@/components/common";
+import React from "react";
+
+import {ConfirmDialog, TConfirmDialogProps} from "@/components";
 
 type TDialogOption = Pick<
 	TConfirmDialogProps,
