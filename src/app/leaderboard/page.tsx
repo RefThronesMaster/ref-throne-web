@@ -85,6 +85,7 @@ const TotalInfo = () => {
 		if (account) {
 			try {
 				// TODO: TOTAL Users
+				// ?
 			} catch (err) {
 				console.log(err);
 			}
@@ -95,6 +96,7 @@ const TotalInfo = () => {
 		if (account) {
 			try {
 				// TODO: TOTAL REWARDS
+				// 
 			} catch (err) {
 				console.log(err);
 			}
@@ -105,6 +107,7 @@ const TotalInfo = () => {
 		if (account) {
 			try {
 				// TODO: TOTAL Thrones
+				// RefThroneContract.getOwnedThroneCount()
 			} catch (err) {
 				console.log(err);
 			}
@@ -200,10 +203,12 @@ const RewardPoints = () => {
 		},
 	]);
 
+	// Reward Points Leaderboard
 	const getRewards = React.useCallback(async () => {
 		if (account) {
 			try {
 				// TODO: Reward Points
+				// ?
 			} catch (err) {
 				console.log(err);
 				// setData([]);
