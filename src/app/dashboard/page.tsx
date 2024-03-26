@@ -595,29 +595,7 @@ const LiveAccumPoint = React.memo(function FnLiveAccumPoint({
 const MyHistories = () => {
   const { contracts, utils, account } = React.useContext(MyAccountContext);
   const [sort, setSort] = React.useState<SORT>(defaultHistorySort);
-  // const [data, setData] = React.useState<TActVal[]>([]);
-
-  // TODO: 임시 데이터를 실제 데이터로 할당
-  const [data, setData] = React.useState<TActVal[]>([
-    {
-      act_type: 1,
-      timestamp: BigInt(new Date().valueOf()),
-      activity_points: BigInt(150),
-      deposit_points: BigInt(63),
-      tor_balance: BigInt(12000),
-      tor_changes: BigInt(5000),
-      total_points: BigInt(1393),
-    },
-    {
-      act_type: 2,
-      timestamp: BigInt(1647312000000),
-      activity_points: BigInt(100),
-      deposit_points: BigInt(930),
-      tor_balance: BigInt(7000),
-      tor_changes: BigInt(3000),
-      total_points: BigInt(1180),
-    },
-  ]);
+  const [data, setData] = React.useState<TActVal[]>([]);
 
   const getMyHistories = React.useCallback(async () => {
     if (account) {
