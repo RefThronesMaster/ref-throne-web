@@ -43,15 +43,16 @@ export default function PageSwap() {
   );
 }
 
-const Deposit = () => {
+const Deposit = React.memo(function FnDeposit() {
   const [value, setValue] = React.useState<string>("0.0000");
   const { account, getBalance, web3, contracts, utils } =
     React.useContext(MyAccountContext);
   const [message, setMessage] = React.useState<string>("");
   const [depositFeeRate, setDepositFeeRate] = React.useState<number>(1);
   const [transacting, setTransacting] = React.useState<boolean>(false);
+  const [ethBalance, setEthBalance] = React.useState<number>(-1);
 
-  React.useEffect(() => {
+  const getDepositFeeRate = React.useCallback(() => {
     contracts.EthTreasury?.methods
       ._depositFeeRate()
       .call<number>()
@@ -61,17 +62,45 @@ const Deposit = () => {
       .catch((err) => console.error(err));
   }, [contracts.EthTreasury]);
 
+  const getMyEthBalance = React.useCallback(async () => {
+    try {
+      const balance = await getBalance();
+      if (balance) {
+        setEthBalance(Number(utils?.fromWei(balance)) || -1);
+      } else {
+        setEthBalance(-1);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }, [getBalance, utils?.fromWei]);
+
+  React.useEffect(() => {
+    getDepositFeeRate();
+  }, [getDepositFeeRate]);
+
+  React.useEffect(() => {
+    getMyEthBalance();
+  }, [getMyEthBalance]);
+
   const handleChange = React.useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      const { value: newValue } = event.target;
+      let { value: newValue } = event.target;
 
       setMessage("");
+      if (newValue == "") {
+        newValue = "0.0000";
+      }
       const floatVal = parseFloat(newValue);
+
       if (!Number.isNaN(floatVal) && floatVal >= 0) {
         setValue(newValue);
+        if (floatVal > ethBalance) {
+          setMessage("must be less than you own");
+        }
       }
     },
-    []
+    [ethBalance]
   );
 
   const transact = React.useCallback(
@@ -148,6 +177,7 @@ const Deposit = () => {
     try {
       const balance = await getBalance();
       if (balance) {
+        setEthBalance(Number(utils.fromWei(balance.toString())) || 0);
         const deposit = BigInt(utils.toWei(value));
         const total = deposit + depositFeeWei;
 
@@ -191,6 +221,16 @@ const Deposit = () => {
             />
           </label>
         </div>
+        <div className="flex justify-end px-2 text-sm text-camo-300">
+          Available:{" "}
+          {ethBalance >= 0
+            ? Intl.NumberFormat("en-US", {
+                minimumFractionDigits: 4,
+                maximumFractionDigits: 18,
+              }).format(ethBalance)
+            : "-"}{" "}
+          ETH
+        </div>
         {message && (
           <div className="flex justify-end px-2 text-red-400">
             <span>{message}</span>
@@ -231,7 +271,7 @@ const Deposit = () => {
             </div>
             <Button
               className="mt-5 mb-2 py-1 w-full chakra-petch-bold rounded-md bg-yellow-100 active:bg-amber-200 disabled:cursor-not-allowed text-black disabled:bg-camo-300 disabled:text-gray-100"
-              disabled={parseFloat(value) <= 0 || transacting}
+              disabled={parseFloat(value) > ethBalance || transacting}
               onClick={handleTransaction}
             >
               {transacting && (
@@ -248,9 +288,9 @@ const Deposit = () => {
       </div>
     </>
   );
-};
+});
 
-const Withdraw = () => {
+const Withdraw = React.memo(function FnWithdraw() {
   const [value, setValue] = React.useState<string>("0");
   const { account, getBalance, web3, contracts, utils } =
     React.useContext(MyAccountContext);
@@ -483,4 +523,4 @@ const Withdraw = () => {
       </div>
     </>
   );
-};
+});
