@@ -29,7 +29,7 @@ export default function PageReferral() {
   const [openNewDialog, setOpenNewDialog] = React.useState<boolean>(false);
   const [selectedId, setSelectedId] = React.useState<BigInt | undefined>();
   const [search, setSearch] = React.useState<string>("");
-  const { contracts, utils } = React.useContext(MyAccountContext);
+  const { contracts, account, utils } = React.useContext(MyAccountContext);
 
   const [sort, setSort] = React.useState<SORT>(defaultSort);
 
@@ -90,11 +90,15 @@ export default function PageReferral() {
     [sort]
   );
 
-  const getAllOwnedThrones = React.useCallback(() => {
-    contracts.RefThrone?.methods
-      .getAllOwnedThrones()
-      .call<TThrone[]>()
-      .then(setData);
+  const getAllOwnedThrones = React.useCallback(async () => {
+    try {
+      const result = await contracts.RefThrone?.methods
+        .getAllOwnedThrones()
+        .call<TThrone[]>();
+      setData(result ?? []);
+    } catch (err) {
+      console.log(err);
+    }
   }, [contracts.RefThrone]);
 
   React.useEffect(() => {
@@ -186,7 +190,7 @@ export default function PageReferral() {
           },
         },
       ] as DataRowProps[],
-    []
+    [utils?.fromWei]
   );
 
   const handleUsurpDialogClose = React.useCallback(() => {

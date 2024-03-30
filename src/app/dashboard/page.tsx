@@ -605,7 +605,7 @@ const MyThrones = () => {
           },
         },
       ] as DataRowProps[],
-    []
+    [utils?.fromWei]
   );
 
   const handleSort = React.useCallback(
