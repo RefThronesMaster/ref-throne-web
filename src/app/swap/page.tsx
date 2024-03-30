@@ -270,8 +270,12 @@ const Deposit = React.memo(function FnDeposit() {
               </span> */}
             </div>
             <Button
-              className="mt-5 mb-2 py-1 w-full chakra-petch-bold rounded-md bg-yellow-100 active:bg-amber-200 disabled:cursor-not-allowed text-black disabled:bg-camo-300 disabled:text-gray-100"
-              disabled={parseFloat(value) > ethBalance || transacting}
+              className="mt-5 mb-2 py-1 w-full chakra-petch-bold rounded-md bg-yellow-100 active:bg-amber-200 disabled:cursor-not-allowed text-black disabled:bg-camo-300 disabled:text-gray-500"
+              disabled={
+                parseFloat(value) <= 0 ||
+                parseFloat(value) > ethBalance ||
+                transacting
+              }
               onClick={handleTransaction}
             >
               {transacting && (
@@ -291,29 +295,33 @@ const Deposit = React.memo(function FnDeposit() {
 });
 
 const Withdraw = React.memo(function FnWithdraw() {
-  const [value, setValue] = React.useState<string>("0");
+  const [value, setValue] = React.useState<string>("0.0000");
   const { account, getBalance, web3, contracts, utils } =
     React.useContext(MyAccountContext);
   const [message, setMessage] = React.useState<string>("");
   const [withdrawFeeRate, setWithdrawFeeRate] = React.useState<number>(2);
   const [transacting, setTransacting] = React.useState<boolean>(false);
-  const [torBalanceWei, setTorBalanceWei] = React.useState<string>("0");
+  const [targetEth, setTargetEth] = React.useState<number>(0);
+  const [targetFeeEth, setTargetFeeEth] = React.useState<number>(0);
 
-  const [loaded, setLoaded] = React.useState<boolean>(false);
+  const [torBalance, setTorBalance] = React.useState<number>(-1);
 
-  const getMyTorBalance = React.useCallback(async () => {
-    try {
-      const result = await contracts.TORToken?.methods
-        .balanceOf(account)
-        .call();
-      return result?.toString() ?? "";
-    } catch (err: any) {
-      console.log(err?.data);
-      return "";
-    }
-  }, [contracts.EthTreasury]);
+  const getMyTorBalance = React.useCallback(() => {
+    contracts.TORToken?.methods
+      .balanceOf(account)
+      .call<BigInt>()
+      .then((result) => {
+        if (result) {
+          setTorBalance(Number(utils?.fromWei(result.toString()) || -1));
+        }
+      })
+      .catch((err) => {
+        console.log(err?.data);
+        setTorBalance(-1);
+      });
+  }, [contracts.EthTreasury, utils?.fromWei]);
 
-  React.useEffect(() => {
+  const getWithdrawFeeRate = React.useCallback(() => {
     contracts.EthTreasury?.methods
       ._withdrawFeeRate()
       .call<number>()
@@ -321,31 +329,42 @@ const Withdraw = React.memo(function FnWithdraw() {
         setWithdrawFeeRate(Number(rate));
       })
       .catch((err) => console.error(err));
-    getMyTorBalance().then((result) => {
-      setLoaded(true);
-      setTorBalanceWei(result);
-    });
-  }, [contracts.EthTreasury, getMyTorBalance]);
+  }, [contracts.EthTreasury]);
 
-  const torBalance = React.useMemo(() => {
-    try {
-      return utils.fromWei(torBalanceWei);
-    } catch (err) {}
-    return "-";
-  }, [torBalanceWei, utils]);
+  React.useEffect(() => {
+    getWithdrawFeeRate();
+  }, [getWithdrawFeeRate]);
+
+  React.useEffect(() => {
+    getMyTorBalance();
+  }, [getMyTorBalance]);
 
   const handleChange = React.useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      const { value } = event.target;
+      let { value: newValue } = event.target;
 
       setMessage("");
-      if (parseFloat(value) < 0) {
-        setValue("0");
-      } else {
-        setValue(value);
+      if (newValue == "") {
+        newValue = "0.0000";
+      }
+
+      const floatVal = parseFloat(newValue);
+
+      if (!Number.isNaN(floatVal) && floatVal >= 0) {
+        setValue(newValue);
+
+        const ethWei =
+          (BigInt(utils.toWei(newValue)) / BigInt(10000)) * BigInt(2);
+        const feeWei = (ethWei / BigInt(100)) * BigInt(withdrawFeeRate);
+        setTargetFeeEth(Number(utils.fromWei(feeWei.toString())) || -1);
+        setTargetEth(Number(utils.fromWei(ethWei.toString())) || -1);
+
+        if (floatVal > torBalance) {
+          setMessage("must be less than you own");
+        }
       }
     },
-    []
+    [utils?.toWei, utils?.fromWei, torBalance, withdrawFeeRate]
   );
 
   const transact = React.useCallback(
@@ -399,42 +418,12 @@ const Withdraw = React.memo(function FnWithdraw() {
     [contracts.EthTreasury, setMessage, account, utils]
   );
 
-  const receivedEthWei = React.useMemo(() => {
-    // 1ETH = 5000TOR
-    return (BigInt(utils.toWei(value)) / BigInt(10000)) * BigInt(2);
-  }, [value, utils]);
-
-  const receivedEth = React.useMemo(() => {
-    try {
-      return utils.fromWei(receivedEthWei.toString()) || "-";
-    } catch (err) {}
-    return "-";
-  }, [receivedEthWei, utils]);
-
-  const withdrawFeeWei = React.useMemo(() => {
-    const feeWei = (receivedEthWei / BigInt(100)) * BigInt(withdrawFeeRate);
-    return feeWei;
-  }, [receivedEthWei, withdrawFeeRate]);
-
-  const withdrawFeeEth = React.useMemo(() => {
-    return utils.fromWei(withdrawFeeWei.toString());
-  }, [withdrawFeeWei, utils]);
-
-  const withdrawTorWei = React.useMemo(() => {
-    return BigInt(utils.toWei(value));
-  }, [value, utils]);
-
   const handleTransaction = React.useCallback(async () => {
     try {
-      // const total = withdrawTorWei + withdrawTorFeeWei;
-      await transact(withdrawTorWei.toString());
-
-      // if (total > BigInt(balance)) {
-      //   setMessage("not enough your balance");
-      // } else {
-      // }
+      const torWei = BigInt(utils.toWei(value));
+      await transact(torWei.toString());
     } catch (err) {}
-  }, [withdrawTorWei, transact]);
+  }, [utils?.toWei, value, transact]);
 
   return (
     <>
@@ -467,7 +456,14 @@ const Withdraw = React.memo(function FnWithdraw() {
           </label>
         </div>
         <div className="flex justify-end px-2 text-sm text-camo-300">
-          Available: {loaded ? torBalance : "-"} TOR
+          Available:{" "}
+          {torBalance >= 0
+            ? Intl.NumberFormat("en-US", {
+                minimumFractionDigits: 4,
+                maximumFractionDigits: 18,
+              }).format(torBalance)
+            : "-"}{" "}
+          TOR
         </div>
         {message && (
           <div className="flex justify-end px-2 text-red-400">
@@ -492,7 +488,12 @@ const Withdraw = React.memo(function FnWithdraw() {
                 id="eth_val"
                 className="w-full h-full py-1 text-right chakra-petch-regular text-white placeholder:text-camo-300 bg-transparent"
               >
-                {receivedEth}
+                {targetEth >= 0
+                  ? Intl.NumberFormat("en-US", {
+                      minimumFractionDigits: 4,
+                      maximumFractionDigits: 18,
+                    }).format(targetEth)
+                  : "-"}
               </span>
             </div>
 
@@ -502,11 +503,23 @@ const Withdraw = React.memo(function FnWithdraw() {
             </div>
             <div className="mt-1 w-full flex justify-between items-center">
               <span className="text-sm">Withdraw Fee ({withdrawFeeRate}%)</span>
-              <span className="text-sm">{withdrawFeeEth} ETH</span>
+              <span className="text-sm">
+                {targetFeeEth >= 0
+                  ? Intl.NumberFormat("en-US", {
+                      minimumFractionDigits: 4,
+                      maximumFractionDigits: 18,
+                    }).format(targetFeeEth)
+                  : "-"}{" "}
+                ETH
+              </span>
             </div>
             <Button
-              className="mt-5 mb-2 py-1 w-full chakra-petch-bold rounded-md bg-yellow-100 active:bg-amber-200 disabled:cursor-not-allowed text-black disabled:bg-camo-300 disabled:text-gray-100"
-              disabled={parseFloat(value) <= 0 || transacting}
+              className="mt-5 mb-2 py-1 w-full chakra-petch-bold rounded-md bg-yellow-100 active:bg-amber-200 disabled:cursor-not-allowed text-black disabled:bg-camo-300 disabled:text-gray-500"
+              disabled={
+                parseFloat(value) <= 0 ||
+                parseFloat(value) > torBalance ||
+                transacting
+              }
               onClick={handleTransaction}
             >
               {transacting && (
