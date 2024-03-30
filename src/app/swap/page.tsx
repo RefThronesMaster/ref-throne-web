@@ -337,7 +337,6 @@ const Withdraw = () => {
               from: account,
             });
 
-          console.log({ result });
           setValue("0");
 
           // .catch(() => {

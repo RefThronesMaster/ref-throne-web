@@ -1,6 +1,6 @@
 "use client";
 
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, useContext } from "react";
 import {
   Button,
   DataRowProps,
@@ -42,7 +42,6 @@ const BindCode = () => {
           .addInvitee(invitationCode)
           .send({ from: account });
 
-        console.log({ result });
         open({
           title: "Bind Invitation Code",
           children: <center>Binding Invitation Code Successful.</center>,
@@ -82,7 +81,7 @@ const BindCode = () => {
           onChange={handleInputChange}
         />
         <Button
-          className="w-[180px] h-[32px] chakra-petch-bold rounded-md bg-yellow-300 text-black disabled:bg-camo-300 disabled:text-gray-300"
+          className="w-[180px] h-[32px] chakra-petch-bold rounded-md bg-yellow-300 text-black disabled:bg-camo-300 disabled:text-gray-500"
           onClick={bindingInvitationCode}
           disabled={!invitationCode || transacting}
         >
@@ -162,7 +161,7 @@ const MyInvitationCode = () => {
         <span>My Code: {myInvitationCode}</span>
       ) : (
         <Button
-          className="w-[240px] h-[32px] chakra-petch-bold rounded-md bg-yellow-300 text-black disabled:bg-camo-300 disabled:text-gray-300"
+          className="w-[240px] h-[32px] chakra-petch-bold rounded-md bg-yellow-300 text-black disabled:bg-camo-300 disabled:text-gray-500"
           onClick={generateMyInvitationCode}
           disabled={!transacting}
         >
@@ -182,6 +181,84 @@ const MyInvitationCode = () => {
   );
 };
 
+type TPanelTitleProps = {
+  name: string | React.ReactNode;
+  result: string | number;
+  className?: string;
+};
+
+const PanelTitle = ({ name, result, className }: TPanelTitleProps) => {
+  return (
+    <div
+      className={
+        "rounded-md p-2 flex flex-col items-center bg-camo-500 text-white" +
+        (className ? ` ${className}` : "")
+      }
+    >
+      <div className="flex items-center text-center min-h-[50px]">{name}</div>
+      <p className="py-3">{result}</p>
+    </div>
+  );
+};
+
+type TLiveAccumPointPanelTitle = Omit<TPanelTitleProps, "result"> & {
+  result?: TActVal;
+};
+
+const LiveAccumPointPanelTitle = React.memo(
+  function FnLiveAccumPointPanelTitle({
+    name,
+    result,
+    className,
+  }: TLiveAccumPointPanelTitle) {
+    const { utils } = useContext(MyAccountContext);
+    const [livePoint, setLivePoint] = React.useState<number>(0);
+
+    // 컴포넌트가 마운트 되었을때 실행됩니다.
+    React.useEffect(() => {
+      // 100ms 마다 호출됩니다.
+      const timer = setInterval(() => {
+        if (result) {
+          const realEst =
+            Number(utils.fromWei(result.total_points.toString())) +
+            Number(
+              utils.fromWei(
+                ((new Date().valueOf() / 1000 - Number(result.timestamp)) *
+                  Number(result.tor_balance)) /
+                  2000000
+              )
+            );
+          setLivePoint(realEst);
+        }
+        // 100ms 마다 업데이트
+      }, 100);
+
+      // 컴포넌트가 언마운트 되었을때 실행됩니다.
+      return () => {
+        clearInterval(timer);
+        setLivePoint(0);
+      };
+    }, [setLivePoint, result, utils]);
+
+    return (
+      <div
+        className={
+          "rounded-md p-2 flex flex-col items-center bg-camo-500 text-white" +
+          (className ? ` ${className}` : "")
+        }
+      >
+        <div className="flex items-center text-center min-h-[50px]">{name}</div>
+        <p className="py-3">
+          {Intl.NumberFormat("en-US", {
+            minimumFractionDigits: 5,
+            maximumFractionDigits: 5,
+          }).format(livePoint)}
+        </p>
+      </div>
+    );
+  }
+);
+
 const MyInfo = () => {
   const [myTotalEthDeposited, setMyTotalEthDeposited] =
     React.useState<string>("-");
@@ -191,6 +268,7 @@ const MyInfo = () => {
   const [myInvitees, setMyInvitees] = React.useState<any[] | null>(null);
   const { contracts, utils, account } = React.useContext(MyAccountContext);
   const [myInfo, setMyInfo] = React.useState<TUserInfo | undefined>();
+  const [myLastAct, setMyLastAct] = React.useState<TActVal | undefined>();
 
   const getMyInfo = React.useCallback(async () => {
     if (account) {
@@ -229,7 +307,6 @@ const MyInfo = () => {
           .call<bigint>();
 
         if (result) {
-          console.log({ eth: result });
           setMyTotalEthDeposited(
             Number(utils.fromWei(result?.toString())).toLocaleString("en-US", {
               minimumFractionDigits: 2,
@@ -251,7 +328,6 @@ const MyInfo = () => {
           .call<bigint>();
 
         if (result) {
-          console.log({ tor: result });
           setMyTotalTorDeposited(
             Number(utils.fromWei(result?.toString())).toLocaleString("en-US", {
               minimumFractionDigits: 2,
@@ -275,6 +351,27 @@ const MyInfo = () => {
     getMyTotalTorBalance();
   }, [contracts.EthTreasury]);
 
+  const getMyLastAct = React.useCallback(async () => {
+    if (account) {
+      try {
+        const results = await contracts.UserHistory?.methods
+          .getHistory(account, 1, 1)
+          .call<TActVal[]>();
+
+        if (results && results[0]) {
+          setMyLastAct(results[0]);
+        }
+      } catch (err) {
+        console.log(err);
+        setMyLastAct(undefined);
+      }
+    }
+  }, [contracts.UserHistory, utils, account]);
+
+  React.useEffect(() => {
+    getMyLastAct();
+  }, [contracts.UserHistory]);
+
   return (
     <>
       <PanelTitle
@@ -292,14 +389,14 @@ const MyInfo = () => {
         result={myInvitees ? myInvitees.length : "-"}
         className="w-full max-w-[90%] mt-3 md:mt-0 md:w-1/6 md:max-w-[170px]"
       />
-      <PanelTitle
+      <LiveAccumPointPanelTitle
         name={
           <div>
             <p>My Reward Points</p>
             <p>(Realtime Estimated)</p>
           </div>
         }
-        result={"-"}
+        result={myLastAct}
         className="w-full max-w-[90%] mt-3 md:mt-0 md:w-1/6 md:max-w-[170px]"
       />
       <PanelTitle
@@ -368,9 +465,8 @@ const MyThrones = () => {
         const result = await contracts.RefThrone?.methods
           .getAllOwnedThrones(account, 1, 100)
           .call<TThrone[]>();
-        console.log({ result });
+
         setData(result ?? []);
-        console.log({ result });
       } catch (err) {
         console.log(err);
         // setData([]);
@@ -560,37 +656,6 @@ const defaultHistorySort: SORT = {
   field: "timestamp",
   order: "DESC",
 };
-
-type LiveAccumPointProps = {
-  data: TActVal;
-};
-
-const LiveAccumPoint = React.memo(function FnLiveAccumPoint({
-  data,
-}: LiveAccumPointProps) {
-  const [timestamp, setTimestamp] = React.useState<number>(
-    Number(data.timestamp)
-  );
-  const [livePoint, setLivePoint] = React.useState<number>(
-    Number(data.total_points)
-  );
-
-  // 컴포넌트가 마운트 되었을때 실행됩니다.
-  React.useEffect(() => {
-    // 100ms 마다 호출됩니다.
-    const timer = setInterval(() => {
-      // TODO: 수식을 까먹었는데 알려주시면 감사하겠습니다.
-      setLivePoint(livePoint + (new Date().valueOf() - timestamp) / 10000);
-    }, 100);
-
-    // 컴포넌트가 언마운트 되었을때 실행됩니다.
-    return () => {
-      clearInterval(timer);
-    };
-  }, [setLivePoint, data]);
-
-  return <div>{Intl.NumberFormat("en-US").format(livePoint)}</div>;
-});
 
 const MyHistories = () => {
   const { contracts, utils, account } = React.useContext(MyAccountContext);
@@ -801,26 +866,6 @@ export default function PageDashboard() {
     </div>
   );
 }
-
-type TitleProps = {
-  name: string | React.ReactNode;
-  result: string | number;
-  className?: string;
-};
-
-const PanelTitle = ({ name, result, className }: TitleProps) => {
-  return (
-    <div
-      className={
-        "rounded-md p-2 flex flex-col items-center bg-camo-500 text-white" +
-        (className ? ` ${className}` : "")
-      }
-    >
-      <div className="flex items-center text-center min-h-[50px]">{name}</div>
-      <p className="py-3">{result}</p>
-    </div>
-  );
-};
 
 // type DialogProps = {
 //   open: boolean;
