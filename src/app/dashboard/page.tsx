@@ -223,15 +223,18 @@ const LiveAccumPointPanelTitle = React.memo(
             Number(utils.fromWei(result.total_points.toString())) +
             Number(
               utils.fromWei(
-                ((new Date().valueOf() / 1000 - Number(result.timestamp)) *
-                  Number(result.tor_balance)) /
+                (
+                  ((new Date().valueOf() / 1000 - Number(result.timestamp)) *
+                    Number(result.tor_balance)) /
                   2000000
+                ).toFixed(0)
               )
             );
+
           setLivePoint(realEst);
         }
-        // 100ms 마다 업데이트
-      }, 100);
+        // 200ms 마다 업데이트
+      }, 200);
 
       // 컴포넌트가 언마운트 되었을때 실행됩니다.
       return () => {
@@ -362,7 +365,6 @@ const MyInfo = () => {
           setMyLastAct(results[0]);
         }
       } catch (err) {
-        console.log(err);
         setMyLastAct(undefined);
       }
     }
@@ -451,25 +453,27 @@ const StatusButton = React.memo(function FnStatusButton({
   return <></>;
 });
 
-const MyThrones = () => {
+const MyThrones = React.memo(function FnMyTHornes() {
   const { contracts, utils, account } = React.useContext(MyAccountContext);
   const [sort, setSort] = React.useState<SORT>(defaultThroneSort);
-  // const [data, setData] = React.useState<TActVal[]>([]);
 
-  // TODO: 임시 데이터를 실제 데이터로 할당
   const [data, setData] = React.useState<TThrone[]>([]);
 
   const getMyThrones = React.useCallback(async () => {
     if (account) {
       try {
         const result = await contracts.RefThrone?.methods
-          .getAllOwnedThrones(account, 1, 100)
+          .getThronesByAddress(account)
+          // .getAllOwnedThrones(account)
           .call<TThrone[]>();
 
         setData(result ?? []);
-      } catch (err) {
-        console.log(err);
-        // setData([]);
+      } catch (err: any) {
+        console.log("etc");
+        if (err.code == -32603) {
+          console.log("test");
+        }
+        setData([]);
       }
     }
   }, [contracts.RefThrone, utils, account]);
@@ -634,7 +638,7 @@ const MyThrones = () => {
 
   React.useEffect(() => {
     getMyThrones();
-  }, [contracts.RefThrone]);
+  }, [getMyThrones]);
   return (
     <>
       <DataTable
@@ -650,14 +654,14 @@ const MyThrones = () => {
       />
     </>
   );
-};
+});
 
 const defaultHistorySort: SORT = {
   field: "timestamp",
   order: "DESC",
 };
 
-const MyHistories = () => {
+const MyHistories = React.memo(function FnMyHistories() {
   const { contracts, utils, account } = React.useContext(MyAccountContext);
   const [sort, setSort] = React.useState<SORT>(defaultHistorySort);
   const [data, setData] = React.useState<TActVal[]>([]);
@@ -671,11 +675,10 @@ const MyHistories = () => {
 
         setData(result ?? []);
       } catch (err) {
-        console.log(err);
         setData([]);
       }
     }
-  }, [contracts.UserHistory, utils, account]);
+  }, [contracts.UserHistory, account]);
 
   const handleChangeSort = React.useCallback(
     (fieldName: string) => {
@@ -803,8 +806,8 @@ const MyHistories = () => {
 
   React.useEffect(() => {
     getMyHistories();
-  }, [contracts.UserHistory]);
-  // console.log(data);
+  }, [getMyHistories]);
+
   return (
     <>
       <DataTable
@@ -815,7 +818,7 @@ const MyHistories = () => {
       />
     </>
   );
-};
+});
 
 export default function PageDashboard() {
   return (
