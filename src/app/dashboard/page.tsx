@@ -16,6 +16,7 @@ import {
 import { MyAccountContext } from "../MyAccountProvider";
 import {
   BENEFIT_TYPE_LABEL,
+  ConfirmDialog,
   LabelActType,
   LabelThroneStatus,
   TActVal,
@@ -500,6 +501,7 @@ const StatusButton = React.memo(function FnStatusButton({
 
 const MyThrones = React.memo(function FnMyTHornes() {
   const { contracts, utils, account } = React.useContext(MyAccountContext);
+  const { open, setTransacting, close } = React.useContext(MyDialogContext);
   const [sort, setSort] = React.useState<SORT>(defaultThroneSort);
 
   const [data, setData] = React.useState<TThrone[]>([]);
@@ -534,8 +536,7 @@ const MyThrones = React.memo(function FnMyTHornes() {
     [sort]
   );
   const [openUsurpDialog, setOpenUsurpDialog] = React.useState<boolean>(false);
-  const [openWithdrawDialog, setOpenWithdrawDialog] =
-    React.useState<boolean>(false);
+
   const [selectedId, setSelectedId] = React.useState<BigInt | undefined>();
 
   const handleUsurpDialogClose = React.useCallback(() => {
@@ -543,10 +544,30 @@ const MyThrones = React.memo(function FnMyTHornes() {
     setSelectedId(undefined);
   }, []);
 
-  const handleWithdrawDialogClose = React.useCallback(() => {
-    setOpenWithdrawDialog(false);
-    setSelectedId(undefined);
-  }, []);
+  const handleWithdrawThroneById = React.useCallback(
+    async (throneId: string) => {
+      if (account && throneId) {
+        try {
+          setTransacting(true);
+          const result = await contracts.RefThrone?.methods
+            .withdrawFromThrone(throneId)
+            .send({ from: account });
+          console.log({ withdrawFromThrone: result });
+        } catch (err) {
+          console.log(err);
+        } finally {
+          setTransacting(false);
+          close();
+        }
+      }
+    },
+    [contracts.RefThrone, account]
+  );
+
+  // const handleWithdrawThrone = React.useCallback(() => {
+  //   setOpenWithdrawDialog(false);
+  //   setSelectedId(undefined);
+  // }, [selectedId]);
 
   const Columns: DataRowProps[] = React.useMemo(
     () =>
@@ -646,18 +667,26 @@ const MyThrones = React.memo(function FnMyTHornes() {
                   {LabelThroneStatus[row.status]}
                 </span>
                 <StatusButton
-                  status={Number(row.status)}
+                  status={Number(row.status.toString())}
                   onClick={() => {
-                    setSelectedId(row.id);
-                    switch (Number(row.status)) {
+                    switch (Number(row.status.toString())) {
                       case ThroneStatus.InReview:
                       case ThroneStatus.Owned:
-                        setOpenUsurpDialog(false);
-                        setOpenWithdrawDialog(true);
+                        open({
+                          modal: "YesOrNo",
+                          title: "Withdraw Throne",
+                          onConfirm: () =>
+                            handleWithdrawThroneById(row.id.toString()),
+                          children: (
+                            <center>
+                              Do you want to withdraw this throne?
+                            </center>
+                          ),
+                        });
                         break;
                       case ThroneStatus.Lost:
                       case ThroneStatus.Rejected:
-                        setOpenWithdrawDialog(false);
+                        setSelectedId(row.id);
                         setOpenUsurpDialog(true);
                         break;
                       default:
@@ -713,13 +742,6 @@ const MyThrones = React.memo(function FnMyTHornes() {
         dataId={selectedId}
         onClose={handleUsurpDialogClose}
       />
-      <YesOrNoDialog
-        title={"Withdraw Throne"}
-        open={openWithdrawDialog}
-        onClose={handleWithdrawDialogClose}
-      >
-        <center>Do you want to withdraw this throne?</center>
-      </YesOrNoDialog>
     </>
   );
 });
@@ -929,11 +951,3 @@ export default function PageDashboard() {
     </div>
   );
 }
-
-// type DialogProps = {
-//   open: boolean;
-// };
-
-// export const UsurpReferralDialog = ({ open }: DialogProps) => {
-//   return <Modal title={"Usurp the Referral Throne"}>asdsadad</Modal>;
-// };

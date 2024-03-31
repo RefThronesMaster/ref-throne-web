@@ -2,52 +2,85 @@
 
 import React from "react";
 
-import {ConfirmDialog, TConfirmDialogProps} from "@/components";
+import {
+  ConfirmDialog,
+  TConfirmDialogProps,
+  TYesOrNoDialogProps,
+  YesOrNoDialog,
+} from "@/components";
 
 type TDialogOption = Pick<
-	TConfirmDialogProps,
-	"title" | "children" | "onClose"
->;
+  TYesOrNoDialogProps,
+  "title" | "children" | "onClose" | "onConfirm"
+> & {
+  modal?: "YesOrNo" | "Confirm";
+};
 
 type TMyDialogContext = {
-	open: (options: TDialogOption) => void;
-	close: () => void;
+  open: (options: TDialogOption) => void;
+  close: () => void;
+  setTransacting: (transacting: boolean) => void;
+  transacting: boolean;
 };
 
 export const MyDialogContext = React.createContext<TMyDialogContext>({
-	open: (options: TDialogOption) => {},
-	close: () => {},
+  open: (options: TDialogOption) => {},
+  close: () => {},
+  setTransacting: (transacting: boolean) => {},
+  transacting: false,
 });
 
-const initValues: TConfirmDialogProps = {
-	open: false,
-	title: "",
+type TMyDialogState = TDialogOption & { open: boolean };
+
+const initValues: TMyDialogState = {
+  open: false,
+  title: "",
 };
 
-export const MyDialogProvider = ({children}: {children: React.ReactNode}) => {
-	const [values, setValues] = React.useState<TConfirmDialogProps>(initValues);
+export const MyDialogProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
+  const [values, setValues] = React.useState<TMyDialogState>(initValues);
+  const [transacting, setTransacting] = React.useState<boolean>(false);
 
-	const open = React.useCallback((options: TDialogOption) => {
-		setValues({
-			open: true,
-			...options,
-		});
-	}, []);
+  const open = React.useCallback((options: TDialogOption) => {
+    setValues({
+      open: true,
+      ...options,
+    });
+  }, []);
 
-	const close = React.useCallback(() => {
-		setValues(initValues);
-	}, []);
+  const close = React.useCallback(() => {
+    setValues(initValues);
+  }, []);
 
-	return (
-		<MyDialogContext.Provider value={{open, close}}>
-			{children}
-			<ConfirmDialog
-				open={values.open}
-				title={values.title}
-				onClose={values.onClose ?? close}
-			>
-				{values.children}
-			</ConfirmDialog>
-		</MyDialogContext.Provider>
-	);
+  return (
+    <MyDialogContext.Provider
+      value={{ open, close, setTransacting, transacting }}
+    >
+      {children}
+      {values.modal == "YesOrNo" ? (
+        <YesOrNoDialog
+          open={values.open}
+          title={values.title}
+          onConfirm={values.onConfirm ?? close}
+          transacting={transacting}
+          onClose={values.onClose ?? close}
+        >
+          {values.children}
+        </YesOrNoDialog>
+      ) : (
+        <ConfirmDialog
+          open={values.open}
+          title={values.title}
+          transacting={transacting}
+          onClose={values.onClose ?? close}
+        >
+          {values.children}
+        </ConfirmDialog>
+      )}
+    </MyDialogContext.Provider>
+  );
 };
