@@ -812,7 +812,7 @@ const MyHistories = React.memo(function FnMyHistories() {
           width: 140,
           value: (row: TActVal) => (
             <span>
-              {`${row.act_type == 2 ? "- " : ""}${Intl.NumberFormat(
+              {`${row.act_type == 1 ? "- " : ""}${Intl.NumberFormat(
                 "en-US"
               ).format(Number(utils.fromWei(row.tor_changes?.toString())))}`}
             </span>

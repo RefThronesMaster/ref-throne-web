@@ -100,3 +100,13 @@ export const LabelActType = [
 //   7: "Throne",
 //   8: "Usurp",
 // };
+
+export type TRank = {
+  //
+  tier: string;
+  rank: number;
+
+  account: string;
+  timestamp: BigInt;
+  point: BigInt;
+};
