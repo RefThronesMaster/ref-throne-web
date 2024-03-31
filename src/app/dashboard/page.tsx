@@ -365,9 +365,15 @@ const MyInfo = () => {
           .call<bigint>();
 
         if (result) {
-          console.log({ myTor: result?.toString() });
           setMyTotalTorDeposited(
-            Number(utils.fromWei(result?.toString())).toLocaleString("en-US", {
+            Number(utils.fromWei(result!.toString())).toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 5,
+            })
+          );
+        } else {
+          setMyTotalTorDeposited(
+            Number(utils.fromWei("0")).toLocaleString("en-US", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 5,
             })
@@ -786,7 +792,7 @@ const MyHistories = React.memo(function FnMyHistories() {
             <span>
               {`${row.act_type == 2 ? "- " : ""}${Intl.NumberFormat(
                 "en-US"
-              ).format(Number(utils.fromWei(Number(row.tor_changes))))}`}
+              ).format(Number(utils.fromWei(row.tor_changes?.toString())))}`}
             </span>
           ),
         },
@@ -797,7 +803,7 @@ const MyHistories = React.memo(function FnMyHistories() {
           value: (row: TActVal) => (
             <span>
               {`${Intl.NumberFormat("en-US").format(
-                Number(utils.fromWei(Number(row.tor_balance)))
+                Number(utils.fromWei(row.tor_balance?.toString()))
               )}`}
             </span>
           ),
@@ -809,7 +815,7 @@ const MyHistories = React.memo(function FnMyHistories() {
           value: (row: TActVal) => (
             <span>
               {`${Intl.NumberFormat("en-US").format(
-                Number(utils.fromWei(Number(row.activity_points)))
+                Number(utils.fromWei(row.activity_points?.toString()))
               )}`}
             </span>
           ),
@@ -821,7 +827,7 @@ const MyHistories = React.memo(function FnMyHistories() {
           value: (row: TActVal) => (
             <span>
               {`${Intl.NumberFormat("en-US").format(
-                Number(utils.fromWei(Number(row.deposit_points)))
+                Number(utils.fromWei(row.deposit_points?.toString()))
               )}`}
             </span>
           ),
@@ -833,7 +839,7 @@ const MyHistories = React.memo(function FnMyHistories() {
           value: (row: TActVal, index: number) => (
             <span>
               {Intl.NumberFormat("en-US").format(
-                Number(utils.fromWei(Number(row.total_points)))
+                Number(utils.fromWei(row.total_points?.toString()))
               )}
             </span>
           ),
