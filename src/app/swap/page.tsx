@@ -44,7 +44,7 @@ export default function PageSwap() {
 }
 
 const Deposit = React.memo(function FnDeposit() {
-  const [value, setValue] = React.useState<string>("0.0000");
+  const [value, setValue] = React.useState<string>("");
   const { account, getBalance, web3, contracts, utils } =
     React.useContext(MyAccountContext);
   const [message, setMessage] = React.useState<string>("");
@@ -89,14 +89,16 @@ const Deposit = React.memo(function FnDeposit() {
 
       setMessage("");
       if (newValue == "") {
-        newValue = "0.0000";
-      }
-      const floatVal = parseFloat(newValue);
+        setValue("");
+        setMessage("must be large than 0");
+      } else {
+        const floatVal = parseFloat(newValue);
 
-      if (!Number.isNaN(floatVal) && floatVal >= 0) {
-        setValue(newValue);
-        if (floatVal > ethBalance) {
-          setMessage("must be less than you own");
+        if (!Number.isNaN(floatVal) && floatVal >= 0) {
+          setValue(newValue);
+          if (floatVal > ethBalance) {
+            setMessage("must be less than you own");
+          }
         }
       }
     },
@@ -120,7 +122,7 @@ const Deposit = React.memo(function FnDeposit() {
             gasLimit: 2000000,
           });
 
-          setValue("0.0000");
+          setValue("");
         } catch (err: any) {
           console.log("error transaction");
           if (err?.message?.includes("Internal JSON-RPC")) {
@@ -140,16 +142,17 @@ const Deposit = React.memo(function FnDeposit() {
 
   const receivedTor = React.useMemo(() => {
     try {
-      const floatVal = parseFloat(value);
+      const floatVal = parseFloat(value) || 0;
       const tor = ethToTor(floatVal);
       const stringVal = floatVal.toString();
-      return tor
+      const result = tor
         .toFixed(stringVal.length > 3 ? stringVal.length - 3 : stringVal.length)
         .replace(/\.?0+$/, "");
+      return result;
     } catch (err) {
       console.log(err);
     }
-    return "-";
+    return "0";
   }, [value]);
 
   const depositFeeWei = React.useMemo(() => {
@@ -170,7 +173,7 @@ const Deposit = React.memo(function FnDeposit() {
     } catch (err) {
       console.log(err);
     }
-    return "-";
+    return "0";
   }, [depositFeeWei, utils]);
 
   const handleTransaction = React.useCallback(async () => {
@@ -264,15 +267,18 @@ const Deposit = React.memo(function FnDeposit() {
             </div>
             <div className="mt-1 w-full flex justify-between items-center">
               <span className="text-sm">Deposit Fee ({depositFeeRate}%)</span>
-              <span className="text-sm">{depositFeeEth} ETH</span>
-              {/* <span className="text-sm">
-                {(value * 0.01).toFixed(18).replace(/\.?0+$/, "")} ETH
-              </span> */}
+              <span className="text-sm">
+                {Intl.NumberFormat("en-US", {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 18,
+                }).format(Number(depositFeeEth) || 0)}{" "}
+                ETH
+              </span>
             </div>
             <Button
               className="mt-5 mb-2 py-1 w-full chakra-petch-bold rounded-md bg-yellow-100 active:bg-amber-200 disabled:cursor-not-allowed text-black disabled:bg-camo-300 disabled:text-gray-500"
               disabled={
-                parseFloat(value) <= 0 ||
+                (parseFloat(value) || 0) <= 0 ||
                 parseFloat(value) > ethBalance ||
                 transacting
               }
@@ -295,7 +301,7 @@ const Deposit = React.memo(function FnDeposit() {
 });
 
 const Withdraw = React.memo(function FnWithdraw() {
-  const [value, setValue] = React.useState<string>("0.0000");
+  const [value, setValue] = React.useState<string>("");
   const { account, getBalance, web3, contracts, utils } =
     React.useContext(MyAccountContext);
   const [message, setMessage] = React.useState<string>("");
@@ -345,22 +351,25 @@ const Withdraw = React.memo(function FnWithdraw() {
 
       setMessage("");
       if (newValue == "") {
-        newValue = "0.0000";
-      }
+        setValue("");
+        setMessage("must be large than 0");
+        setTargetFeeEth(-1);
+        setTargetEth(-1);
+      } else {
+        const floatVal = parseFloat(newValue);
 
-      const floatVal = parseFloat(newValue);
+        if (!Number.isNaN(floatVal) && floatVal >= 0) {
+          setValue(newValue);
 
-      if (!Number.isNaN(floatVal) && floatVal >= 0) {
-        setValue(newValue);
+          const ethWei =
+            (BigInt(utils.toWei(newValue)) / BigInt(10000)) * BigInt(2);
+          const feeWei = (ethWei / BigInt(100)) * BigInt(withdrawFeeRate);
+          setTargetFeeEth(Number(utils.fromWei(feeWei.toString())) || -1);
+          setTargetEth(Number(utils.fromWei(ethWei.toString())) || -1);
 
-        const ethWei =
-          (BigInt(utils.toWei(newValue)) / BigInt(10000)) * BigInt(2);
-        const feeWei = (ethWei / BigInt(100)) * BigInt(withdrawFeeRate);
-        setTargetFeeEth(Number(utils.fromWei(feeWei.toString())) || -1);
-        setTargetEth(Number(utils.fromWei(ethWei.toString())) || -1);
-
-        if (floatVal > torBalance) {
-          setMessage("must be less than you own");
+          if (floatVal > torBalance) {
+            setMessage("must be less than you own");
+          }
         }
       }
     },
@@ -490,10 +499,10 @@ const Withdraw = React.memo(function FnWithdraw() {
               >
                 {targetEth >= 0
                   ? Intl.NumberFormat("en-US", {
-                      minimumFractionDigits: 4,
+                      minimumFractionDigits: 0,
                       maximumFractionDigits: 18,
                     }).format(targetEth)
-                  : "-"}
+                  : "0"}
               </span>
             </div>
 
@@ -506,17 +515,17 @@ const Withdraw = React.memo(function FnWithdraw() {
               <span className="text-sm">
                 {targetFeeEth >= 0
                   ? Intl.NumberFormat("en-US", {
-                      minimumFractionDigits: 4,
+                      minimumFractionDigits: 0,
                       maximumFractionDigits: 18,
                     }).format(targetFeeEth)
-                  : "-"}{" "}
+                  : "0"}{" "}
                 ETH
               </span>
             </div>
             <Button
               className="mt-5 mb-2 py-1 w-full chakra-petch-bold rounded-md bg-yellow-100 active:bg-amber-200 disabled:cursor-not-allowed text-black disabled:bg-camo-300 disabled:text-gray-500"
               disabled={
-                parseFloat(value) <= 0 ||
+                (parseFloat(value) || 0) <= 0 ||
                 parseFloat(value) > torBalance ||
                 transacting
               }
