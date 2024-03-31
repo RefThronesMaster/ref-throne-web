@@ -112,7 +112,7 @@ const TotalInfo = () => {
 
 const defaultRewardSort: SORT = {
   field: "rank",
-  order: "DESC",
+  order: "ASC",
 };
 
 type TRewardPoint = {
