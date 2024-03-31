@@ -8,7 +8,6 @@ import { MyAccountContext } from "../MyAccountProvider";
 const TotalInfo = () => {
   const [totalEthDeposited, setTotalEthDeposited] = React.useState<string>("-");
   const [totalTorSupplied, setTotalTorSupplied] = React.useState<string>("-");
-  const [totalUser, setTotalUser] = React.useState<string>("-");
   const [totalRewards, setTotalRewards] = React.useState<string>("-");
   const [totalThrones, setTotalThrones] = React.useState<string>("-");
 
@@ -56,17 +55,6 @@ const TotalInfo = () => {
     }
   }, [contracts.EthTreasury, utils, account]);
 
-  const getTotalUsers = React.useCallback(async () => {
-    if (account) {
-      try {
-        // TODO: TOTAL Users
-        // ?
-      } catch (err) {
-        console.log(err);
-      }
-    }
-  }, [contracts.EthTreasury, utils, account]);
-
   const getTotalRewards = React.useCallback(async () => {
     if (account) {
       try {
@@ -92,7 +80,6 @@ const TotalInfo = () => {
   React.useEffect(() => {
     getTotalEthBalance();
     getTotalTorSupplied();
-    getTotalUsers();
     getTotalRewards();
     getTotalThrones();
   }, [contracts.EthTreasury]);
@@ -107,11 +94,6 @@ const TotalInfo = () => {
       <PanelTitle
         name={"Total TOR Supply"}
         result={`${totalTorSupplied} TOR`}
-        className="w-full max-w-[90%] mt-3 md:mt-0 md:w-1/6 md:max-w-[170px]"
-      />
-      <PanelTitle
-        name={"Total Users"}
-        result={totalUser}
         className="w-full max-w-[90%] mt-3 md:mt-0 md:w-1/6 md:max-w-[170px]"
       />
       <PanelTitle
