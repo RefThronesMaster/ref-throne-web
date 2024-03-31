@@ -4,6 +4,7 @@ import React from "react";
 import { DataRowProps, DataTable, SORT } from "@/components/common";
 
 import { MyAccountContext } from "../MyAccountProvider";
+import { TRank } from "@/components";
 
 const TotalInfo = () => {
   const [totalEthDeposited, setTotalEthDeposited] = React.useState<string>("-");
@@ -89,22 +90,22 @@ const TotalInfo = () => {
       <PanelTitle
         name={"Total ETH Deposited"}
         result={`${totalEthDeposited} ETH`}
-        className="w-full max-w-[90%] md:w-1/6 md:max-w-[170px]"
+        className="w-full max-w-[90%] md:w-1/5 md:max-w-[250px]"
       />
       <PanelTitle
         name={"Total TOR Supply"}
         result={`${totalTorSupplied} TOR`}
-        className="w-full max-w-[90%] mt-3 md:mt-0 md:w-1/6 md:max-w-[170px]"
+        className="w-full max-w-[90%] mt-3 md:mt-0 md:w-1/5 md:max-w-[250px]"
       />
       <PanelTitle
         name={"Total Reward Points"}
         result={totalRewards}
-        className="w-full max-w-[90%] mt-3 md:mt-0 md:w-1/6 md:max-w-[170px]"
+        className="w-full max-w-[90%] mt-3 md:mt-0 md:w-1/5 md:max-w-[250px]"
       />
       <PanelTitle
         name={"Total Referral Thrones"}
         result={totalThrones}
-        className="w-full max-w-[90%] mt-3 md:mt-0 md:w-1/6 md:max-w-[170px]"
+        className="w-full max-w-[90%] mt-3 md:mt-0 md:w-1/5 md:max-w-[250px]"
       />
     </>
   );
@@ -129,49 +130,77 @@ const RewardPoints = () => {
   const { contracts, utils, account } = React.useContext(MyAccountContext);
   const [sort, setSort] = React.useState<SORT>(defaultRewardSort);
 
+  const [data, setData] = React.useState<TRank[]>([]);
+
   // TODO: 임시 데이터를 실제 데이터로 할당
-  const [data, setData] = React.useState<TRewardPoint[]>([
-    {
-      tier: "Diamond",
-      rank: BigInt(1),
-      user: "0x0000ff",
-      ownedThrone: BigInt(10),
-      depositedEth: BigInt(32),
-      invitees: BigInt(32),
-      points: BigInt(32),
-    },
-    {
-      tier: "Platinum",
-      rank: BigInt(11),
-      user: "0x0003ff",
-      ownedThrone: BigInt(13),
-      depositedEth: BigInt(21),
-      invitees: BigInt(21),
-      points: BigInt(21),
-    },
-    {
-      tier: "Gold",
-      rank: BigInt(31),
-      user: "0x0043ff",
-      ownedThrone: BigInt(4),
-      depositedEth: BigInt(15),
-      invitees: BigInt(15),
-      points: BigInt(15),
-    },
-  ]);
+  // const [data, setData] = React.useState<TRewardPoint[]>([
+  //   {
+  //     tier: "Diamond",
+  //     rank: BigInt(1),
+  //     user: "0x0000ff",
+  //     ownedThrone: BigInt(10),
+  //     depositedEth: BigInt(32),
+  //     invitees: BigInt(32),
+  //     points: BigInt(32),
+  //   },
+  //   {
+  //     tier: "Platinum",
+  //     rank: BigInt(11),
+  //     user: "0x0003ff",
+  //     ownedThrone: BigInt(13),
+  //     depositedEth: BigInt(21),
+  //     invitees: BigInt(21),
+  //     points: BigInt(21),
+  //   },
+  //   {
+  //     tier: "Gold",
+  //     rank: BigInt(31),
+  //     user: "0x0043ff",
+  //     ownedThrone: BigInt(4),
+  //     depositedEth: BigInt(15),
+  //     invitees: BigInt(15),
+  //     points: BigInt(15),
+  //   },
+  // ]);
 
   // Reward Points Leaderboard
-  const getRewards = React.useCallback(async () => {
+  const getRanks = React.useCallback(async () => {
     if (account) {
       try {
-        // TODO: Reward Points
-        // ?
+        const results = await contracts.UserHistory?.methods
+          .getRank()
+          .call<TRank[]>();
+
+        console.log({ getRank: results });
+        setData(
+          results?.map((item, index) => {
+            const result: TRank = {
+              ...item,
+              tier: "",
+              rank: index + 1,
+            };
+            if (result.rank > 200) {
+              result.tier = "Stone";
+            } else if (result.rank > 100) {
+              result.tier = "Bronze";
+            } else if (result.rank > 50) {
+              result.tier = "Silver";
+            } else if (result.rank > 30) {
+              result.tier = "Gold";
+            } else if (result.rank > 10) {
+              result.tier = "Platinum";
+            } else {
+              result.tier = "Diamond";
+            }
+            return result;
+          }) ?? []
+        );
       } catch (err) {
         console.log(err);
-        // setData([]);
+        setData([]);
       }
     }
-  }, [contracts.RefThrone, utils, account]);
+  }, [contracts.UserHistory, utils, account]);
 
   const handleChangeSort = React.useCallback(
     (fieldName: string) => {
@@ -195,51 +224,95 @@ const RewardPoints = () => {
           field: "tier",
           displayName: "Tier",
           width: 140,
-          value: (row: TRewardPoint) => <span>{row.tier}</span>,
+          value: (row: TRank) => {
+            return <span>{row.tier}</span>;
+          },
         },
         {
           field: "rank",
           displayName: "Rank",
           width: 140,
           sortable: true,
-          value: (row: TRewardPoint) => <span>{Number(row.rank)}</span>,
+          value: (row: TRank) => <span>{row.rank}</span>,
         },
         {
           field: "user",
           displayName: "User",
           width: 130,
-          value: (row: TRewardPoint) => <span>{Number(row.user)}</span>,
+          value: (row: TRank) => (
+            <span>{`${row.account.substring(0, 8)}...${row.account.substring(
+              row.account.length - 4
+            )}`}</span>
+          ),
         },
         {
-          field: "ownedThrone",
-          displayName: "Owned Thrones",
-          width: 130,
-          value: (row: TRewardPoint) => <span>{Number(row.ownedThrone)}</span>,
-        },
-        {
-          field: "depositedEth",
-          displayName: "Depoisted ETH",
-          width: "*",
-          value: (row: TRewardPoint) => <span>{Number(row.depositedEth)}</span>,
-        },
-        {
-          field: "invitees",
-          displayName: "Invitees",
-          width: 130,
-          value: (row: TRewardPoint) => <span>{Number(row.invitees)}</span>,
-        },
-        {
-          field: "points",
+          field: "point",
           displayName: "Points",
           width: 130,
-          value: (row: TRewardPoint) => <span>{Number(row.points)}</span>,
+          value: (row: TRank) => (
+            <span>
+              {Intl.NumberFormat("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 10,
+              }).format(Number(utils.fromWei(row.point?.toString())))}
+            </span>
+          ),
         },
       ] as DataRowProps[],
     [utils?.fromWei]
   );
+  // const Columns: DataRowProps[] = React.useMemo(
+  //   () =>
+  //     [
+  //       {
+  //         field: "tier",
+  //         displayName: "Tier",
+  //         width: 140,
+  //         value: (row: TRewardPoint) => <span>{row.tier}</span>,
+  //       },
+  //       {
+  //         field: "rank",
+  //         displayName: "Rank",
+  //         width: 140,
+  //         sortable: true,
+  //         value: (row: TRewardPoint) => <span>{Number(row.rank)}</span>,
+  //       },
+  //       {
+  //         field: "user",
+  //         displayName: "User",
+  //         width: 130,
+  //         value: (row: TRewardPoint) => <span>{Number(row.user)}</span>,
+  //       },
+  //       {
+  //         field: "ownedThrone",
+  //         displayName: "Owned Thrones",
+  //         width: 130,
+  //         value: (row: TRewardPoint) => <span>{Number(row.ownedThrone)}</span>,
+  //       },
+  //       {
+  //         field: "depositedEth",
+  //         displayName: "Depoisted ETH",
+  //         width: "*",
+  //         value: (row: TRewardPoint) => <span>{Number(row.depositedEth)}</span>,
+  //       },
+  //       {
+  //         field: "invitees",
+  //         displayName: "Invitees",
+  //         width: 130,
+  //         value: (row: TRewardPoint) => <span>{Number(row.invitees)}</span>,
+  //       },
+  //       {
+  //         field: "points",
+  //         displayName: "Points",
+  //         width: 130,
+  //         value: (row: TRewardPoint) => <span>{Number(row.points)}</span>,
+  //       },
+  //     ] as DataRowProps[],
+  //   [utils?.fromWei]
+  // );
 
   const handleSort = React.useCallback(
-    (a: TRewardPoint, b: TRewardPoint) => {
+    (a: TRank, b: TRank) => {
       let front, back;
       if (sort.order == "ASC") {
         front = a;
@@ -262,8 +335,8 @@ const RewardPoints = () => {
   );
 
   React.useEffect(() => {
-    getRewards();
-  }, [contracts.RefThrone]);
+    getRanks();
+  }, [getRanks]);
   return (
     <>
       <DataTable
