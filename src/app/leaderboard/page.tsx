@@ -235,7 +235,7 @@ const RewardPoints = () => {
           value: (row: TRewardPoint) => <span>{Number(row.points)}</span>,
         },
       ] as DataRowProps[],
-    []
+    [utils?.fromWei]
   );
 
   const handleSort = React.useCallback(
