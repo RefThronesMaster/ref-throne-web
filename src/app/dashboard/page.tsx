@@ -845,7 +845,7 @@ const MyHistories = React.memo(function FnMyHistories() {
           ),
         },
       ] as DataRowProps[],
-    []
+    [utils?.fromWei]
   );
 
   const handleSort = React.useCallback(
