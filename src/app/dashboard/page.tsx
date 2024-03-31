@@ -23,6 +23,7 @@ import {
   TUserInfo,
   ThroneStatus,
   UsurpReferralDialog,
+  YesOrNoDialog,
 } from "@/components";
 import dayjs from "dayjs";
 import Link from "next/link";
@@ -364,6 +365,7 @@ const MyInfo = () => {
           .call<bigint>();
 
         if (result) {
+          console.log({ myTor: result?.toString() });
           setMyTotalTorDeposited(
             Number(utils.fromWei(result?.toString())).toLocaleString("en-US", {
               minimumFractionDigits: 2,
@@ -464,13 +466,13 @@ const StatusButton = React.memo(function FnStatusButton({
   switch (status) {
     case ThroneStatus.InReview:
       return (
-        <Button className="mx-1" onClick={() => {}}>
+        <Button className="mx-1" onClick={onClick}>
           <OwnedIcon className="w-6 h-6 fill-red-600 stroke-red-600" />
         </Button>
       );
     case ThroneStatus.Owned:
       return (
-        <Button className="mx-1" onClick={() => {}}>
+        <Button className="mx-1" onClick={onClick}>
           <OwnedIcon className="w-6 h-6 fill-red-600 stroke-red-600" />
         </Button>
       );
@@ -526,10 +528,17 @@ const MyThrones = React.memo(function FnMyTHornes() {
     [sort]
   );
   const [openUsurpDialog, setOpenUsurpDialog] = React.useState<boolean>(false);
+  const [openWithdrawDialog, setOpenWithdrawDialog] =
+    React.useState<boolean>(false);
   const [selectedId, setSelectedId] = React.useState<BigInt | undefined>();
 
   const handleUsurpDialogClose = React.useCallback(() => {
     setOpenUsurpDialog(false);
+    setSelectedId(undefined);
+  }, []);
+
+  const handleWithdrawDialogClose = React.useCallback(() => {
+    setOpenWithdrawDialog(false);
     setSelectedId(undefined);
   }, []);
 
@@ -633,8 +642,21 @@ const MyThrones = React.memo(function FnMyTHornes() {
                 <StatusButton
                   status={Number(row.status)}
                   onClick={() => {
-                    setOpenUsurpDialog(true);
                     setSelectedId(row.id);
+                    switch (Number(row.status)) {
+                      case ThroneStatus.InReview:
+                      case ThroneStatus.Owned:
+                        setOpenUsurpDialog(false);
+                        setOpenWithdrawDialog(true);
+                        break;
+                      case ThroneStatus.Lost:
+                      case ThroneStatus.Rejected:
+                        setOpenWithdrawDialog(false);
+                        setOpenUsurpDialog(true);
+                        break;
+                      default:
+                        break;
+                    }
                   }}
                 />
               </div>
@@ -685,6 +707,13 @@ const MyThrones = React.memo(function FnMyTHornes() {
         dataId={selectedId}
         onClose={handleUsurpDialogClose}
       />
+      <YesOrNoDialog
+        title={"Withdraw Throne"}
+        open={openWithdrawDialog}
+        onClose={handleWithdrawDialogClose}
+      >
+        <center>Do you want to withdraw this throne?</center>
+      </YesOrNoDialog>
     </>
   );
 });
@@ -881,14 +910,6 @@ export default function PageDashboard() {
         </h2>
         <div className="flex items-center justify-center">
           <MyThrones />
-          {/* <Image
-            src="/assets/images/mythrones.png"
-            width={1439}
-            height={331}
-            alt="tor_concept"
-            className="w-full"
-            style={{ objectFit: "contain" }}
-          /> */}
         </div>
       </div>
       <div className="mt-6">
