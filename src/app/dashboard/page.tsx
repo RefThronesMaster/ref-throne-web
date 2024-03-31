@@ -273,6 +273,8 @@ const MyInfo = () => {
   const [myInfo, setMyInfo] = React.useState<TUserInfo | undefined>();
   const [myLastAct, setMyLastAct] = React.useState<TActVal | undefined>();
 
+  const [myRank, setMyRank] = React.useState<string>("-");
+
   const getMyInfo = React.useCallback(async () => {
     if (account) {
       try {
@@ -287,6 +289,37 @@ const MyInfo = () => {
       }
     }
   }, [contracts.User, utils, account]);
+
+  const getMyRank = React.useCallback(async () => {
+    if (account) {
+      try {
+        const result = await contracts.UserHistory?.methods
+          .getMyRank()
+          .call<bigint>();
+
+        if (result) {
+          if (result > BigInt(200)) {
+            setMyRank("Stone");
+          } else if (result > BigInt(100)) {
+            setMyRank("Bronze");
+          } else if (result > BigInt(50)) {
+            setMyRank("Silber");
+          } else if (result > BigInt(30)) {
+            setMyRank("Gold");
+          } else if (result > BigInt(10)) {
+            setMyRank("Platinum");
+          } else {
+            setMyRank("Diamond");
+          }
+        } else {
+          setMyRank("Stone");
+        }
+      } catch (err) {
+        console.log(err);
+        setMyRank("-");
+      }
+    }
+  }, [contracts.UserHistory, utils, account]);
 
   const getMyInvitees = React.useCallback(async () => {
     try {
@@ -350,6 +383,10 @@ const MyInfo = () => {
   }, [contracts.User]);
 
   React.useEffect(() => {
+    getMyRank();
+  }, [contracts.UserHistory]);
+
+  React.useEffect(() => {
     getMyTotalEthBalance();
     getMyTotalTorBalance();
   }, [contracts.EthTreasury]);
@@ -403,7 +440,7 @@ const MyInfo = () => {
       />
       <PanelTitle
         name={"My Tier"}
-        result={"Stone"}
+        result={myRank}
         className="w-full max-w-[90%] mt-3 md:mt-0 md:w-1/6 md:max-w-[170px]"
       />
     </>
@@ -469,10 +506,6 @@ const MyThrones = React.memo(function FnMyTHornes() {
 
         setData(result ?? []);
       } catch (err: any) {
-        console.log("etc");
-        if (err.code == -32603) {
-          console.log("test");
-        }
         setData([]);
       }
     }
