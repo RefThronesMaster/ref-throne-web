@@ -88,7 +88,7 @@ export const UsurpReferralDialog = ({
   const disabled = React.useMemo(() => {
     if (!formData.linkUrl) return true;
     if (!formData.referralCode) return true;
-    if (formData.benefitAmount <= 0) return true;
+    if (formData.benefitAmount < 0) return true;
     if (formData.torAmount <= 0) return true;
 
     const currentBenefitAmount = BigInt(data?.benefitAmount.toString() ?? "");
