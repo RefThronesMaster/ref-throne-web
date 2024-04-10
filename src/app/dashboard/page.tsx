@@ -296,7 +296,7 @@ const MyInfo = () => {
     if (account) {
       try {
         const result = await contracts.UserHistory?.methods
-          .getMyRank()
+          .getMyRank(account)
           .call<bigint>();
 
         if (result) {
@@ -324,18 +324,23 @@ const MyInfo = () => {
   }, [contracts.UserHistory, utils, account]);
 
   const getMyInvitees = React.useCallback(async () => {
-    try {
-      const result = await contracts.User?.methods.getInvitees().call<any[]>();
-      console.log({ getMyInvitees: result });
+    if (account) {
+      try {
+        const result = await contracts.User?.methods
+          .getInvitees(account)
+          .call<any[]>();
 
-      if (result) {
-        setMyInvitees(result || []);
+        console.log({ getMyInvitees: result });
+
+        if (result) {
+          setMyInvitees(result || []);
+        }
+      } catch (err) {
+        setMyInvitees(null);
+        console.log(err);
       }
-    } catch (err) {
-      setMyInvitees(null);
-      console.log(err);
     }
-  }, [contracts.User, utils]);
+  }, [contracts.User, utils, account]);
 
   const getMyTotalEthBalance = React.useCallback(async () => {
     if (account) {

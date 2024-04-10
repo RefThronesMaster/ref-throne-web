@@ -88,7 +88,7 @@ export const UsurpReferralDialog = ({
   const disabled = React.useMemo(() => {
     if (!formData.linkUrl) return true;
     if (!formData.referralCode) return true;
-    if (formData.benefitAmount <= 0) return true;
+    if (formData.benefitAmount < 0) return true;
     if (formData.torAmount <= 0) return true;
 
     const currentBenefitAmount = BigInt(data?.benefitAmount.toString() ?? "");
@@ -249,25 +249,27 @@ export const NewReferralDialog = ({ open, onClose }: DialogProps) => {
 
   const getServiceTypes = React.useCallback(async () => {
     try {
-      const result = await contracts.RefThrone?.methods
+      const result = await contracts.RefThroneTypes?.methods
         .getServiceTypes()
         .call<TServiceType[]>();
+
       setServiceTypes(result ?? []);
     } catch (err) {
       console.log(err);
     }
-  }, [contracts]);
+  }, [contracts.RefThroneTypes]);
 
   const getBenefitTypes = React.useCallback(async () => {
     try {
-      const result = await contracts.RefThrone?.methods
+      const result = await contracts.RefThroneTypes?.methods
         .getBenefitTypes()
         .call<TBenefitType[]>();
+
       setBenefitTypes(result ?? []);
     } catch (err) {
       console.log(err);
     }
-  }, [contracts]);
+  }, [contracts.RefThroneTypes]);
 
   React.useEffect(() => {
     getServiceTypes();
@@ -303,7 +305,7 @@ export const NewReferralDialog = ({ open, onClose }: DialogProps) => {
   const disabled = React.useMemo(() => {
     if (!formData.linkUrl) return true;
     if (!formData.referralCode) return true;
-    if (formData.benefitAmount <= 0) return true;
+    if (formData.benefitAmount < 0) return true;
     if (formData.torAmount <= 0) return true;
 
     return false;

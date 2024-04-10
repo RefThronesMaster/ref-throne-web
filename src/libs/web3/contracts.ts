@@ -1,7 +1,9 @@
 import { ContractAbi } from "web3";
 import {
   EthTreasuryABI,
+  OwnerGroupABI,
   RefThroneABI,
+  RefThroneTypesABI,
   TorTokenABI,
   UserABI,
   UserHistoryABI,
@@ -17,9 +19,19 @@ export const TORTokenContract: TContract = {
   ABI: TorTokenABI,
 };
 
+export const OwnerGroupContract: TContract = {
+  ADDRESS: process.env.NEXT_PUBLIC_OWNER_GROUP_CONTRACT_ADDRESS,
+  ABI: OwnerGroupABI,
+};
+
 export const RefThroneContract: TContract = {
   ADDRESS: process.env.NEXT_PUBLIC_REF_THRONE_CONTRACT_ADDRESS,
   ABI: RefThroneABI,
+};
+
+export const RefThroneTypesContract: TContract = {
+  ADDRESS: process.env.NEXT_PUBLIC_REF_THRONE_TYPES_CONTRACT_ADDRESS,
+  ABI: RefThroneTypesABI,
 };
 
 export const EthTreasuryContract: TContract = {
