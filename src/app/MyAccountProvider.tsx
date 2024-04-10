@@ -17,7 +17,9 @@ import { CHAIN_IDS, getAddChainParameters } from "@/libs/web3/chains";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   EthTreasuryContract,
+  OwnerGroupContract,
   RefThroneContract,
+  RefThroneTypesContract,
   TORTokenContract,
   UserContract,
   UserHistoryContract,
@@ -44,7 +46,9 @@ type TMyAccountContext = {
   web3?: Web3 | null;
   getBalance: () => Promise<string>;
   contracts: {
+    OwnerGroup: Contract<ContractAbi> | null;
     RefThrone: Contract<ContractAbi> | null;
+    RefThroneTypes: Contract<ContractAbi> | null;
     TORToken: Contract<ContractAbi> | null;
     EthTreasury: Contract<ContractAbi> | null;
     UserHistory: Contract<ContractAbi> | null;
@@ -61,7 +65,9 @@ export const MyAccountContext = React.createContext<TMyAccountContext>({
   account: null,
   getBalance: async () => "0",
   contracts: {
+    OwnerGroup: null,
     RefThrone: null,
+    RefThroneTypes: null,
     TORToken: null,
     EthTreasury: null,
     UserHistory: null,
@@ -123,32 +129,17 @@ export const MyAccountProvider = ({
     }
     return "0";
   }, [web3, defaultAccount]);
-  //   const getBalance = React.useCallback(async () => {
-  //     if (!window.ethereum?.isMetaMask) {
-  //       window.open("https://metamask.io/", "_blank");
-  //       return "0";
-  //     } else {
-  //       if (connector?.provider) {
-  //         try {
-  //           const _web3 = new Web3(connector.provider);
-  // 		  _web3.provider
-  //           setWeb3(_web3);
-  //           if (defaultAccount) {
-  //             try {
-  //               return (await _web3.eth.getBalance(defaultAccount)).toString();
-  //             } catch (err) {
-  //               console.error(err);
-  //               return "0";
-  //             }
-  //           }
-  //         } catch (err) {
-  //           console.error(err);
-  //           return "0";
-  //         }
-  //       }
-  //       return "0";
-  //     }
-  //   }, [connector, defaultAccount]);
+
+  const contractOwnerGroup = React.useMemo(() => {
+    if (web3) {
+      console.log({ ownerGroupContract: OwnerGroupContract.ADDRESS });
+      return new web3.eth.Contract(
+        OwnerGroupContract.ABI,
+        OwnerGroupContract.ADDRESS
+      );
+    }
+    return null;
+  }, [web3]);
 
   const contractRefThrone = React.useMemo(() => {
     if (web3) {
@@ -156,6 +147,17 @@ export const MyAccountProvider = ({
       return new web3.eth.Contract(
         RefThroneContract.ABI,
         RefThroneContract.ADDRESS
+      );
+    }
+    return null;
+  }, [web3]);
+
+  const contractRefThroneTypes = React.useMemo(() => {
+    if (web3) {
+      console.log({ refThroneTypesContract: RefThroneTypesContract.ADDRESS });
+      return new web3.eth.Contract(
+        RefThroneTypesContract.ABI,
+        RefThroneTypesContract.ADDRESS
       );
     }
     return null;
@@ -298,9 +300,11 @@ export const MyAccountProvider = ({
         getBalance,
         web3,
         contracts: {
+          OwnerGroup: contractOwnerGroup,
           EthTreasury: contractEthTreasury,
           TORToken: contractTORToken,
           RefThrone: contractRefThrone,
+          RefThroneTypes: contractRefThroneTypes,
           UserHistory: contractUserHistory,
           User: contractUser,
         },

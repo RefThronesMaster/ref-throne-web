@@ -61,6 +61,9 @@ const TotalInfo = () => {
       try {
         // TODO: TOTAL REWARDS
         //
+
+        
+
       } catch (err) {
         console.log(err);
       }
