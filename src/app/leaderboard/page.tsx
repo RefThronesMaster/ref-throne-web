@@ -59,16 +59,23 @@ const TotalInfo = () => {
   const getTotalRewards = React.useCallback(async () => {
     if (account) {
       try {
-        // TODO: TOTAL REWARDS
-        //
+        const result = await contracts.UserHistory?.methods
+          .getTotalPoints()
+          .call<bigint>();
 
-        
-
+        if (result) {
+          setTotalRewards(
+            Number(utils.fromWei(result?.toString())).toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 3,
+            })
+          );
+        }
       } catch (err) {
         console.log(err);
       }
     }
-  }, [contracts.EthTreasury, utils, account]);
+  }, [contracts.UserHistory, utils, account]);
 
   const getTotalThrones = React.useCallback(async () => {
     if (account) {
