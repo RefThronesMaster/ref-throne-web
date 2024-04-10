@@ -133,3 +133,7 @@ input[type="number"] {
 ::-webkit-scrollbar-track {
   background-color: #11140c;
 }
+
+select>option {
+  background-color: #000;
+}
