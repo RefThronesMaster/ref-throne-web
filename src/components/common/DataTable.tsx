@@ -72,18 +72,29 @@ export const DataTable = React.memo(function FnDataTable({
           </tr>
         </thead>
         <tbody>
-          {data?.map((row, rowIdx) => (
-            <tr key={rowIdx}>
-              {columns?.map((column, colIdx) => (
-                <td
-                  key={colIdx}
-                  className="text-sm chakra-petch-bold py-4 px-2 bg-camo-700 border-y-[14px] border-y-black"
-                >
-                  {column.value(row, rowIdx, column.field, row[column.field])}
-                </td>
-              ))}
+          {data?.length > 0 ? (
+            data?.map((row, rowIdx) => (
+              <tr key={rowIdx}>
+                {columns?.map((column, colIdx) => (
+                  <td
+                    key={colIdx}
+                    className="text-sm chakra-petch-bold py-4 px-2 bg-camo-700 border-y-[14px] border-y-black"
+                  >
+                    {column.value(row, rowIdx, column.field, row[column.field])}
+                  </td>
+                ))}
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td
+                className="text-sm items-center justify-center text-center chakra-petch-bold py-4 px-2 border-y-[14px] border-y-black"
+                colSpan={columns?.length}
+              >
+                Empty Data
+              </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
     </div>
