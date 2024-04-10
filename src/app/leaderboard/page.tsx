@@ -73,6 +73,7 @@ const TotalInfo = () => {
         }
       } catch (err) {
         console.log(err);
+        setTotalRewards("-");
       }
     }
   }, [contracts.UserHistory, utils, account]);
@@ -80,13 +81,22 @@ const TotalInfo = () => {
   const getTotalThrones = React.useCallback(async () => {
     if (account) {
       try {
-        // TODO: TOTAL Thrones
-        // RefThroneContract.getOwnedThroneCount()
+        const result = await contracts.RefThrone?.methods
+          .getOwnedThroneCount()
+          .call<bigint>();
+
+        setTotalThrones(
+          Number(utils.fromWei(result!.toString())).toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 3,
+          })
+        );
       } catch (err) {
         console.log(err);
+        setTotalThrones("-");
       }
     }
-  }, [contracts.EthTreasury, utils, account]);
+  }, [contracts.RefThrone, utils, account]);
 
   React.useEffect(() => {
     getTotalEthBalance();
