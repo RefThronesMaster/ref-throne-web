@@ -1,12 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { MyAccountContext } from "@/app/MyAccountProvider";
+import { MyWeb3Context } from "@/app/MyWeb3Provider";
 import React, { ChangeEvent } from "react";
 import { Button, Input, ProgressCircleIcon } from "@/components/common";
 import { EthTreasuryContract } from "@/libs/web3/contracts";
 import { RpcError } from "web3";
 import { ethToTor } from "@/libs/web3/utils";
+import { MyDialogContext } from "../MyDialogProvider";
 
 type MODE = "deposit" | "withdraw";
 
@@ -45,8 +46,9 @@ export default function PageSwap() {
 
 const Deposit = React.memo(function FnDeposit() {
   const [value, setValue] = React.useState<string>("");
+  const { open, close } = React.useContext(MyDialogContext);
   const { account, getBalance, web3, contracts, utils } =
-    React.useContext(MyAccountContext);
+    React.useContext(MyWeb3Context);
   const [message, setMessage] = React.useState<string>("");
   const [depositFeeRate, setDepositFeeRate] = React.useState<number>(1);
   const [transacting, setTransacting] = React.useState<boolean>(false);
@@ -122,7 +124,13 @@ const Deposit = React.memo(function FnDeposit() {
             gasLimit: 2000000,
           });
 
+          open({
+            title: "Deposit ETH",
+            children: <center>Deposit ETH Successful.</center>,
+          });
+
           setValue("");
+          getMyEthBalance();
         } catch (err: any) {
           console.log("error transaction");
           if (err?.message?.includes("Internal JSON-RPC")) {
@@ -301,9 +309,10 @@ const Deposit = React.memo(function FnDeposit() {
 });
 
 const Withdraw = React.memo(function FnWithdraw() {
+  const { open, close } = React.useContext(MyDialogContext);
   const [value, setValue] = React.useState<string>("");
   const { account, getBalance, web3, contracts, utils } =
-    React.useContext(MyAccountContext);
+    React.useContext(MyWeb3Context);
   const [message, setMessage] = React.useState<string>("");
   const [withdrawFeeRate, setWithdrawFeeRate] = React.useState<number>(2);
   const [transacting, setTransacting] = React.useState<boolean>(false);
@@ -405,8 +414,13 @@ const Withdraw = React.memo(function FnWithdraw() {
               from: account,
             });
 
-          setValue("0");
+          open({
+            title: "Withdraw ETH",
+            children: <center>Withdraw ETH Successful.</center>,
+          });
 
+          setValue("0");
+          getMyTorBalance();
           // .catch(() => {
           //   setMessage("not enough your balance");
           // });

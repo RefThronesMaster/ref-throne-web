@@ -3,7 +3,7 @@
 import React from "react";
 import { DataRowProps, DataTable, SORT } from "@/components/common";
 
-import { MyAccountContext } from "../MyAccountProvider";
+import { MyWeb3Context } from "../MyWeb3Provider";
 import { TRank } from "@/components";
 
 const TotalInfo = () => {
@@ -12,7 +12,7 @@ const TotalInfo = () => {
   const [totalRewards, setTotalRewards] = React.useState<string>("-");
   const [totalThrones, setTotalThrones] = React.useState<string>("-");
 
-  const { contracts, utils, account } = React.useContext(MyAccountContext);
+  const { contracts, utils, account } = React.useContext(MyWeb3Context);
 
   const getTotalEthBalance = React.useCallback(async () => {
     if (account) {
@@ -147,7 +147,7 @@ type TRewardPoint = {
 };
 
 const RewardPoints = () => {
-  const { contracts, utils, account } = React.useContext(MyAccountContext);
+  const { contracts, utils, account } = React.useContext(MyWeb3Context);
   const [sort, setSort] = React.useState<SORT>(defaultRewardSort);
 
   const [data, setData] = React.useState<TRank[]>([]);

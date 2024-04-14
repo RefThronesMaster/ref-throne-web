@@ -13,7 +13,7 @@ import {
   SwordIcon,
 } from "@/components/common";
 
-import { MyAccountContext } from "../MyAccountProvider";
+import { MyWeb3Context } from "../MyWeb3Provider";
 import {
   BENEFIT_TYPE_LABEL,
   ConfirmDialog,
@@ -33,7 +33,7 @@ import { MyDialogContext } from "../MyDialogProvider";
 const BindCode = () => {
   const { open, close } = React.useContext(MyDialogContext);
   const [invitationCode, setInvitationCode] = React.useState<string>("");
-  const { contracts, account } = React.useContext(MyAccountContext);
+  const { contracts, account, updateTs } = React.useContext(MyWeb3Context);
   const [transacting, setTransacting] = React.useState<boolean>(false);
 
   const bindingInvitationCode = React.useCallback(async () => {
@@ -49,6 +49,8 @@ const BindCode = () => {
           children: <center>Binding Invitation Code Successful.</center>,
         });
         setInvitationCode("");
+
+        updateTs(dayjs().valueOf());
       } catch (err) {
         open({
           title: "Bind Invitation Code",
@@ -59,7 +61,7 @@ const BindCode = () => {
         setTransacting(false);
       }
     }
-  }, [contracts.User, invitationCode, account]);
+  }, [contracts.User, invitationCode, account, updateTs]);
 
   const handleInputChange = React.useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -105,7 +107,7 @@ const MyInvitationCode = () => {
   const { open, close } = React.useContext(MyDialogContext);
   const [myInvitationCode, setMyInvitationCode] = React.useState<string>("");
 
-  const { contracts, account } = React.useContext(MyAccountContext);
+  const { contracts, account, ts } = React.useContext(MyWeb3Context);
   const [transacting, setTransacting] = React.useState<boolean>(false);
 
   const getMyInvitaionCode = React.useCallback(
@@ -155,7 +157,7 @@ const MyInvitationCode = () => {
 
   React.useEffect(() => {
     contracts.User && account && getMyInvitaionCode(account);
-  }, [contracts.User, account]);
+  }, [contracts.User, account, ts]);
 
   return (
     <>
@@ -213,7 +215,7 @@ const LiveAccumPointPanelTitle = React.memo(
     result,
     className,
   }: TLiveAccumPointPanelTitle) {
-    const { utils } = useContext(MyAccountContext);
+    const { utils } = useContext(MyWeb3Context);
     const [livePoint, setLivePoint] = React.useState<number>(0);
 
     // 컴포넌트가 마운트 되었을때 실행됩니다.
@@ -271,7 +273,7 @@ const MyInfo = () => {
     React.useState<string>("-");
 
   const [myInvitees, setMyInvitees] = React.useState<any[] | null>(null);
-  const { contracts, utils, account } = React.useContext(MyAccountContext);
+  const { contracts, utils, account, ts } = React.useContext(MyWeb3Context);
   const [myInfo, setMyInfo] = React.useState<TUserInfo | undefined>();
   const [myLastAct, setMyLastAct] = React.useState<TActVal | undefined>();
 
@@ -398,7 +400,7 @@ const MyInfo = () => {
 
   React.useEffect(() => {
     getMyRank();
-  }, [contracts.UserHistory]);
+  }, [contracts.UserHistory, ts]);
 
   React.useEffect(() => {
     getMyTotalEthBalance();
@@ -423,7 +425,7 @@ const MyInfo = () => {
 
   React.useEffect(() => {
     getMyLastAct();
-  }, [contracts.UserHistory]);
+  }, [contracts.UserHistory, ts]);
 
   return (
     <>
@@ -505,7 +507,7 @@ const StatusButton = React.memo(function FnStatusButton({
 });
 
 const MyThrones = React.memo(function FnMyTHornes() {
-  const { contracts, utils, account } = React.useContext(MyAccountContext);
+  const { contracts, utils, account } = React.useContext(MyWeb3Context);
   const { open, setTransacting, close } = React.useContext(MyDialogContext);
   const [sort, setSort] = React.useState<SORT>(defaultThroneSort);
 
@@ -757,7 +759,7 @@ const defaultHistorySort: SORT = {
 };
 
 const MyHistories = React.memo(function FnMyHistories() {
-  const { contracts, utils, account } = React.useContext(MyAccountContext);
+  const { contracts, utils, account, ts } = React.useContext(MyWeb3Context);
   const [sort, setSort] = React.useState<SORT>(defaultHistorySort);
   const [data, setData] = React.useState<TActVal[]>([]);
 
@@ -901,7 +903,7 @@ const MyHistories = React.memo(function FnMyHistories() {
 
   React.useEffect(() => {
     getMyHistories();
-  }, [getMyHistories]);
+  }, [getMyHistories, ts]);
 
   return (
     <>

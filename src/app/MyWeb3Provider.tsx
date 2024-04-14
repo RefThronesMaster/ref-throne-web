@@ -35,13 +35,13 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <Web3ReactProvider connectors={connectors}>
       <Suspense>
-        <MyAccountProvider>{children}</MyAccountProvider>
+        <MyWeb3Provider>{children}</MyWeb3Provider>
       </Suspense>
     </Web3ReactProvider>
   );
 };
 
-type TMyAccountContext = {
+type TMyWeb3Context = {
   account?: string | null;
   web3?: Web3 | null;
   getBalance: () => Promise<string>;
@@ -59,9 +59,11 @@ type TMyAccountContext = {
     toWei: (value: string | number) => string;
     toBN: (value: string | number) => bigint;
   };
+  updateTs: (value?: string | number) => void;
+  ts?: string | number;
 };
 
-export const MyAccountContext = React.createContext<TMyAccountContext>({
+export const MyWeb3Context = React.createContext<TMyWeb3Context>({
   account: null,
   getBalance: async () => "0",
   contracts: {
@@ -78,15 +80,13 @@ export const MyAccountContext = React.createContext<TMyAccountContext>({
     toWei: (value: string | number) => "0",
     toBN: (value: string | number) => BigInt(0),
   },
+  updateTs: (value?: string | number) => {},
+  ts: undefined,
 });
 
 const { useAccounts, useChainId } = hooks;
 
-export const MyAccountProvider = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
+export const MyWeb3Provider = ({ children }: { children: React.ReactNode }) => {
   const { connector } = useWeb3React();
   const accounts = useAccounts();
   const chainId = useChainId();
@@ -99,6 +99,15 @@ export const MyAccountProvider = ({
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const [ts, setTs] = React.useState<string | number>();
+
+  const updateTs = React.useCallback(
+    (value?: string | number) => {
+      setTs(value);
+    },
+    [setTs]
+  );
 
   const signedIn = React.useMemo(() => {
     return CHAIN_IDS.BLAST_SEPOLIA == chainId && defaultAccount;
@@ -294,7 +303,7 @@ export const MyAccountProvider = ({
   }, [connector]);
 
   return (
-    <MyAccountContext.Provider
+    <MyWeb3Context.Provider
       value={{
         account: defaultAccount,
         getBalance,
@@ -313,6 +322,8 @@ export const MyAccountProvider = ({
           fromWei,
           toBN,
         },
+        updateTs,
+        ts,
       }}
     >
       <MyDialogProvider>
@@ -349,6 +360,6 @@ export const MyAccountProvider = ({
         )}
         <Footer />
       </MyDialogProvider>
-    </MyAccountContext.Provider>
+    </MyWeb3Context.Provider>
   );
 };

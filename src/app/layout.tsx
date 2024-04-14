@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { AppProvider } from "./MyAccountProvider";
+import { AppProvider } from "./MyWeb3Provider";
 import { Footer, Header } from "@/components";
 import React from "react";
 import Error from "./error";
