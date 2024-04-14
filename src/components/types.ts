@@ -8,6 +8,7 @@ export const ColorSet = {
 export type TServiceType = "DEX" | "CEX" | "MISC";
 
 export type TBenefitType =
+  | "None"
   | "Fee discount"
   | "USDT"
   | "USDC"
@@ -43,6 +44,7 @@ export type TBenefitTypeLabel = {
 };
 
 export const BENEFIT_TYPE_LABEL: TBenefitTypeLabel = {
+  None: "None",
   "Fee discount": "% Fee discount",
   "Fee Discount": "% Fee discount",
   USDT: "USDT",

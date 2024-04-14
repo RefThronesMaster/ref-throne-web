@@ -9,8 +9,10 @@ import React from "react";
 import { useWeb3React } from "@web3-react/core";
 import { hooks } from "@/libs/web3/connectors/metamask";
 import { CHAIN_IDS, getAddChainParameters } from "@/libs/web3/chains";
-import { MyAccountContext } from "@/app/MyAccountProvider";
+import { MyWeb3Context } from "@/app/MyWeb3Provider";
 import { MyDialogContext } from "@/app/MyDialogProvider";
+
+import dayjs from "dayjs";
 
 const MENU = {
   "/referrals": "Referral Thrones",
@@ -29,7 +31,7 @@ type TAttendButton = {
 export const AttendButton = ({ signedIn = false }: TAttendButton) => {
   const { open, close } = React.useContext(MyDialogContext);
 
-  const { account, contracts } = React.useContext(MyAccountContext);
+  const { account, contracts, updateTs } = React.useContext(MyWeb3Context);
   const [transacting, setTransacting] = React.useState<boolean>(false);
 
   const handleDailyCheck = React.useCallback(async () => {
@@ -49,6 +51,7 @@ export const AttendButton = ({ signedIn = false }: TAttendButton) => {
             title: "Daily Check",
             children: <center>Welcome to visit again today.</center>,
           });
+          updateTs(dayjs().valueOf());
         } else {
           open({
             title: "Daily Check",
@@ -60,7 +63,7 @@ export const AttendButton = ({ signedIn = false }: TAttendButton) => {
         setTransacting(false);
       }
     }
-  }, [account, contracts.UserHistory]);
+  }, [account, contracts.UserHistory, updateTs]);
 
   return (
     <Button
@@ -87,7 +90,7 @@ export const Header = () => {
   const pathname = usePathname();
   const { connector } = useWeb3React();
   const chainId = useChainId();
-  const { account, getBalance, contracts } = React.useContext(MyAccountContext);
+  const { account, getBalance, contracts } = React.useContext(MyWeb3Context);
 
   const signedIn = React.useMemo(() => {
     return Boolean(CHAIN_IDS.BLAST_SEPOLIA == chainId && account);

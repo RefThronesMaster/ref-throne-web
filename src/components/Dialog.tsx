@@ -1,7 +1,7 @@
 import React, { ChangeEvent } from "react";
 import { DataInfo, InputData, Modal, SelectData } from "@/components/common";
 
-import { MyAccountContext } from "@/app/MyAccountProvider";
+import { MyWeb3Context } from "@/app/MyWeb3Provider";
 import { RefThroneContract } from "@/libs/web3/contracts";
 import {
   BENEFIT_TYPE_LABEL,
@@ -38,7 +38,7 @@ export const UsurpReferralDialog = ({
   dataId,
   onClose,
 }: UsurpReferralDialog) => {
-  const { account, utils, contracts } = React.useContext(MyAccountContext);
+  const { account, utils, contracts } = React.useContext(MyWeb3Context);
   const [formData, setFormData] = React.useState<TFormReferral>(
     initFormUsurpReferral
   );
@@ -240,7 +240,7 @@ const initFormNewReferral = {
 } as const;
 
 export const NewReferralDialog = ({ open, onClose }: DialogProps) => {
-  const { account, utils, contracts } = React.useContext(MyAccountContext);
+  const { account, utils, contracts } = React.useContext(MyWeb3Context);
   const [formData, setFormData] =
     React.useState<TNewFormReferral>(initFormNewReferral);
   const [serviceTypes, setServiceTypes] = React.useState<TServiceType[]>([]);

@@ -10,7 +10,7 @@ import {
   DataRowProps,
 } from "@/components/common";
 import { TThrone, UsurpReferralDialog, NewReferralDialog } from "@/components";
-import { MyAccountContext } from "../MyAccountProvider";
+import { MyWeb3Context } from "../MyWeb3Provider";
 import { BENEFIT_TYPE_LABEL } from "@/components/types";
 import Link from "next/link";
 
@@ -29,7 +29,7 @@ export default function PageReferral() {
   const [openNewDialog, setOpenNewDialog] = React.useState<boolean>(false);
   const [selectedId, setSelectedId] = React.useState<BigInt | undefined>();
   const [search, setSearch] = React.useState<string>("");
-  const { contracts, account, utils } = React.useContext(MyAccountContext);
+  const { contracts, account, utils } = React.useContext(MyWeb3Context);
 
   const [sort, setSort] = React.useState<SORT>(defaultSort);
 
