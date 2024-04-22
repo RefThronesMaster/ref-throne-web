@@ -9,6 +9,7 @@ import {
   TThrone,
   TServiceType,
 } from "@/components/types";
+import { MyDialogContext } from "@/app/MyDialogProvider";
 
 type DialogProps = {
   open: boolean;
@@ -38,6 +39,7 @@ export const UsurpReferralDialog = ({
   dataId,
   onClose,
 }: UsurpReferralDialog) => {
+  const { open: openDialog } = React.useContext(MyDialogContext);
   const { account, utils, contracts } = React.useContext(MyWeb3Context);
   const [formData, setFormData] = React.useState<TFormReferral>(
     initFormUsurpReferral
@@ -141,9 +143,23 @@ export const UsurpReferralDialog = ({
               formData?.linkUrl
             )
             .send({ from: account });
+
+          openDialog({
+            title: "Usurp Referral Throne",
+            children: (
+              <center>
+                Your creation request is submitted successfully. Registration
+                will be reviewed and completed within 24 hours.
+              </center>
+            ),
+          });
           return true;
         } catch (err) {
           console.log(err);
+          openDialog({
+            title: "Usurp Referral Throne",
+            children: <center>Submission of creation request failed.</center>,
+          });
         } finally {
           setTransacting(false);
         }
@@ -240,6 +256,8 @@ const initFormNewReferral = {
 } as const;
 
 export const NewReferralDialog = ({ open, onClose }: DialogProps) => {
+  const { open: openDialog } = React.useContext(MyDialogContext);
+
   const { account, utils, contracts } = React.useContext(MyWeb3Context);
   const [formData, setFormData] =
     React.useState<TNewFormReferral>(initFormNewReferral);
@@ -345,9 +363,23 @@ export const NewReferralDialog = ({ open, onClose }: DialogProps) => {
               formData?.linkUrl
             )
             .send({ from: account });
+
+          openDialog({
+            title: "New Referral Throne",
+            children: (
+              <center>
+                Your creation request is submitted successfully. Registration
+                will be reviewed and completed within 24 hours.
+              </center>
+            ),
+          });
           return true;
         } catch (err) {
           console.log(err);
+          openDialog({
+            title: "New Referral Throne",
+            children: <center>Submission of creation request failed.</center>,
+          });
         } finally {
           setTransacting(false);
         }
