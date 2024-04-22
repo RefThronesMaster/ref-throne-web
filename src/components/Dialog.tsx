@@ -9,6 +9,7 @@ import {
   TThrone,
   TServiceType,
 } from "@/components/types";
+import { MyDialogContext } from "@/app/MyDialogProvider";
 
 type DialogProps = {
   open: boolean;
@@ -38,6 +39,7 @@ export const UsurpReferralDialog = ({
   dataId,
   onClose,
 }: UsurpReferralDialog) => {
+  const { open: openDialog } = React.useContext(MyDialogContext);
   const { account, utils, contracts } = React.useContext(MyWeb3Context);
   const [formData, setFormData] = React.useState<TFormReferral>(
     initFormUsurpReferral
@@ -88,7 +90,9 @@ export const UsurpReferralDialog = ({
   const disabled = React.useMemo(() => {
     if (!formData.linkUrl) return true;
     if (!formData.referralCode) return true;
-    if (formData.benefitAmount < 0) return true;
+
+    if (data?.benefitType != "None" && formData.benefitAmount < 0) return true;
+
     if (formData.torAmount <= 0) return true;
 
     const currentBenefitAmount = BigInt(data?.benefitAmount.toString() ?? "");
@@ -135,15 +139,31 @@ export const UsurpReferralDialog = ({
               data?.name,
               data?.serviceType,
               data?.benefitType,
-              utils.toWei(formData?.benefitAmount),
+              utils.toWei(
+                data.benefitType == "None" ? 0 : formData?.benefitAmount
+              ),
               formData?.referralCode,
               torAmount,
               formData?.linkUrl
             )
             .send({ from: account });
+
+          openDialog({
+            title: "Usurp Referral Throne",
+            children: (
+              <center>
+                Your creation request is submitted successfully. Registration
+                will be reviewed and completed within 24 hours.
+              </center>
+            ),
+          });
           return true;
         } catch (err) {
           console.log(err);
+          openDialog({
+            title: "Usurp Referral Throne",
+            children: <center>Submission of creation request failed.</center>,
+          });
         } finally {
           setTransacting(false);
         }
@@ -185,14 +205,17 @@ export const UsurpReferralDialog = ({
           data ? `${utils.fromWei(data?.torAmount.toString() ?? "")} TOR` : "-"
         }
       />
-      <InputData
-        id="benefitAmount"
-        label="New Benefit"
-        className="pl-2 text-right"
-        value={formData.benefitAmount}
-        onChange={handleChange}
-        type="number"
-      />
+      {data?.benefitType != "None" && (
+        <InputData
+          id="benefitAmount"
+          label="New Benefit"
+          className="pl-2 text-right"
+          value={formData.benefitAmount}
+          onChange={handleChange}
+          type="number"
+        />
+      )}
+
       <InputData
         id="torAmount"
         label="New TOR Deposit"
@@ -225,8 +248,8 @@ export const UsurpReferralDialog = ({
 
 type TNewFormReferral = TFormReferral & {
   name: "";
-  serviceType: string;
-  benefitType: string;
+  serviceType: TServiceType | "";
+  benefitType: TBenefitType | "";
 };
 
 const initFormNewReferral = {
@@ -240,6 +263,8 @@ const initFormNewReferral = {
 } as const;
 
 export const NewReferralDialog = ({ open, onClose }: DialogProps) => {
+  const { open: openDialog } = React.useContext(MyDialogContext);
+
   const { account, utils, contracts } = React.useContext(MyWeb3Context);
   const [formData, setFormData] =
     React.useState<TNewFormReferral>(initFormNewReferral);
@@ -303,10 +328,13 @@ export const NewReferralDialog = ({ open, onClose }: DialogProps) => {
   );
 
   const disabled = React.useMemo(() => {
-    if (!formData.linkUrl) return true;
-    if (!formData.referralCode) return true;
-    if (formData.benefitAmount < 0) return true;
+    if (formData.serviceType == "") return true;
+    if (formData.benefitType == "") return true;
+    if (formData.benefitType != "None" && formData.benefitAmount < 0)
+      return true;
     if (formData.torAmount <= 0) return true;
+    if (!formData.referralCode) return true;
+    if (!formData.linkUrl) return true;
 
     return false;
   }, [formData]);
@@ -317,11 +345,11 @@ export const NewReferralDialog = ({ open, onClose }: DialogProps) => {
         try {
           setTransacting(true);
           const torAmount = utils.toWei(formData?.torAmount);
+          console.log({ torAmount });
 
           const allowance = await contracts.TORToken?.methods
             .allowance(account, RefThroneContract.ADDRESS)
             .call<bigint>();
-          console.log({ torAmount });
 
           if (!allowance || allowance < BigInt(torAmount)) {
             console.log("need approve");
@@ -339,15 +367,31 @@ export const NewReferralDialog = ({ open, onClose }: DialogProps) => {
               formData.name,
               formData.serviceType,
               formData.benefitType,
-              utils.toWei(formData?.benefitAmount),
+              utils.toWei(
+                formData.benefitType == "None" ? 0 : formData?.benefitAmount
+              ),
               formData?.referralCode,
               torAmount,
               formData?.linkUrl
             )
             .send({ from: account });
+
+          openDialog({
+            title: "New Referral Throne",
+            children: (
+              <center>
+                Your creation request is submitted successfully. Registration
+                will be reviewed and completed within 24 hours.
+              </center>
+            ),
+          });
           return true;
         } catch (err) {
           console.log(err);
+          openDialog({
+            title: "New Referral Throne",
+            children: <center>Submission of creation request failed.</center>,
+          });
         } finally {
           setTransacting(false);
         }
@@ -406,14 +450,17 @@ export const NewReferralDialog = ({ open, onClose }: DialogProps) => {
           value: type,
         }))}
       />
-      <InputData
-        id="benefitAmount"
-        label="Benefit"
-        className="pl-2 text-right"
-        value={formData.benefitAmount}
-        onChange={handleChange}
-        type="number"
-      />
+      {formData.benefitType != "" && formData.benefitType != "None" && (
+        <InputData
+          id="benefitAmount"
+          label="Benefit"
+          className="pl-2 text-right"
+          value={formData.benefitAmount}
+          onChange={handleChange}
+          type="number"
+        />
+      )}
+
       <InputData
         id="torAmount"
         label="TOR Deposit"
