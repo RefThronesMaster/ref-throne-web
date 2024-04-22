@@ -43,7 +43,7 @@ const BindCode = () => {
         const result = await contracts.User?.methods
           .addInvitee(invitationCode)
           .send({ from: account });
-
+        console.log({ addInvitee: result });
         open({
           title: "Bind Invitation Code",
           children: <center>Binding Invitation Code Successful.</center>,
