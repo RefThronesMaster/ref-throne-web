@@ -43,7 +43,7 @@ const BindCode = () => {
         const result = await contracts.User?.methods
           .addInvitee(invitationCode)
           .send({ from: account });
-
+        console.log({ addInvitee: result });
         open({
           title: "Bind Invitation Code",
           children: <center>Binding Invitation Code Successful.</center>,
@@ -167,7 +167,7 @@ const MyInvitationCode = () => {
         <Button
           className="w-[240px] h-[32px] chakra-petch-bold rounded-md bg-yellow-300 text-black disabled:bg-camo-300 disabled:text-gray-500"
           onClick={generateMyInvitationCode}
-          disabled={!transacting}
+          disabled={transacting}
         >
           {transacting && (
             <ProgressCircleIcon
