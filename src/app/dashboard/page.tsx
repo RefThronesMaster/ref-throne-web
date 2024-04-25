@@ -43,9 +43,9 @@ const BindCode = () => {
       try {
         const getMyInviterCode = await contracts.User?.methods
           .getMyInviterCode()
-          .call<string>();
+          .call<string>({ from: account });
 
-        console.log({ getMyInviterCode });
+        // console.log({ getMyInviterCode });
         if (getMyInviterCode) {
           setInvitationCode(getMyInviterCode);
           setBinded(true);
@@ -374,9 +374,9 @@ const MyInfo = () => {
       try {
         const result = await contracts.User?.methods
           .getInvitees()
-          .call<any[]>();
+          .call<any[]>({ from: account });
 
-        console.log({ getMyInvitees: result });
+        // console.log({ getMyInvitees: result });
 
         if (result) {
           setMyInvitees(result || []);
