@@ -395,16 +395,18 @@ const MyInfo = () => {
           .getSwappedUserEthBalance(account)
           .call<bigint>();
 
-        if (result) {
-          setMyTotalEthDeposited(
-            Number(utils.fromWei(result?.toString())).toLocaleString("en-US", {
+        setMyTotalEthDeposited(
+          Number(utils.fromWei(result?.toString() ?? "0n")).toLocaleString(
+            "en-US",
+            {
               minimumFractionDigits: 2,
               maximumFractionDigits: 5,
-            })
-          );
-        }
+            }
+          )
+        );
       } catch (err) {
         console.log(err);
+        setMyTotalEthDeposited("-");
       }
     }
   }, [contracts.EthTreasury, utils]);
