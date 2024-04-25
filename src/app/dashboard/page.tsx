@@ -37,7 +37,7 @@ const BindCode = () => {
   const [transacting, setTransacting] = React.useState<boolean>(false);
 
   const bindingInvitationCode = React.useCallback(async () => {
-    if (account) {
+    if (account && invitationCode?.trim()) {
       try {
         setTransacting(true);
         // const result = await contracts.User?.methods
@@ -45,9 +45,9 @@ const BindCode = () => {
         //   .call<string>();
 
         // console.log({ result });
-        
+
         const result = await contracts.User?.methods
-          .addInvitee(invitationCode)
+          .addInvitee(invitationCode?.trim())
           .call({ from: account });
 
         if (result) {
