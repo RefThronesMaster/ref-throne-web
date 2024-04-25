@@ -422,5 +422,18 @@ const UserABI = [
     stateMutability: "nonpayable",
     type: "function",
   },
+  {
+    inputs: [],
+    name: "getMyInviterCode",
+    outputs: [
+      {
+        internalType: "string",
+        name: "code",
+        type: "string",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
 ];
 export default UserABI;
