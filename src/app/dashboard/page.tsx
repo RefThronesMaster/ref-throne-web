@@ -32,30 +32,52 @@ import { MyDialogContext } from "../MyDialogProvider";
 
 const BindCode = () => {
   const { open, close } = React.useContext(MyDialogContext);
+  const [binded, setBinded] = React.useState<boolean>(false);
+
   const [invitationCode, setInvitationCode] = React.useState<string>("");
-  const { contracts, account, updateTs } = React.useContext(MyWeb3Context);
+  const { contracts, account, updateTs, ts } = React.useContext(MyWeb3Context);
   const [transacting, setTransacting] = React.useState<boolean>(false);
+  // Invitation code binded
+  const getMyInviterCode = React.useCallback(async () => {
+    if (account) {
+      try {
+        const getMyInviterCode = await contracts.User?.methods
+          .getMyInviterCode()
+          .call<string>();
+
+        console.log({ getMyInviterCode });
+        if (getMyInviterCode) {
+          setInvitationCode(getMyInviterCode);
+          setBinded(true);
+        } else {
+          setInvitationCode("");
+          setBinded(false);
+        }
+      } catch (err) {
+        console.log(err);
+        setInvitationCode("");
+        setBinded(false);
+      } finally {
+      }
+    }
+  }, [contracts.User, account, ts]);
 
   const bindingInvitationCode = React.useCallback(async () => {
     if (account && invitationCode?.trim()) {
       try {
         setTransacting(true);
-        // const result = await contracts.User?.methods
-        //   .getMyInviterCode(invitationCode?.trim())
-        //   .call<string>();
 
-        // console.log({ result });
-
-        const result = await contracts.User?.methods
+        const addInvitee = await contracts.User?.methods
           .addInvitee(invitationCode?.trim())
           .send({ from: account });
 
-        if (result) {
+        console.log({ addInvitee });
+
+        if (addInvitee) {
           open({
             title: "Bind Invitation Code",
             children: <center>Binding Invitation Code Successful.</center>,
           });
-          setInvitationCode("");
           updateTs(dayjs().valueOf());
         } else {
           open({
@@ -83,34 +105,44 @@ const BindCode = () => {
     []
   );
 
+  React.useEffect(() => {
+    getMyInviterCode();
+  }, [getMyInviterCode]);
+
   return (
     <>
-      <label htmlFor="invitationCode">
-        Bind invitation code & Earn reward points
-      </label>
-      <div className="flex flex-wrap justify-between">
-        <Input
-          className="w-full max-w-[calc(100%_-_200px)] py-1 px-2 chakra-petch-regular rounded-sm text-white placeholder:text-camo-300 bg-camo-700 border border-gray-400"
-          id="invitationCode"
-          type="text"
-          value={invitationCode}
-          onChange={handleInputChange}
-        />
-        <Button
-          className="w-[180px] h-[32px] chakra-petch-bold rounded-md bg-yellow-300 text-black disabled:bg-camo-300 disabled:text-gray-500"
-          onClick={bindingInvitationCode}
-          disabled={!invitationCode || transacting}
-        >
-          {transacting && (
-            <ProgressCircleIcon
-              className="animate-spin inline-block mr-1 w-[20px] h-[20px]"
-              color="text-yellow-100"
-              bgColor="text-gray-300"
+      {binded ? (
+        <label>Invitation code binded: {invitationCode}</label>
+      ) : (
+        <>
+          <label htmlFor="invitationCode">
+            Bind invitation code & Earn reward points
+          </label>
+          <div className="flex flex-wrap justify-between">
+            <Input
+              className="w-full max-w-[calc(100%_-_200px)] py-1 px-2 chakra-petch-regular rounded-sm text-white placeholder:text-camo-300 bg-camo-700 border border-gray-400"
+              id="invitationCode"
+              type="text"
+              value={invitationCode}
+              onChange={handleInputChange}
             />
-          )}
-          <span>{transacting ? "Binding..." : "Bind Invitation Code"}</span>
-        </Button>
-      </div>
+            <Button
+              className="w-[180px] h-[32px] chakra-petch-bold rounded-md bg-yellow-300 text-black disabled:bg-camo-300 disabled:text-gray-500"
+              onClick={bindingInvitationCode}
+              disabled={!invitationCode || transacting}
+            >
+              {transacting && (
+                <ProgressCircleIcon
+                  className="animate-spin inline-block mr-1 w-[20px] h-[20px]"
+                  color="text-yellow-100"
+                  bgColor="text-gray-300"
+                />
+              )}
+              <span>{transacting ? "Binding..." : "Bind Invitation Code"}</span>
+            </Button>
+          </div>
+        </>
+      )}
     </>
   );
 };
