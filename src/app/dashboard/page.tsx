@@ -41,14 +41,14 @@ const BindCode = () => {
       try {
         setTransacting(true);
         // const result = await contracts.User?.methods
-        //   .getMyInviterCode()
+        //   .getMyInviterCode(invitationCode?.trim())
         //   .call<string>();
 
         // console.log({ result });
 
         const result = await contracts.User?.methods
           .addInvitee(invitationCode?.trim())
-          .call({ from: account });
+          .send({ from: account });
 
         if (result) {
           open({
@@ -341,7 +341,7 @@ const MyInfo = () => {
     if (account) {
       try {
         const result = await contracts.User?.methods
-          .getInvitees(account)
+          .getInvitees()
           .call<any[]>();
 
         console.log({ getMyInvitees: result });
