@@ -173,7 +173,7 @@ const UserABI = [
         type: "bool",
       },
     ],
-    // stateMutability: "nonpayable",
+    stateMutability: "nonpayable",
     type: "function",
   },
   {
