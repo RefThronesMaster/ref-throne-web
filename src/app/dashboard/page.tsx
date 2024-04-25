@@ -69,7 +69,7 @@ const BindCode = () => {
 
         const addInvitee = await contracts.User?.methods
           .addInvitee(invitationCode?.trim())
-          .send({ from: account });
+          .call({ from: account });
 
         console.log({ addInvitee });
 
