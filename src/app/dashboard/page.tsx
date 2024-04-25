@@ -40,17 +40,29 @@ const BindCode = () => {
     if (account) {
       try {
         setTransacting(true);
+        // const result = await contracts.User?.methods
+        //   .getMyInviterCode()
+        //   .call<string>();
+
+        // console.log({ result });
+        
         const result = await contracts.User?.methods
           .addInvitee(invitationCode)
-          .send({ from: account });
-        console.log({ addInvitee: result });
-        open({
-          title: "Bind Invitation Code",
-          children: <center>Binding Invitation Code Successful.</center>,
-        });
-        setInvitationCode("");
+          .call({ from: account });
 
-        updateTs(dayjs().valueOf());
+        if (result) {
+          open({
+            title: "Bind Invitation Code",
+            children: <center>Binding Invitation Code Successful.</center>,
+          });
+          setInvitationCode("");
+          updateTs(dayjs().valueOf());
+        } else {
+          open({
+            title: "Bind Invitation Code",
+            children: <center>Binding Invitation Code Failed.</center>,
+          });
+        }
       } catch (err) {
         open({
           title: "Bind Invitation Code",
