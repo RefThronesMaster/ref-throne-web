@@ -93,7 +93,11 @@ export const Header = () => {
   const { account, getBalance, contracts } = React.useContext(MyWeb3Context);
 
   const signedIn = React.useMemo(() => {
-    return Boolean(CHAIN_IDS.BLAST_SEPOLIA == chainId && account);
+    return Boolean(
+      (CHAIN_IDS.BLAST_SEPOLIA == chainId ||
+        CHAIN_IDS.BLAST_MAINNET == chainId) &&
+        account
+    );
   }, [account, chainId]);
 
   //   React.useEffect(() => {
@@ -110,7 +114,7 @@ export const Header = () => {
       window.open("https://metamask.io/", "_blank");
       return;
     } else {
-      if (CHAIN_IDS.BLAST_SEPOLIA == chainId) {
+      if (CHAIN_IDS.BLAST_MAINNET == chainId) {
         // if (connector?.deactivate) {
         //   await connector.deactivate();
         // } else {
@@ -119,7 +123,7 @@ export const Header = () => {
         // connector?.connectEagerly;
       } else if (connector) {
         await connector.activate(
-          getAddChainParameters(CHAIN_IDS.BLAST_SEPOLIA)
+          getAddChainParameters(CHAIN_IDS.BLAST_MAINNET)
         );
       }
     }
