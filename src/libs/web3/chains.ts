@@ -48,18 +48,20 @@ export function getAddChainParameters(
 type ChainConfig = {
   [chainId: number]: BasicChainInformation | ExtendedChainInformation;
 };
-
-export const MAINNET_CHAINS: ChainConfig = {
-  //   42220: {
-  //     urls: ["https://forno.celo.org"],
-  //     name: "Celo",
-  //     nativeCurrency: CELO,
-  //     blockExplorerUrls: ["https://explorer.celo.org"],
-  //   },
-};
 export enum CHAIN_IDS {
+  BLAST_MAINNET = 81457,
   BLAST_SEPOLIA = 168587773,
 }
+
+export const MAINNET_CHAINS: ChainConfig = {
+  [CHAIN_IDS.BLAST_MAINNET]: {
+    urls: ["https://rpc.blast.io"],
+    name: "Blast Mainnet",
+    nativeCurrency: ETH,
+    blockExplorerUrls: ["https://blastscan.io"],
+  },
+};
+
 export const TESTNET_CHAINS: ChainConfig = {
   [CHAIN_IDS.BLAST_SEPOLIA]: {
     urls: ["https://sepolia.blast.io"],

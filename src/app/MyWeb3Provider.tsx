@@ -110,7 +110,11 @@ export const MyWeb3Provider = ({ children }: { children: React.ReactNode }) => {
   );
 
   const signedIn = React.useMemo(() => {
-    return CHAIN_IDS.BLAST_SEPOLIA == chainId && defaultAccount;
+    return (
+      (CHAIN_IDS.BLAST_SEPOLIA == chainId ||
+        CHAIN_IDS.BLAST_MAINNET == chainId) &&
+      defaultAccount
+    );
   }, [defaultAccount, chainId]);
 
   React.useEffect(() => {
